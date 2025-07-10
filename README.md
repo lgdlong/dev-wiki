@@ -1,135 +1,371 @@
-# Turborepo starter
+# Dev Wiki
 
-This Turborepo starter is maintained by the Turborepo core team.
+A comprehensive development wiki platform built with modern web technologies. This monorepo contains multiple applications and shared packages for creating, managing, and consuming developer documentation and tutorials.
 
-## Using this example
+## 🚀 Project Overview
 
-Run the following command:
+Dev Wiki is a full-stack monorepo application designed to provide a seamless platform for developer documentation and knowledge sharing. The project leverages the power of Turborepo for efficient development and build processes across multiple interconnected applications.
 
-```sh
-npx create-turbo@latest
+### 🛠 Tech Stack
+
+- **Frontend**: Next.js 15.3.0 with React 19
+- **Backend**: NestJS with TypeScript
+- **Monorepo Management**: Turborepo 2.5.4
+- **Package Manager**: pnpm 9.0.0
+- **Language**: TypeScript 5.8.3
+- **Styling**: Shared UI component library
+- **Code Quality**: ESLint + Prettier
+- **Runtime**: Node.js 18+
+
+## 📁 Project Structure
+
+This monorepo includes the following applications and packages:
+
+### Applications
+
+- **`web`**: Main web application built with Next.js (runs on port 3000)
+- **`docs`**: Documentation site built with Next.js (runs on port 3001)
+- **`api`**: Backend API server built with NestJS
+
+### Shared Packages
+
+- **`@repo/ui`**: Shared React component library used across all applications
+- **`@repo/eslint-config`**: ESLint configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- **`@repo/typescript-config`**: Shared TypeScript configurations for the monorepo
+
+All packages and applications are written in 100% TypeScript for enhanced developer experience and type safety.
+
+## 📋 Prerequisites
+
+Before getting started, ensure you have the following installed on your system:
+
+### Required Software
+
+1. **Node.js** (version 18 or higher)
+
+   ```bash
+   node --version  # Should show v18.0.0 or higher
+   ```
+
+2. **pnpm** (version 9.0.0 or higher) - Required package manager
+
+   ```bash
+   npm install -g pnpm
+   pnpm --version  # Should show 9.0.0 or higher
+   ```
+
+3. **Git** (for cloning the repository)
+   ```bash
+   git --version
+   ```
+
+### Optional but Recommended
+
+- **Turborepo CLI** (for advanced usage)
+  ```bash
+  npm install -g turbo
+  ```
+
+## 🚀 Getting Started
+
+Follow these steps to set up the development environment:
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/lgdlong/dev-wiki.git
+cd dev-wiki
 ```
 
-## What's inside?
+### 2. Install Dependencies
 
-This Turborepo includes the following packages/apps:
+Install all dependencies for the entire monorepo:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+pnpm install
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+This command will:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+- Install dependencies for all apps and packages
+- Create symlinks between workspace packages
+- Set up the development environment
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### 3. Environment Setup
 
-### Develop
+Currently, no environment variables are required for basic development. If needed in the future, environment files should be created as:
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+# Create environment files (when needed)
+cp .env.example .env.local  # If .env.example exists
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 4. Start Development
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+Start all applications in development mode:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm dev
 ```
 
-### Remote Caching
+This will start:
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- Web app: http://localhost:3000
+- Docs app: http://localhost:3001
+- API server: http://localhost:3333 (default NestJS port)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+### 5. Verify Installation
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Check that everything is working:
 
-```
-cd my-turborepo
+```bash
+# Build all applications
+pnpm build
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+# Run type checking
+pnpm check-types
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+# Run linting (note: may show some warnings)
+pnpm lint
 ```
 
-## Useful Links
+## 🛠 Development Scripts
 
-Learn more about the power of Turborepo:
+Here are the main commands available in the project:
 
+### Core Commands
+
+```bash
+# Start all applications in development mode
+pnpm dev
+
+# Build all applications for production
+pnpm build
+
+# Run linting across all packages
+pnpm lint
+
+# Run type checking across all packages
+pnpm check-types
+
+# Format code using Prettier
+pnpm format
+```
+
+### Working with Specific Apps
+
+You can target specific applications using Turborepo filters:
+
+```bash
+# Start only the web application
+pnpm dev --filter=web
+
+# Build only the docs application
+pnpm build --filter=docs
+
+# Run linting for the API only
+pnpm lint --filter=api
+
+# Start only the API server
+pnpm dev --filter=api
+```
+
+### Individual App Commands
+
+Navigate to specific app directories for app-specific commands:
+
+```bash
+# Web app commands
+cd apps/web
+pnpm dev          # Start web app on port 3000
+pnpm build        # Build web app
+pnpm start        # Start production build
+
+# Docs app commands
+cd apps/docs
+pnpm dev          # Start docs on port 3001
+pnpm build        # Build docs app
+pnpm start        # Start production build
+
+# API commands
+cd apps/api
+pnpm dev          # Start API in watch mode
+pnpm start        # Start API in production mode
+pnpm test         # Run API tests
+pnpm test:e2e     # Run end-to-end tests
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### Issue: `pnpm: command not found`
+
+**Solution**: Install pnpm globally
+
+```bash
+npm install -g pnpm
+# or
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+```
+
+#### Issue: Node.js version mismatch
+
+**Error**: `engines.node` requirement not met
+**Solution**: Update Node.js to version 18 or higher
+
+```bash
+# Check current version
+node --version
+
+# Update using nvm (recommended)
+nvm install 18
+nvm use 18
+
+# Or download from https://nodejs.org/
+```
+
+#### Issue: Package installation fails
+
+**Solution**: Clear cache and reinstall
+
+```bash
+pnpm store prune
+rm -rf node_modules
+rm pnpm-lock.yaml
+pnpm install
+```
+
+#### Issue: Port already in use
+
+**Error**: `EADDRINUSE: address already in use :::3000`
+**Solution**: Kill processes on ports or use different ports
+
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+
+# Or start with different port
+cd apps/web
+pnpm dev -- --port 3001
+```
+
+#### Issue: TypeScript errors during development
+
+**Solution**: Restart TypeScript server in your editor or run type checking
+
+```bash
+# Manual type check
+pnpm check-types
+
+# In VS Code: Cmd/Ctrl + Shift + P -> "TypeScript: Restart TS Server"
+```
+
+#### Issue: ESLint warnings/errors
+
+The project may have some linting issues. To fix automatically:
+
+```bash
+# Auto-fix linting issues
+pnpm lint --fix
+
+# Format code
+pnpm format
+```
+
+#### Issue: Build cache issues
+
+**Solution**: Clear Turborepo cache
+
+```bash
+npx turbo clean
+# or
+rm -rf .turbo
+```
+
+### Performance Tips
+
+1. **Use Turborepo filters** for faster development when working on specific apps
+2. **Enable Turborepo caching** for faster builds (see Remote Caching section)
+3. **Use `pnpm dev --filter=<app>`** to start only the app you're working on
+
+## 🤝 Contributing
+
+We welcome contributions to the Dev Wiki project! Here's how to get started:
+
+### Getting Started with Contributions
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally
+3. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+4. **Follow the setup instructions** above to get the project running
+5. **Make your changes** following our coding standards
+6. **Test your changes** thoroughly
+7. **Submit a pull request** with a clear description
+
+### Coding Standards
+
+- **TypeScript**: All code must be written in TypeScript with proper typing
+- **ESLint**: Follow the project's ESLint configuration
+- **Prettier**: Code formatting is handled by Prettier (run `pnpm format`)
+- **Naming**: Use descriptive variable and function names
+- **Comments**: Add comments for complex logic
+
+### Before Submitting
+
+Make sure your changes pass all checks:
+
+```bash
+# Run type checking
+pnpm check-types
+
+# Run linting
+pnpm lint
+
+# Run formatting
+pnpm format
+
+# Build all apps
+pnpm build
+```
+
+### Project Guidelines
+
+- Keep changes focused and atomic
+- Write clear commit messages
+- Update documentation when needed
+- Add tests for new functionality
+- Ensure backward compatibility
+
+## 📚 Learning Resources
+
+### Turborepo
+
+- [Turborepo Documentation](https://turborepo.com/docs)
 - [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
 - [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
 - [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+
+### Tech Stack
+
+- [Next.js 15 Documentation](https://nextjs.org/docs)
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [React 19 Documentation](https://react.dev/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [pnpm Documentation](https://pnpm.io/)
+
+## 📄 License
+
+This project is private and not yet licensed for public use.
+
+## 🆘 Support
+
+If you encounter any issues not covered in the troubleshooting section:
+
+1. Check existing [GitHub Issues](https://github.com/lgdlong/dev-wiki/issues)
+2. Create a new issue with detailed description and reproduction steps
+3. Include your environment details (Node.js version, OS, etc.)
+
+---
+
+**Happy coding! 🚀**
