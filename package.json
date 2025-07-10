@@ -2,6 +2,7 @@
   "name": "dev-wiki",
   "private": true,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
@@ -9,6 +10,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "only-allow": "^1.2.1",
     "prettier": "^3.6.2",
     "turbo": "^2.5.4",
     "typescript": "5.8.3"
