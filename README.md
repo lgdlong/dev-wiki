@@ -73,7 +73,7 @@ Follow these steps to set up the development environment:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/lgdlong/dev-wiki.git
+git clone <repository-url>
 cd dev-wiki
 ```
 
@@ -362,10 +362,6 @@ This project is private and not yet licensed for public use.
 
 If you encounter any issues not covered in the troubleshooting section:
 
-1. Check existing [GitHub Issues](https://github.com/lgdlong/dev-wiki/issues)
+1. Check existing GitHub Issues in the repository
 2. Create a new issue with detailed description and reproduction steps
 3. Include your environment details (Node.js version, OS, etc.)
-
----
-
-**Happy coding! 🚀**
