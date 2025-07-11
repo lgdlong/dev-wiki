@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { Repository } from 'typeorm';
+import { Account } from './entities/account.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AccountService {
-  create(createAccountDto: CreateAccountDto) {
-    return 'This action adds a new account';
+  constructor(
+    @InjectRepository(Account)
+    private readonly repo: Repository<Account>,
+  ) {}
+
+  create(createAccountDto: CreateAccountDto): Promise<Account> {
+    const account = this.repo.create(createAccountDto);
+    return this.repo.save(account);
   }
 
-  findAll() {
-    return `This action returns all account`;
+  findAll(): Promise<Account[]> {
+    return this.repo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} account`;
+  findOne(id: number): Promise<Account | null> {
+    return this.repo.findOne({ where: { id } });
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  findByEmail(email: string): Promise<Account | null> {
+    return this.repo.findOne({ where: { email } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} account`;
+  update(
+    id: number,
+    updateAccountDto: UpdateAccountDto,
+  ): Promise<Account | null> {
+    return this.repo.update(id, updateAccountDto).then(() => {
+      return this.findOne(id);
+    });
+  }
+
+  remove(id: number): Promise<{ deleted: boolean }> {
+    return this.repo.delete(id).then(() => {
+      return { deleted: true };
+    });
   }
 }

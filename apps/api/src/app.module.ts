@@ -7,6 +7,7 @@ import { AccountModule } from './account/account.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from './account/entities/account.entity';
 import { Tutorial } from './tutorial/entities/tutorial.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { Tutorial } from './tutorial/entities/tutorial.entity';
     }),
     AccountModule,
     TutorialModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

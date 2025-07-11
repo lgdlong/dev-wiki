@@ -2,7 +2,7 @@ import { AccountRole } from 'src/common/enums/account-role.enum';
 import { AccountStatus } from 'src/common/enums/account-status.enum';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'accounts' })
 export class Account {
   @PrimaryGeneratedColumn()
   id: number;
@@ -19,10 +19,10 @@ export class Account {
   @Column({ nullable: true })
   avatar_url?: string;
 
-  @Column({ type: 'enum', enum: AccountRole })
+  @Column({ type: 'enum', enum: AccountRole, default: AccountRole.USER })
   role: AccountRole;
 
-  @Column({ type: 'enum', enum: AccountStatus })
+  @Column({ type: 'enum', enum: AccountStatus, default: AccountStatus.ACTIVE })
   status: AccountStatus;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

@@ -1,0 +1,52 @@
+[
+  {
+    "email": "alice@gmail.com",
+    "name": "Alice Nguyen",
+    "password": "Alice123@"
+  },
+  {
+    "email": "bob@gmail.com",
+    "name": "Bob Tran",
+    "password": "BobPass456!"
+  },
+  {
+    "email": "charlie@gmail.com",
+    "name": "Charlie Le",
+    "password": "Charlie789#"
+  },
+  {
+    "email": "diana@gmail.com",
+    "name": "Diana Pham",
+    "password": "Diana321$"
+  },
+  {
+    "email": "eric@gmail.com",
+    "name": "Eric Hoang",
+    "password": "Eric654%"
+  },
+  {
+    "email": "fiona@gmail.com",
+    "name": "Fiona Bui",
+    "password": "Fiona987^"
+  },
+  {
+    "email": "george@gmail.com",
+    "name": "George Do",
+    "password": "George111&"
+  },
+  {
+    "email": "hannah@gmail.com",
+    "name": "Hannah Duong",
+    "password": "Hannah222*"
+  },
+  {
+    "email": "ian@gmail.com",
+    "name": "Ian Vo",
+    "password": "Ian333("
+  },
+  {
+    "email": "julia@gmail.com",
+    "name": "Julia Mai",
+    "password": "Julia444)"
+  }
+]
