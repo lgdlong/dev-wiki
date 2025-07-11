@@ -1,5 +1,6 @@
+import { AccountRole } from 'src/common/enums/account-role.enum';
+import { AccountStatus } from 'src/common/enums/account-status.enum';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { AccountRole, AccountStatus } from '@dev-wiki/enums'; // Adjust the import path as necessary
 
 @Entity()
 export class Account {
@@ -16,7 +17,7 @@ export class Account {
   password: string;
 
   @Column({ nullable: true })
-  avatar_url: string;
+  avatar_url?: string;
 
   @Column({ type: 'enum', enum: AccountRole })
   role: AccountRole;
@@ -27,6 +28,10 @@ export class Account {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 }

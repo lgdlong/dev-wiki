@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
-import { AccountRole } from '@dev-wiki/enums';
+import { AccountRole } from 'src/common/enums/account-role.enum';
 
 export class CreateAccountDto {
   @IsEmail({}, { message: 'Please provide a valid email!' })
