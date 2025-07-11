@@ -6,7 +6,7 @@ import { Account } from './entities/account.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Account])],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, AccountService],
   controllers: [AccountController],
   providers: [AccountService],
 })
