@@ -9,8 +9,9 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
-
-const DEFAULT_SALT_ROUNDS = 12;
+import { AccountRole } from 'src/common/enums/account-role.enum';
+import { DEFAULT_SALT_ROUNDS } from 'src/common/constants';
+import { AuthAccountResponse } from './interfaces/auth-account-response.interface';
 
 @Injectable()
 export class AuthService {
@@ -24,11 +25,14 @@ export class AuthService {
   // Hàm này sẽ được gọi khi người dùng đăng nhập
   // Không thay đổi tên hàm này để Passport có thể nhận diện
   async validateUser(
-    username: string,
+    email: string,
     pass: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{
+    access_token: string;
+    user: AuthAccountResponse;
+  }> {
     // 1. Tìm tài khoản theo email
-    const account = await this.accountService.findByEmail(username);
+    const account = await this.accountService.findByEmail(email);
 
     // 2. Kiểm tra tài khoản có tồn tại không và mật khẩu có khớp không
     if (!account) {
@@ -43,12 +47,24 @@ export class AuthService {
 
     // 3. Tạo JWT token
     // Tạo payload cho JWT, có thể thêm thông tin khác nếu cần
-    const payload: JwtPayload = { sub: account.id, email: account.email };
+    const payload: JwtPayload = {
+      sub: account.id,
+      email: account.email,
+      role: account.role,
+    };
 
     return {
       // Sử dụng JwtService để tạo token từ payload
       // access_token là tên chuẩn, có thể đổi nếu cần
       access_token: await this.jwtService.signAsync(payload),
+      // Tra trả thông tin tài khoản đã loại bỏ mật khẩu
+      user: {
+        id: account.id,
+        email: account.email,
+        role: account.role,
+        name: account.name,
+        avatar_url: account.avatar_url,
+      },
     };
   }
 
@@ -83,6 +99,7 @@ export class AuthService {
       ...dto,
       email: normalizedEmail,
       password: hashedPassword,
+      role: AccountRole.USER, // Mặc định là USER khi register
     });
 
     // 4. Không trả về JWT hoặc user, chỉ trả message
