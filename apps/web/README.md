@@ -31,27 +31,30 @@ Ensure you have the following installed:
 ### Installation
 
 1. **Install dependencies** from the root of the monorepo:
+
    ```bash
    # From monorepo root
    pnpm install
    ```
 
 2. **Environment Variables Setup** (Optional):
-   
+
    Currently, the web application doesn't require environment variables for basic operation. If needed in the future, create:
+
    ```bash
    cd apps/web
    cp .env.example .env.local  # When .env.example is available
    ```
 
    **Potential Environment Variables:**
+
    ```bash
    # API Configuration (when backend integration is needed)
    NEXT_PUBLIC_API_URL=http://localhost:8000  # API server URL
-   
+
    # App Configuration
    NEXT_PUBLIC_APP_ENV=development            # Environment identifier
-   
+
    # Analytics/External Services (when applicable)
    NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
    ```
@@ -121,11 +124,12 @@ apps/web/
 
 1. **Browser DevTools**: Use React DevTools and standard browser debugging
 2. **TypeScript Errors**: Check VS Code problems panel or run `pnpm check-types`
-3. **Next.js Debugging**: 
+3. **Next.js Debugging**:
+
    ```bash
    # Enable debug mode
    DEBUG=* pnpm dev
-   
+
    # Or specific debug categories
    DEBUG=next:* pnpm dev
    ```
@@ -144,6 +148,7 @@ pnpm build
 ```
 
 This creates an optimized `.next/` directory with:
+
 - Static pages pre-rendered
 - Optimized JavaScript bundles
 - Compressed assets and images
@@ -161,6 +166,7 @@ pnpm start
 ### Deployment Options
 
 **1. Vercel (Recommended for Next.js)**
+
 ```bash
 # Deploy to Vercel
 npx vercel --cwd apps/web
@@ -169,6 +175,7 @@ npx vercel --cwd apps/web
 ```
 
 **2. Static Export (if applicable)**
+
 ```bash
 # Configure next.config.js for static export
 # Then build and export
@@ -176,6 +183,7 @@ pnpm build
 ```
 
 **3. Docker Deployment**
+
 ```bash
 # Build Docker image (from web directory)
 docker build -t dev-wiki-web .
@@ -185,6 +193,7 @@ docker run -p 3000:3000 dev-wiki-web
 ```
 
 **4. Other Platforms**
+
 - **Netlify**: Connect repository for automatic deployments
 - **AWS**: Use AWS Amplify or deploy to EC2/ECS
 - **Self-hosted**: Use PM2 or similar process managers
@@ -207,13 +216,14 @@ The web application follows the monorepo's shared standards:
    - Implement proper loading and error states
 
 2. **Component Structure**:
+
    ```tsx
    // Use TypeScript with proper prop typing
    interface ComponentProps {
      title: string;
      optional?: boolean;
    }
-   
+
    export default function Component({ title, optional }: ComponentProps) {
      return <div>{title}</div>;
    }
@@ -224,7 +234,7 @@ The web application follows the monorepo's shared standards:
    - Leverage shared UI components from `@repo/ui`
    - Implement responsive design principles
 
-4. **Performance**: 
+4. **Performance**:
    - Use Next.js Image component for optimized images
    - Implement proper loading states
    - Follow React performance best practices
@@ -243,11 +253,13 @@ pnpm build                  # Production build success
 ### Development Server Issues
 
 **Problem**: Development server won't start or crashes
+
 ```bash
 Error: EADDRINUSE: address already in use :::3000
 ```
 
 **Solutions**:
+
 ```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
@@ -264,6 +276,7 @@ netstat -an | grep 3000
 **Problem**: Build fails with TypeScript or ESLint errors
 
 **Solutions**:
+
 ```bash
 # Check TypeScript errors
 pnpm check-types
@@ -281,6 +294,7 @@ pnpm build
 **Problem**: Turbopack development errors
 
 **Solutions**:
+
 ```bash
 # Disable Turbopack temporarily
 pnpm dev -- --no-turbo
@@ -297,6 +311,7 @@ rm -rf .next
 **Problem**: Cannot resolve module imports
 
 **Solutions**:
+
 ```bash
 # Reinstall dependencies
 pnpm install
@@ -313,6 +328,7 @@ pnpm build --filter=@repo/ui
 **Problem**: CSS not loading or styles not applied
 
 **Solutions**:
+
 1. Check CSS Module naming conventions
 2. Verify import statements
 3. Clear browser cache and restart dev server
@@ -323,6 +339,7 @@ pnpm build --filter=@repo/ui
 **Problem**: Slow page loads or poor performance
 
 **Solutions**:
+
 1. Use Next.js Image component for images
 2. Implement proper code splitting
 3. Check bundle analyzer:

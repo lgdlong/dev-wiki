@@ -31,26 +31,29 @@ Ensure you have the following installed:
 ### Installation
 
 1. **Install dependencies** from the root of the monorepo:
+
    ```bash
    # From monorepo root
    pnpm install
    ```
 
 2. **Environment Variables Setup**:
-   
+
    Copy and configure the environment file:
+
    ```bash
    cd apps/api
    cp .env.development .env
    ```
 
    **Required Environment Variables:**
+
    ```bash
    # Server Configuration
    PORT=8000                    # API server port (default: 8000)
 
    # Database Configuration (choose one approach)
-   
+
    # Option 1: Local PostgreSQL Database
    DB_HOST=localhost
    DB_PORT=5432
@@ -67,6 +70,7 @@ Ensure you have the following installed:
    ```
 
    **Optional Environment Variables:**
+
    ```bash
    # Database URL alternatives (if not using individual DB_ vars)
    INTERNAL_DB_URL=postgresql://user:pass@host/db_name
@@ -76,6 +80,7 @@ Ensure you have the following installed:
 ### Database Setup
 
 **Option 1: Local PostgreSQL**
+
 ```bash
 # Create local database
 createdb dev_wiki_local
@@ -89,6 +94,7 @@ PASSWORD=postgres
 ```
 
 **Option 2: Use External Database**
+
 - Uncomment the external database configuration in `.env`
 - The application will automatically create tables using TypeORM synchronization
 
@@ -150,6 +156,7 @@ pnpm test:cov
 # Debug tests
 pnpm test:debug
 ```
+
 ## 🏗 Build & Deploy
 
 ### Building for Production
@@ -213,11 +220,13 @@ pnpm build                   # Verify build success
 ### Database Connection Issues
 
 **Problem**: `ENOTFOUND` or connection timeout errors
+
 ```bash
 Error: getaddrinfo ENOTFOUND your-db-host
 ```
 
 **Solutions**:
+
 1. Verify database host and credentials in `.env`
 2. Check if database is accessible from your network
 3. For external databases, ensure SSL configuration is correct
@@ -228,6 +237,7 @@ Error: getaddrinfo ENOTFOUND your-db-host
 **Problem**: `EADDRINUSE: address already in use :::8000`
 
 **Solution**:
+
 ```bash
 # Find and kill process on port 8000
 lsof -ti:8000 | xargs kill -9
@@ -241,6 +251,7 @@ PORT=8001 pnpm dev
 **Problem**: Database schema sync errors
 
 **Solutions**:
+
 1. For development: Drop and recreate database
 2. Check entity definitions for syntax errors
 3. Disable synchronization and use migrations for production
@@ -250,6 +261,7 @@ PORT=8001 pnpm dev
 **Problem**: Module not found errors
 
 **Solution**:
+
 ```bash
 # Reinstall dependencies
 pnpm install
@@ -265,6 +277,7 @@ pnpm install
 **Problem**: Linting or type checking failures
 
 **Solutions**:
+
 ```bash
 # Fix auto-fixable linting issues
 pnpm lint --fix
@@ -281,6 +294,7 @@ pnpm check-types --filter=api
 **Problem**: Token validation failures
 
 **Solutions**:
+
 1. Verify JWT secret configuration
 2. Check token expiration settings
 3. Ensure proper token format in requests
