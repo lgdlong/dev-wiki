@@ -150,24 +150,6 @@ pnpm test:cov
 # Debug tests
 pnpm test:debug
 ```
-
-### Debugging
-
-1. **VS Code Debugging**: Use the debug configuration or run:
-   ```bash
-   pnpm start:debug
-   ```
-
-2. **Database Debugging**: 
-   - Check TypeORM logs in console output
-   - Verify database connection in application startup logs
-   - Use database client tools to inspect data
-
-3. **API Testing**: 
-   - Use tools like Postman, Insomnia, or curl
-   - API runs on `http://localhost:8000`
-   - Check available endpoints in controller files
-
 ## 🏗 Build & Deploy
 
 ### Building for Production
@@ -183,16 +165,6 @@ pnpm build
 
 This creates a `dist/` directory with compiled JavaScript files.
 
-### Starting Production Server
-
-```bash
-# After building
-pnpm start:prod
-
-# Or directly run the compiled output
-node dist/main
-```
-
 ### Deployment Considerations
 
 1. **Environment Variables**: Ensure production environment variables are properly configured
@@ -201,16 +173,6 @@ node dist/main
 4. **Process Management**: Use PM2, Docker, or similar for process management
 5. **Logging**: Configure proper logging levels for production
 6. **Health Checks**: The application includes basic health endpoints
-
-### Docker Deployment (if applicable)
-
-```bash
-# Build Docker image (from api directory)
-docker build -t dev-wiki-api .
-
-# Run container
-docker run -p 8000:8000 --env-file .env dev-wiki-api
-```
 
 ## 📏 Coding Standards & Contribution
 
