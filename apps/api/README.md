@@ -1,98 +1,300 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# API - Dev Wiki Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The backend API server for the Dev Wiki platform, built with NestJS and TypeScript. This application provides REST APIs for user authentication, account management, and tutorial content management in the monorepo.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Project Overview
 
-## Description
+The **API** application serves as the core backend service for the Dev Wiki platform. It's responsible for:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **User Authentication & Authorization**: JWT-based authentication with Passport.js
+- **Account Management**: User registration, login, and profile management
+- **Tutorial Management**: CRUD operations for developer tutorials and documentation
+- **Data Persistence**: PostgreSQL database integration with TypeORM
 
-## Project setup
+### Role in Monorepo
 
+- Provides REST APIs consumed by the `web` and `docs` applications
+- Shares TypeScript configurations and ESLint rules from `@repo/` packages
+- Runs independently on port 8000 (configurable via environment)
+- Integrates with the Turborepo build system for efficient development and deployment
+
+## 📋 Setup Instructions
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+1. **Node.js** (version 18 or higher)
+2. **pnpm** (version 9.0.0 or higher) - Required package manager
+3. **PostgreSQL** (for database, or use external hosted database)
+
+### Installation
+
+1. **Install dependencies** from the root of the monorepo:
+   ```bash
+   # From monorepo root
+   pnpm install
+   ```
+
+2. **Environment Variables Setup**:
+   
+   Copy and configure the environment file:
+   ```bash
+   cd apps/api
+   cp .env.development .env
+   ```
+
+   **Required Environment Variables:**
+   ```bash
+   # Server Configuration
+   PORT=8000                    # API server port (default: 8000)
+
+   # Database Configuration (choose one approach)
+   
+   # Option 1: Local PostgreSQL Database
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=dev_wiki_local
+   USERNAME=postgres
+   PASSWORD=postgres
+
+   # Option 2: External Database (for development/production)
+   DB_HOST=your-db-host.com
+   DB_PORT=5432
+   DB_NAME=dev_wiki
+   USERNAME=your_username
+   PASSWORD=your_password
+   ```
+
+   **Optional Environment Variables:**
+   ```bash
+   # Database URL alternatives (if not using individual DB_ vars)
+   INTERNAL_DB_URL=postgresql://user:pass@host/db_name
+   EXTERNAL_DB_URL=postgresql://user:pass@external-host/db_name
+   ```
+
+### Database Setup
+
+**Option 1: Local PostgreSQL**
 ```bash
-$ pnpm install
+# Create local database
+createdb dev_wiki_local
+
+# Update .env with local database settings
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=dev_wiki_local
+USERNAME=postgres
+PASSWORD=postgres
 ```
 
-## Compile and run the project
+**Option 2: Use External Database**
+- Uncomment the external database configuration in `.env`
+- The application will automatically create tables using TypeORM synchronization
+
+## 🛠 Development Guide
+
+### Starting Development Server
 
 ```bash
-# development
-$ pnpm run start
+# From monorepo root (recommended)
+pnpm dev --filter=api
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# Or from api directory
+cd apps/api
+pnpm dev
 ```
 
-## Run tests
+The API server will start at `http://localhost:8000` (or configured PORT).
+
+### Available Scripts
 
 ```bash
-# unit tests
-$ pnpm run test
+# Development server with hot reload
+pnpm dev                    # or pnpm start:dev
 
-# e2e tests
-$ pnpm run test:e2e
+# Production build
+pnpm build
 
-# test coverage
-$ pnpm run test:cov
+# Start production server
+pnpm start                  # or pnpm start:prod
+
+# Debug mode
+pnpm start:debug
+
+# Code formatting
+pnpm format
+
+# Linting
+pnpm lint
+
+# Type checking (from monorepo root)
+pnpm check-types --filter=api
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Testing
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Run unit tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run end-to-end tests
+pnpm test:e2e
+
+# Generate test coverage report
+pnpm test:cov
+
+# Debug tests
+pnpm test:debug
+```
+## 🏗 Build & Deploy
+
+### Building for Production
+
+```bash
+# From monorepo root
+pnpm build --filter=api
+
+# Or from api directory
+cd apps/api
+pnpm build
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+This creates a `dist/` directory with compiled JavaScript files.
 
-## Resources
+### Deployment Considerations
 
-Check out a few resources that may come in handy when working with NestJS:
+1. **Environment Variables**: Ensure production environment variables are properly configured
+2. **Database**: Use external PostgreSQL database for production
+3. **SSL**: Configure SSL for external database connections
+4. **Process Management**: Use PM2, Docker, or similar for process management
+5. **Logging**: Configure proper logging levels for production
+6. **Health Checks**: The application includes basic health endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 📏 Coding Standards & Contribution
 
-## Support
+### Shared Configurations
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The API application follows the monorepo's shared standards:
 
-## Stay in touch
+- **TypeScript Config**: Extends `@repo/typescript-config`
+- **ESLint Config**: Uses shared ESLint configurations with NestJS-specific rules
+- **Prettier**: Automatic code formatting on save
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### API-Specific Guidelines
 
-## License
+1. **Module Structure**: Follow NestJS module pattern
+   - Each feature should have its own module (e.g., `auth`, `account`, `tutorial`)
+   - Use proper separation between controllers, services, and entities
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+2. **Database Entities**: Use TypeORM decorators and follow entity naming conventions
+
+3. **DTOs**: Use class-validator for request/response validation
+
+4. **Error Handling**: Use NestJS built-in exception filters
+
+5. **Authentication**: Follow JWT + Passport.js patterns already established
+
+### Code Quality
+
+```bash
+# Before committing, ensure code passes:
+pnpm lint --fix              # Fix linting issues
+pnpm format                  # Format code
+pnpm test                    # Run tests
+pnpm build                   # Verify build success
+```
+
+## 🚨 Common Issues & Troubleshooting
+
+### Database Connection Issues
+
+**Problem**: `ENOTFOUND` or connection timeout errors
+```bash
+Error: getaddrinfo ENOTFOUND your-db-host
+```
+
+**Solutions**:
+1. Verify database host and credentials in `.env`
+2. Check if database is accessible from your network
+3. For external databases, ensure SSL configuration is correct
+4. Try using database URL format instead of individual parameters
+
+### Port Already in Use
+
+**Problem**: `EADDRINUSE: address already in use :::8000`
+
+**Solution**:
+```bash
+# Find and kill process on port 8000
+lsof -ti:8000 | xargs kill -9
+
+# Or use a different port
+PORT=8001 pnpm dev
+```
+
+### TypeORM Synchronization Issues
+
+**Problem**: Database schema sync errors
+
+**Solutions**:
+1. For development: Drop and recreate database
+2. Check entity definitions for syntax errors
+3. Disable synchronization and use migrations for production
+
+### Missing Dependencies
+
+**Problem**: Module not found errors
+
+**Solution**:
+```bash
+# Reinstall dependencies
+pnpm install
+
+# Clear cache if needed
+pnpm store prune
+rm -rf node_modules
+pnpm install
+```
+
+### ESLint/TypeScript Errors
+
+**Problem**: Linting or type checking failures
+
+**Solutions**:
+```bash
+# Fix auto-fixable linting issues
+pnpm lint --fix
+
+# Check TypeScript errors
+pnpm check-types --filter=api
+
+# Restart TypeScript server in VS Code
+# Cmd/Ctrl + Shift + P -> "TypeScript: Restart TS Server"
+```
+
+### JWT Authentication Issues
+
+**Problem**: Token validation failures
+
+**Solutions**:
+1. Verify JWT secret configuration
+2. Check token expiration settings
+3. Ensure proper token format in requests
+4. Verify Passport.js strategy configuration
+
+## 📚 References
+
+- **Root README**: [../../README.md](../../README.md) - Complete monorepo setup and context
+- **NestJS Documentation**: [https://docs.nestjs.com](https://docs.nestjs.com)
+- **TypeORM Documentation**: [https://typeorm.io](https://typeorm.io)
+- **Turborepo Documentation**: [https://turborepo.com/docs](https://turborepo.com/docs)
+- **Shared Packages**:
+  - UI Components: `packages/ui/README.md`
+  - TypeScript Config: `packages/typescript-config`
+  - ESLint Config: `packages/eslint-config`
+
+For questions about the overall project setup, deployment, or shared configurations, refer to the [root README](../../README.md).
