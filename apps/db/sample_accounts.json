@@ -1,5 +1,10 @@
 [
   {
+    "email": "phungluuhoanglong@gmail.com",
+    "name": "Phùng Lưu Hoàng Long",
+    "password": "Abcd1234@"
+  },
+  {
     "email": "admin@admin.com",
     "name": "Super Admin",
     "password": "Abcd1234@"

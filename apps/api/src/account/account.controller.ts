@@ -14,8 +14,8 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { AccountRole } from 'src/common/enums/account-role.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('accounts')
@@ -23,6 +23,7 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Post()
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
   async create(
     @Body() dto: CreateAccountDto,
   ): Promise<Omit<Account, 'password'>> {
@@ -34,7 +35,7 @@ export class AccountController {
   }
 
   @Get()
-  // @Roles(AccountRole.ADMIN, AccountRole.MOD) // hàm này chỉ cho phép admin và mod xem danh sách tài khoản
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
   findAll() {
     return this.accountService.findAll();
   }

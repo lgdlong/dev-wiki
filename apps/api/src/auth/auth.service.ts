@@ -1,16 +1,11 @@
 import { AccountService } from './../account/account.service';
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { AccountRole } from 'src/common/enums/account-role.enum';
-import { DEFAULT_SALT_ROUNDS } from 'src/common/constants';
 import { AuthAccountResponse } from './interfaces/auth-account-response.interface';
 
 @Injectable()
@@ -69,40 +64,14 @@ export class AuthService {
   }
 
   async register(dto: RegisterUserDto) {
-    // 1. Check email đã tồn tại
-    const normalizedEmail = dto.email.toLowerCase();
-    const exists = await this.accountService.findByEmail(normalizedEmail);
-    if (exists) {
-      throw new ConflictException('Email already registered!');
-    }
-
-    // 2. Hash password
-    // Lấy số vòng salt từ config, nếu không có thì dùng mặc định
-    let saltRounds = parseInt(
-      this.configService.get(
-        'HASH_SALT_ROUNDS',
-        DEFAULT_SALT_ROUNDS.toString(),
-      ),
-      10,
-    );
-    // Kiểm tra saltRounds hợp lệ
-    if (isNaN(saltRounds) || saltRounds < 4) {
-      saltRounds = DEFAULT_SALT_ROUNDS; // hoặc số nào bạn muốn
-    }
-    // Tạo salt và hash password
-    const salt = await bcrypt.genSalt(saltRounds);
-    // Hash password
-    const hashedPassword = await bcrypt.hash(dto.password, salt);
-
-    // 3. Tạo user mới
+    // Let AccountService.create() handle all validation and processing
+    // (email normalization, existence checking, password hashing)
     await this.accountService.create({
       ...dto,
-      email: normalizedEmail,
-      password: hashedPassword,
-      role: AccountRole.USER, // Mặc định là USER khi register
+      role: AccountRole.USER, // Default role for registration
     });
 
-    // 4. Không trả về JWT hoặc user, chỉ trả message
+    // Return success message without exposing user data
     return {
       message: 'Registration successful! Please login to continue.',
     };
