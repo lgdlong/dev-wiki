@@ -1,0 +1,14 @@
+{
+  "extends": "../typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./",
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "NodeNext",
+    "target": "ES2022",
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["index.ts"],
+  "exclude": ["node_modules", "dist", "*.js", "*.d.ts"]
+}
