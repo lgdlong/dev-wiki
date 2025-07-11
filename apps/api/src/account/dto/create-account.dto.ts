@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import { AccountRole } from 'src/common/enums/account-role.enum';
 
 export class CreateAccountDto {
@@ -13,5 +13,8 @@ export class CreateAccountDto {
   password: string;
 
   @IsNotEmpty({ message: 'Role is required!' })
+  @IsEnum(AccountRole, {
+    message: 'Role must be one of the defined enum values',
+  })
   role: AccountRole;
 }
