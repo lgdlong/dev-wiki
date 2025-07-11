@@ -32,13 +32,13 @@ export class AuthService {
 
     // 2. Kiểm tra tài khoản có tồn tại không và mật khẩu có khớp không
     if (!account) {
-      throw new UnauthorizedException('Account not found!');
+      throw new UnauthorizedException('Invalid credentials!');
     }
 
     // So sánh mật khẩu đã hash bằng bcrypt với mật khẩu người dùng nhập vào
     const isMatch = await bcrypt.compare(pass, account.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid password!');
+      throw new UnauthorizedException('Invalid credentials!');
     }
 
     // 3. Tạo JWT token
@@ -77,21 +77,15 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, salt);
 
-    // 3. Tạo user mới (dùng DTO, thay password thành hashed)
-    const account = await this.accountService.create({
+    // 3. Tạo user mới
+    await this.accountService.create({
       ...dto,
       password: hashedPassword,
     });
 
-    // 4. Trả về JWT (giống validateUser)
-    const payload = { sub: account.id, email: account.email };
+    // 4. Không trả về JWT hoặc user, chỉ trả message
     return {
-      access_token: await this.jwtService.signAsync(payload),
-      user: {
-        id: account.id,
-        email: account.email,
-        name: account.name,
-      },
+      message: 'Registration successful! Please login to continue.',
     };
   }
 }

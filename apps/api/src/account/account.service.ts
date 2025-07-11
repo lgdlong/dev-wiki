@@ -29,16 +29,18 @@ export class AccountService {
     return this.repo.findOne({ where: { email } });
   }
 
-  update(
+  async update(
     id: number,
     updateAccountDto: UpdateAccountDto,
   ): Promise<Account | null> {
-    return this.repo.update(id, updateAccountDto).then(() => {
-      return this.findOne(id);
-    });
+    const result = await this.repo.update(id, updateAccountDto);
+    if (result.affected === 0) {
+      return null;
+    }
+    return this.findOne(id);
   }
 
-  remove(id: number): Promise<{ deleted: boolean }> {
+  async remove(id: number): Promise<{ deleted: boolean }> {
     return this.repo.delete(id).then(() => {
       return { deleted: true };
     });
