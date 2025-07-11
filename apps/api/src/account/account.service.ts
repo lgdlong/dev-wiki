@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Account } from './entities/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -33,16 +33,19 @@ export class AccountService {
     id: number,
     updateAccountDto: UpdateAccountDto,
   ): Promise<Account | null> {
-    const result = await this.repo.update(id, updateAccountDto);
+    const result: UpdateResult = await this.repo.update(id, updateAccountDto);
     if (result.affected === 0) {
       return null;
     }
-    return this.findOne(id);
+    const updatedAccount = await this.findOne(id);
+    if (!updatedAccount) {
+      throw new Error('Account was deleted during update operation');
+    }
+    return updatedAccount;
   }
 
   async remove(id: number): Promise<{ deleted: boolean }> {
-    return this.repo.delete(id).then(() => {
-      return { deleted: true };
-    });
+    const result: DeleteResult = await this.repo.delete(id);
+    return { deleted: (result.affected ?? 0) > 0 };
   }
 }

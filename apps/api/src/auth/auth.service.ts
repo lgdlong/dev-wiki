@@ -54,7 +54,8 @@ export class AuthService {
 
   async register(dto: RegisterUserDto) {
     // 1. Check email đã tồn tại
-    const exists = await this.accountService.findByEmail(dto.email);
+    const normalizedEmail = dto.email.toLowerCase();
+    const exists = await this.accountService.findByEmail(normalizedEmail);
     if (exists) {
       throw new ConflictException('Email already registered!');
     }
@@ -80,6 +81,7 @@ export class AuthService {
     // 3. Tạo user mới
     await this.accountService.create({
       ...dto,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 

@@ -17,8 +17,14 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Post()
-  create(@Body() dto: CreateAccountDto): Promise<Account> {
-    return this.accountService.create(dto);
+  async create(
+    @Body() dto: CreateAccountDto,
+  ): Promise<Omit<Account, 'password'>> {
+    // Exclude password from response
+    const account = await this.accountService.create(dto);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...publicAccount } = account;
+    return publicAccount;
   }
 
   @Get()
