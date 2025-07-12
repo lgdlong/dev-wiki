@@ -26,7 +26,7 @@ export default function ErrorPage({
         className="px-4 py-2 rounded-full bg-zinc-950 border-2 text-white font-semibold"
         onClick={() => reset()}
       >
-        Thử lại
+        Try again
       </button>
     </div>
   );
