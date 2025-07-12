@@ -1,7 +1,15 @@
 // apps/web/src/lib/fetcher.ts
 import { API_URL } from "@/config/api";
 
-export async function fetcher(path: string, options?: RequestInit) {
+/**
+ * Hàm fetcher dùng cho mọi API, hỗ trợ generic type, trả về dữ liệu đúng type.
+ * @param path - endpoint (bắt đầu bằng dấu /)
+ * @param options - RequestInit (method, body, headers, ...)
+ */
+export async function fetcher<T>(
+  path: string,
+  options?: RequestInit,
+): Promise<T> {
   const url = `${API_URL}${path}`;
   let res: Response;
 
@@ -15,7 +23,6 @@ export async function fetcher(path: string, options?: RequestInit) {
     });
   } catch (err) {
     console.error("Fetch error:", err);
-    // Lỗi do không kết nối được đến server (mạng lỗi, backend không chạy,...)
     throw new Error("Could not connect to server. Please try again later.");
   }
 
@@ -39,27 +46,22 @@ export async function fetcher(path: string, options?: RequestInit) {
 
   if (!res.ok) {
     // Trường hợp có trả về lỗi dạng JSON với message
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const hasMessage = (obj: unknown): obj is { message: string } => {
-      return (
-        typeof obj === "object" &&
-        obj !== null &&
-        "message" in obj &&
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        typeof (obj as any).message === "string"
-      );
-    };
+    const hasMessage = (obj: unknown): obj is { message: string } =>
+      typeof obj === "object" &&
+      obj !== null &&
+      "message" in obj &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      typeof (obj as any).message === "string";
 
     if (hasMessage(data)) {
       throw new Error(data.message);
     }
-    // Nếu trả về lỗi dạng text hoặc lỗi khác
     if (typeof data === "string" && data.length > 0) {
       throw new Error(data);
     }
-    // Nếu không có gì thì dùng statusText hoặc generic
     throw new Error(res.statusText || "API error");
   }
 
-  return data;
+  // Trả về đúng kiểu dữ liệu
+  return data as T;
 }

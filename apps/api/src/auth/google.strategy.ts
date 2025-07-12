@@ -3,6 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { GoogleProfile } from './interfaces/google-profile.interface'; // Đường dẫn tương đối tuỳ cấu trúc
+import { RawGoogleProfile } from './interfaces/raw-google-profile.interface';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -15,28 +17,24 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       // passReqToCallback: true,
     });
   }
+
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: {
-      name?: { givenName?: string; familyName?: string };
-      emails?: Array<{ value: string }>;
-      photos?: Array<{ value: string }>;
-      [key: string]: any;
-    },
+    profile: RawGoogleProfile,
     done: VerifyCallback,
-  ): Promise<any> {
-    const { name, emails, photos } = profile;
-    // TODO: Check DB, tạo user nếu chưa có
-    const user = {
-      email: emails?.[0]?.value || '',
-      firstName: name?.givenName || '',
-      lastName: name?.familyName || '',
-      picture: photos?.[0]?.value || '',
-      // Thường không cần trả accessToken/refreshToken ra ngoài
-      accessToken,
-      refreshToken,
+  ) {
+    // Dùng interface GoogleProfile
+    const user: GoogleProfile = {
+      googleId: profile.id,
+      email: profile.emails?.[0]?.value || profile._json?.email || '',
+      emailVerified: profile._json?.email_verified ?? true,
+      name: profile.displayName || profile._json?.name || '',
+      givenName: profile._json?.given_name || profile.name?.givenName || '',
+      avatar: profile.photos?.[0]?.value || profile._json?.picture || '',
+      provider: profile.provider,
     };
+    // TODO: Lưu user vào DB hoặc check tồn tại, sinh JWT cho user này...
     done(null, user);
   }
 }

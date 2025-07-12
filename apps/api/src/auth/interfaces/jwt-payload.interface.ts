@@ -1,10 +1,11 @@
 import { AccountRole } from 'src/common/enums/account-role.enum';
 
 export interface JwtPayload {
-  sub: number; // User ID
-  email: string; // User email
-  role: AccountRole; // Role của user (bắt buộc, nếu chỉ 1 role)
-  name?: string; // (Optional) Tên user nếu bạn muốn truyền
-  iat?: number; // (Tự động) Thời gian phát hành token (Issued At)
-  exp?: number; // (Tự động) Thời gian hết hạn token (Expiration)
+  sub: number | string; // userId (nên là số) hoặc googleId nếu chưa tạo user DB
+  email: string; // Email người dùng
+  role: AccountRole; // Role (enum)
+  name: string; // (Optional) Tên user
+  avatar?: string; // (Optional) Avatar (nếu cần)
+  provider?: string; // (Optional) "google" | "local" | ...
+  // Không cần khai báo iat, exp (NestJS/JWT tự động thêm)
 }
