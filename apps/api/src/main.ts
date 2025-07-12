@@ -5,7 +5,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { DEFAULT_FRONTEND_URL, DEFAULT_PORT } from './common/constants';
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
