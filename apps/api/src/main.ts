@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const DEFAULT_PORT = 8000; // Default port if not specified in .env
+  const DEFAULT_FRONTEND_URL = 'http://localhost:3000'; // Default frontend URL
 
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
@@ -12,6 +13,17 @@ async function bootstrap() {
   // Lấy ConfigService từ app context
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || DEFAULT_PORT; // fallback nếu không có PORT
+
+  // ---- Lấy FRONTEND_URL từ configService thay vì process.env ----
+  const frontendUrl =
+    configService.get<string>('FRONTEND_URL') || DEFAULT_FRONTEND_URL;
+
+  app.enableCors({
+    origin: frontendUrl, // sử dụng biến lấy từ configService
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+  });
 
   await app.listen(port);
 }
