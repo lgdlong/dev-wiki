@@ -4,7 +4,6 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { ConfigService } from '@nestjs/config';
 import { AccountRole } from 'src/common/enums/account-role.enum';
 import { AuthAccountResponse } from './interfaces/auth-account-response.interface';
 
@@ -13,7 +12,6 @@ export class AuthService {
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
   // validateUser là tên hàm chuẩn của Passport Local Strategy
@@ -24,7 +22,7 @@ export class AuthService {
     pass: string,
   ): Promise<{
     access_token: string;
-    user: AuthAccountResponse;
+    account: AuthAccountResponse;
   }> {
     // 1. Tìm tài khoản theo email
     const account = await this.accountService.findByEmail(email);
@@ -46,6 +44,7 @@ export class AuthService {
       sub: account.id,
       email: account.email,
       role: account.role,
+      name: account.name,
     };
 
     return {
@@ -53,7 +52,7 @@ export class AuthService {
       // access_token là tên chuẩn, có thể đổi nếu cần
       access_token: await this.jwtService.signAsync(payload),
       // Tra trả thông tin tài khoản đã loại bỏ mật khẩu
-      user: {
+      account: {
         id: account.id,
         email: account.email,
         role: account.role,
@@ -75,5 +74,11 @@ export class AuthService {
     return {
       message: 'Registration successful! Please login to continue.',
     };
+  }
+
+  // Tạo JWT từ GoogleProfile hoặc Account
+  generateJwt(payload: JwtPayload) {
+    // Có thể tuỳ chỉnh payload cho phù hợp
+    return this.jwtService.sign(payload);
   }
 }

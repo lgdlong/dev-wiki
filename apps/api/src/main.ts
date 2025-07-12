@@ -2,11 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { DEFAULT_FRONTEND_URL, DEFAULT_PORT } from './common/constants';
 
 async function bootstrap() {
-  const DEFAULT_PORT = 8000; // Default port if not specified in .env
-  const DEFAULT_FRONTEND_URL = 'http://localhost:3000'; // Default frontend URL
-
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 

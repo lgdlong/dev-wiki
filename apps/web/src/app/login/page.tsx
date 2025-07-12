@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { loginApi } from "@/utils/api/auth";
+import { LoginResponse } from "@/types/auth";
+import { NEXT_PUBLIC_GOOGLE_AUTH_URL } from "@/config/constants";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,11 +16,19 @@ export default function LoginPage() {
   const router = useRouter();
 
   // React Query mutation
-  const mutation = useMutation({
+  const mutation = useMutation<
+    LoginResponse,
+    Error,
+    { email: string; password: string }
+  >({
     mutationFn: loginApi,
     onSuccess: (data) => {
-      console.log("Login successful:", data);
-      // Xử lý thành công, ví dụ: lưu user, token, redirect...
+      // data sẽ là kiểu LoginResponse, gợi ý đầy đủ
+      if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token);
+        console.log("[DEBUG] Token:", data.access_token);
+      }
+      console.log("[DEBUG] Login successful:", data.account);
       router.push("/");
     },
   });
@@ -80,14 +90,15 @@ export default function LoginPage() {
                   >
                     {mutation.isPending ? "Logging in..." : "Login"}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full py-5"
-                    type="button"
-                    disabled={mutation.isPending}
-                  >
-                    Login with Google
-                  </Button>
+                  <Link href={NEXT_PUBLIC_GOOGLE_AUTH_URL || "#"}>
+                    <Button
+                      variant="outline"
+                      className="w-full py-5"
+                      type="button"
+                    >
+                      Login with Google
+                    </Button>
+                  </Link>
                 </div>
                 {mutation.isError && (
                   <div className="text-red-500 text-center mt-2">

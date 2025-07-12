@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { GoogleProfile } from './auth/interfaces/google-profile.interface';
+import { Request } from 'express';
+import { GoogleLoginResult } from './types/google-login-result.type';
 
 @Injectable()
 export class AppService {
@@ -7,11 +10,14 @@ export class AppService {
     private readonly dataSource: DataSource, // Inject DataSource to manage database connections
   ) {}
 
-  /**
-   * Simple health check method for API
-   */
-  getHello(): string {
-    return 'Hello World! Dev Wiki API is running with Render PostgreSQL!';
+  googleLogin(req: Request): GoogleLoginResult {
+    if (!req.user) {
+      return { message: 'No user from google' };
+    }
+    return {
+      message: 'User information from google',
+      user: req.user as GoogleProfile,
+    };
   }
 
   /**
