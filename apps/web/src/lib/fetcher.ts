@@ -45,6 +45,7 @@ export async function fetcher(path: string, options?: RequestInit) {
         typeof obj === "object" &&
         obj !== null &&
         "message" in obj &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         typeof (obj as any).message === "string"
       );
     };
