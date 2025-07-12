@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from './account/entities/account.entity';
 import { Tutorial } from './tutorial/entities/tutorial.entity';
 import { AuthModule } from './auth/auth.module';
+import { GoogleStrategy } from './auth/google.strategy';
 
 @Module({
   imports: [
@@ -58,6 +59,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleStrategy],
 })
 export class AppModule {}

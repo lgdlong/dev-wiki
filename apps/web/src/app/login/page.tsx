@@ -80,14 +80,15 @@ export default function LoginPage() {
                   >
                     {mutation.isPending ? "Logging in..." : "Login"}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full py-5"
-                    type="button"
-                    disabled={mutation.isPending}
-                  >
-                    Login with Google
-                  </Button>
+                  <Link href="http://localhost:8000/google">
+                    <Button
+                      variant="outline"
+                      className="w-full py-5"
+                      type="button"
+                    >
+                      Login with Google
+                    </Button>
+                  </Link>
                 </div>
                 {mutation.isError && (
                   <div className="text-red-500 text-center mt-2">

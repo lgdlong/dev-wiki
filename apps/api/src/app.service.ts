@@ -7,11 +7,15 @@ export class AppService {
     private readonly dataSource: DataSource, // Inject DataSource to manage database connections
   ) {}
 
-  /**
-   * Simple health check method for API
-   */
-  getHello(): string {
-    return 'Hello World! Dev Wiki API is running with Render PostgreSQL!';
+  googleLogin(req) {
+    if (!req.user) {
+      return 'No user from google';
+    }
+
+    return {
+      message: 'User information from google',
+      user: req.user,
+    };
   }
 
   /**
