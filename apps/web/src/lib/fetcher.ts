@@ -40,9 +40,17 @@ export async function fetcher(path: string, options?: RequestInit) {
   if (!res.ok) {
     // Trường hợp có trả về lỗi dạng JSON với message
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (data && typeof data === "object" && "message" in (data as any)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      throw new Error((data as any).message);
+    const hasMessage = (obj: unknown): obj is { message: string } => {
+      return (
+        typeof obj === "object" &&
+        obj !== null &&
+        "message" in obj &&
+        typeof (obj as any).message === "string"
+      );
+    };
+
+    if (hasMessage(data)) {
+      throw new Error(data.message);
     }
     // Nếu trả về lỗi dạng text hoặc lỗi khác
     if (typeof data === "string" && data.length > 0) {
