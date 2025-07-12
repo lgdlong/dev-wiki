@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { loginApi } from "@/utils/api/auth";
 import { LoginResponse } from "@/types/auth";
+import { NEXT_PUBLIC_GOOGLE_AUTH_URL } from "@/config/constants";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -89,7 +90,7 @@ export default function LoginPage() {
                   >
                     {mutation.isPending ? "Logging in..." : "Login"}
                   </Button>
-                  <Link href="http://localhost:8000/google">
+                  <Link href={NEXT_PUBLIC_GOOGLE_AUTH_URL || "#"}>
                     <Button
                       variant="outline"
                       className="w-full py-5"

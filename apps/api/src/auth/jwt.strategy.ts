@@ -43,7 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const userId =
       typeof payload.sub === 'string' ? parseInt(payload.sub, 10) : payload.sub;
 
-    if (isNaN(userId)) {
+    if (typeof userId !== 'number' || isNaN(userId) || userId <= 0) {
       throw new Error('Invalid user ID');
     }
 

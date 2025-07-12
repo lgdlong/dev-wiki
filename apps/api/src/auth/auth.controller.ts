@@ -87,6 +87,14 @@ export class AuthController {
 
       const user: GoogleProfile = result.user;
 
+      // Validate required user properties
+      if (!user.googleId || !user.email || !user.name) {
+        const frontendUrl =
+          this.configService.get<string>('FRONTEND_URL') ||
+          DEFAULT_FRONTEND_URL;
+        return res.redirect(`${frontendUrl}?error=incomplete_user_data`);
+      }
+
       // Create JWT payload for Google user
       const payload: JwtPayload = {
         sub: user.googleId, // Use googleId as sub for Google users
