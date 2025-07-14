@@ -365,14 +365,19 @@ describe('AccountService', () => {
         generatedMaps: [],
         raw: {},
       };
+      const updatedAccount = {
+        id: 1,
+        name: 'Updated Name',
+      } as Account;
 
       mockRepository.update.mockResolvedValue(updateResult);
+      mockRepository.findOne.mockResolvedValue(updatedAccount);
 
       const result = await service.update(1, updateAccountDto);
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updateAccountDto);
-      expect(mockRepository.findOne).not.toHaveBeenCalled();
-      expect(result).toBeNull();
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(result).toEqual(updatedAccount);
     });
   });
 
