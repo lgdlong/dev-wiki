@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$", "package.json", "tsconfig.json", ".env*"],
       "outputs": [
         "dist/**",
         ".next/**",
@@ -20,6 +20,13 @@
     "dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "test": {
+  "dependsOn": ["^test"]
+},
+"format": {},
+"storybook": {
+  "outputs": [".storybook-static/**"]
+}
   }
 }

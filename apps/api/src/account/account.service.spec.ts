@@ -256,7 +256,9 @@ describe('AccountService', () => {
 
       const result = await service.findOne(-1);
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: -1 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: -1 },
+      });
       expect(result).toBeNull();
     });
   });
