@@ -1,3 +1,4 @@
+// apps/api/src/account/account.service.ts
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';

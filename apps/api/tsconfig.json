@@ -23,6 +23,6 @@
       "@dev-wiki/enums": ["../../packages/enums"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "jest.config.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }
