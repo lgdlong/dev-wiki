@@ -5,18 +5,16 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
+  Index,
 } from 'typeorm';
 import { Account } from 'src/account/entities/account.entity';
+import { EntityType } from 'src/common/enums/entity-type.enum';
 
-@Entity({ name: 'tutorials' })
-export class Tutorial {
+@Entity({ name: 'comments' })
+@Index(['entityType', 'entityId'])
+export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'text', nullable: false })
-  title: string;
 
   @Column({ type: 'text', nullable: false })
   content: string;
@@ -28,8 +26,29 @@ export class Tutorial {
   @JoinColumn({ name: 'author_id' })
   author: Account;
 
+  @Column({ name: 'parent_id', nullable: true })
+  parentId: number;
+
+  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent: Comment;
+
+  @OneToMany(() => Comment, (comment) => comment.parent)
+  replies: Comment[];
+
+  @Column({
+    name: 'entity_type',
+    type: 'enum',
+    enum: EntityType,
+    nullable: false,
+  })
+  entityType: EntityType;
+
+  @Column({ name: 'entity_id', type: 'bigint', nullable: false })
+  entityId: number;
+
   @Column({ type: 'bigint', default: 0 })
-  views: number;
+  upvotes: number;
 
   @Column({
     name: 'created_at',
