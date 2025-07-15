@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 import "./globals.css";
+import { usePathname } from "next/navigation";
+import { Navbar } from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +24,12 @@ export default function RootLayout({
 }>) {
   // Dùng useState để tránh share queryClient giữa các request
   const [queryClient] = useState(() => new QueryClient());
+  const pathname = usePathname();
+
+  // Liệt kê danh sách các route cần ẩn navbar
+  const hideNavbarRoutes = ["/login", "/signup"];
+
+  const showNavbar = !hideNavbarRoutes.includes(pathname);
 
   return (
     <html lang="en">
@@ -29,6 +37,7 @@ export default function RootLayout({
         className={`dark ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProvider client={queryClient}>
+          {showNavbar && <Navbar />}
           {children}
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
