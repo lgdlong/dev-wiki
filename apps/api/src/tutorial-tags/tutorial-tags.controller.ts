@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { TutorialTagsService } from './tutorial-tags.service';
 import { CreateTutorialTagDto } from './dto/create-tutorial-tag.dto';
 

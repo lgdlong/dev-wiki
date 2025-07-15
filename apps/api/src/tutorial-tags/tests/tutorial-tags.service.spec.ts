@@ -30,7 +30,9 @@ describe('TutorialTagsService', () => {
     }).compile();
 
     service = module.get<TutorialTagsService>(TutorialTagsService);
-    repository = module.get<Repository<TutorialTag>>(getRepositoryToken(TutorialTag));
+    repository = module.get<Repository<TutorialTag>>(
+      getRepositoryToken(TutorialTag),
+    );
   });
 
   afterEach(() => {
@@ -68,7 +70,9 @@ describe('TutorialTagsService', () => {
       const existingLink = { id: 1, tutorialId: 1, tagId: 2 };
       mockRepository.findOne.mockResolvedValue(existingLink);
 
-      await expect(service.linkTutorialToTag(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.linkTutorialToTag(createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -87,7 +91,9 @@ describe('TutorialTagsService', () => {
     it('should throw NotFoundException if link not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.unlinkTutorialFromTag(1, 2)).rejects.toThrow(NotFoundException);
+      await expect(service.unlinkTutorialFromTag(1, 2)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -113,8 +119,18 @@ describe('TutorialTagsService', () => {
   describe('getTagTutorials', () => {
     it('should return tutorials for a tag', async () => {
       const links = [
-        { id: 1, tutorialId: 1, tagId: 2, tutorial: { id: 1, title: 'Tutorial 1' } },
-        { id: 2, tutorialId: 3, tagId: 2, tutorial: { id: 3, title: 'Tutorial 3' } },
+        {
+          id: 1,
+          tutorialId: 1,
+          tagId: 2,
+          tutorial: { id: 1, title: 'Tutorial 1' },
+        },
+        {
+          id: 2,
+          tutorialId: 3,
+          tagId: 2,
+          tutorial: { id: 3, title: 'Tutorial 3' },
+        },
       ];
 
       mockRepository.find.mockResolvedValue(links);

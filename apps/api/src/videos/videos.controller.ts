@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { VideosService } from './videos.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -33,7 +43,10 @@ export class VideosController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateVideoDto: UpdateVideoDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateVideoDto: UpdateVideoDto,
+  ) {
     return this.videosService.update(id, updateVideoDto);
   }
 

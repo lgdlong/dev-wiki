@@ -79,7 +79,9 @@ describe('VideosService', () => {
     it('should throw NotFoundException if video not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findByYoutubeId('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findByYoutubeId('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

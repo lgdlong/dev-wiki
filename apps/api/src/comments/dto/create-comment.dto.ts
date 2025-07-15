@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
 import { EntityType } from 'src/common/enums/entity-type.enum';
 
 export class CreateCommentDto {

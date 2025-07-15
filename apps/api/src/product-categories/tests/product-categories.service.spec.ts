@@ -30,7 +30,9 @@ describe('ProductCategoriesService', () => {
     }).compile();
 
     service = module.get<ProductCategoriesService>(ProductCategoriesService);
-    repository = module.get<Repository<ProductCategory>>(getRepositoryToken(ProductCategory));
+    repository = module.get<Repository<ProductCategory>>(
+      getRepositoryToken(ProductCategory),
+    );
   });
 
   afterEach(() => {
@@ -68,7 +70,9 @@ describe('ProductCategoriesService', () => {
       const existingLink = { id: 1, productId: 1, categoryId: 2 };
       mockRepository.findOne.mockResolvedValue(existingLink);
 
-      await expect(service.linkProductToCategory(createDto)).rejects.toThrow(ConflictException);
+      await expect(service.linkProductToCategory(createDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -87,15 +91,27 @@ describe('ProductCategoriesService', () => {
     it('should throw NotFoundException if link not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.unlinkProductFromCategory(1, 2)).rejects.toThrow(NotFoundException);
+      await expect(service.unlinkProductFromCategory(1, 2)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('getProductCategories', () => {
     it('should return categories for a product', async () => {
       const links = [
-        { id: 1, productId: 1, categoryId: 2, category: { id: 2, name: 'Tech' } },
-        { id: 2, productId: 1, categoryId: 3, category: { id: 3, name: 'Tools' } },
+        {
+          id: 1,
+          productId: 1,
+          categoryId: 2,
+          category: { id: 2, name: 'Tech' },
+        },
+        {
+          id: 2,
+          productId: 1,
+          categoryId: 3,
+          category: { id: 3, name: 'Tools' },
+        },
       ];
 
       mockRepository.find.mockResolvedValue(links);
@@ -113,8 +129,18 @@ describe('ProductCategoriesService', () => {
   describe('getCategoryProducts', () => {
     it('should return products for a category', async () => {
       const links = [
-        { id: 1, productId: 1, categoryId: 2, product: { id: 1, name: 'Product 1' } },
-        { id: 2, productId: 3, categoryId: 2, product: { id: 3, name: 'Product 3' } },
+        {
+          id: 1,
+          productId: 1,
+          categoryId: 2,
+          product: { id: 1, name: 'Product 1' },
+        },
+        {
+          id: 2,
+          productId: 3,
+          categoryId: 2,
+          product: { id: 3, name: 'Product 3' },
+        },
       ];
 
       mockRepository.find.mockResolvedValue(links);

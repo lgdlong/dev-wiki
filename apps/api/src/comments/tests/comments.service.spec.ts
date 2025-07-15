@@ -67,8 +67,18 @@ describe('CommentsService', () => {
   describe('findByEntity', () => {
     it('should return comments for a specific entity', async () => {
       const comments = [
-        { id: 1, content: 'Comment 1', entityType: EntityType.TUTORIAL, entityId: 1 },
-        { id: 2, content: 'Comment 2', entityType: EntityType.TUTORIAL, entityId: 1 },
+        {
+          id: 1,
+          content: 'Comment 1',
+          entityType: EntityType.TUTORIAL,
+          entityId: 1,
+        },
+        {
+          id: 2,
+          content: 'Comment 2',
+          entityType: EntityType.TUTORIAL,
+          entityId: 1,
+        },
       ];
 
       mockRepository.find.mockResolvedValue(comments);

@@ -28,15 +28,18 @@ export class ProductsService {
       where: { id },
       relations: ['creator'],
     });
-    
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
+
     return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     const product = await this.findOne(id);
     Object.assign(product, updateProductDto);
     return await this.productRepository.save(product);

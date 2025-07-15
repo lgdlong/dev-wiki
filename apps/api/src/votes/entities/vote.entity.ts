@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Account } from 'src/account/entities/account.entity';
 import { EntityType } from 'src/common/enums/entity-type.enum';
 import { VoteType } from 'src/common/enums/vote-type.enum';
@@ -19,12 +26,21 @@ export class Vote {
   @Column({ name: 'entity_id', type: 'bigint', nullable: false })
   entityId: number;
 
-  @Column({ name: 'entity_type', type: 'enum', enum: EntityType, nullable: false })
+  @Column({
+    name: 'entity_type',
+    type: 'enum',
+    enum: EntityType,
+    nullable: false,
+  })
   entityType: EntityType;
 
   @Column({ name: 'vote_type', type: 'enum', enum: VoteType, nullable: false })
   voteType: VoteType;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 }

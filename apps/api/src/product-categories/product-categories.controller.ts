@@ -1,14 +1,28 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ProductCategoriesService } from './product-categories.service';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 
 @Controller('product-categories')
 export class ProductCategoriesController {
-  constructor(private readonly productCategoriesService: ProductCategoriesService) {}
+  constructor(
+    private readonly productCategoriesService: ProductCategoriesService,
+  ) {}
 
   @Post('link')
-  linkProductToCategory(@Body() createProductCategoryDto: CreateProductCategoryDto) {
-    return this.productCategoriesService.linkProductToCategory(createProductCategoryDto);
+  linkProductToCategory(
+    @Body() createProductCategoryDto: CreateProductCategoryDto,
+  ) {
+    return this.productCategoriesService.linkProductToCategory(
+      createProductCategoryDto,
+    );
   }
 
   @Delete('unlink/:productId/:categoryId')
@@ -16,7 +30,10 @@ export class ProductCategoriesController {
     @Param('productId', ParseIntPipe) productId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ) {
-    return this.productCategoriesService.unlinkProductFromCategory(productId, categoryId);
+    return this.productCategoriesService.unlinkProductFromCategory(
+      productId,
+      categoryId,
+    );
   }
 
   @Get('product/:productId/categories')

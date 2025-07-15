@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  Index,
+} from 'typeorm';
 import { Account } from 'src/account/entities/account.entity';
 import { EntityType } from 'src/common/enums/entity-type.enum';
 
@@ -21,14 +29,19 @@ export class Comment {
   @Column({ name: 'parent_id', nullable: true })
   parentId: number;
 
-  @ManyToOne(() => Comment, comment => comment.replies, { nullable: true })
+  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
   @JoinColumn({ name: 'parent_id' })
   parent: Comment;
 
-  @OneToMany(() => Comment, comment => comment.parent)
+  @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
 
-  @Column({ name: 'entity_type', type: 'enum', enum: EntityType, nullable: false })
+  @Column({
+    name: 'entity_type',
+    type: 'enum',
+    enum: EntityType,
+    nullable: false,
+  })
   entityType: EntityType;
 
   @Column({ name: 'entity_id', type: 'bigint', nullable: false })
@@ -37,7 +50,11 @@ export class Comment {
   @Column({ type: 'bigint', default: 0 })
   upvotes: number;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   @Column({

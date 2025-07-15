@@ -26,6 +26,10 @@ export class Video {
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 }

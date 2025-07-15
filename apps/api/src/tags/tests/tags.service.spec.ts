@@ -68,13 +68,19 @@ describe('TagsService', () => {
       const existingTag = { id: 1, name: 'JavaScript' };
       mockRepository.findOne.mockResolvedValue(existingTag);
 
-      await expect(service.create(createTagDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(createTagDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
   describe('findByName', () => {
     it('should return tag by name', async () => {
-      const tag = { id: 1, name: 'JavaScript', description: 'Programming language' };
+      const tag = {
+        id: 1,
+        name: 'JavaScript',
+        description: 'Programming language',
+      };
 
       mockRepository.findOne.mockResolvedValue(tag);
 
@@ -89,7 +95,9 @@ describe('TagsService', () => {
     it('should throw NotFoundException if tag not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findByName('NonExistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findByName('NonExistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -116,7 +124,9 @@ describe('TagsService', () => {
         .mockResolvedValueOnce(tag) // findOne for the tag being updated
         .mockResolvedValueOnce(existingTag); // findOne for existing tag with new name
 
-      await expect(service.update(1, updateTagDto)).rejects.toThrow(ConflictException);
+      await expect(service.update(1, updateTagDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 

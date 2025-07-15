@@ -75,7 +75,9 @@ describe('VotesService', () => {
       const existingVote = { id: 1, ...createVoteDto };
       mockRepository.findOne.mockResolvedValue(existingVote);
 
-      await expect(service.create(createVoteDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(createVoteDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -107,7 +109,12 @@ describe('VotesService', () => {
       mockRepository.findOne.mockResolvedValue(existingVote);
       mockRepository.save.mockResolvedValue(updatedVote);
 
-      const result = await service.changeVote(1, EntityType.TUTORIAL, 1, VoteType.DOWN);
+      const result = await service.changeVote(
+        1,
+        EntityType.TUTORIAL,
+        1,
+        VoteType.DOWN,
+      );
 
       expect(result.voteType).toBe(VoteType.DOWN);
     });
@@ -126,7 +133,12 @@ describe('VotesService', () => {
       mockRepository.create.mockReturnValue(newVoteDto);
       mockRepository.save.mockResolvedValue({ id: 1, ...newVoteDto });
 
-      const result = await service.changeVote(1, EntityType.TUTORIAL, 1, VoteType.UP);
+      const result = await service.changeVote(
+        1,
+        EntityType.TUTORIAL,
+        1,
+        VoteType.UP,
+      );
 
       expect(result.voteType).toBe(VoteType.UP);
     });
@@ -144,7 +156,11 @@ describe('VotesService', () => {
 
       mockRepository.findOne.mockResolvedValue(vote);
 
-      const result = await service.findUserVoteOnEntity(1, EntityType.TUTORIAL, 1);
+      const result = await service.findUserVoteOnEntity(
+        1,
+        EntityType.TUTORIAL,
+        1,
+      );
 
       expect(result).toEqual(vote);
     });
@@ -152,7 +168,11 @@ describe('VotesService', () => {
     it('should return null if no vote found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.findUserVoteOnEntity(1, EntityType.TUTORIAL, 1);
+      const result = await service.findUserVoteOnEntity(
+        1,
+        EntityType.TUTORIAL,
+        1,
+      );
 
       expect(result).toBeNull();
     });

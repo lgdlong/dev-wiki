@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsNotEmpty, IsNumber, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+} from 'class-validator';
 
 export class CreateVideoDto {
   @IsString()

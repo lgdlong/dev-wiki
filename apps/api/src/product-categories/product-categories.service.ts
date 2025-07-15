@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductCategory } from './entities/product-category.entity';
@@ -11,7 +15,9 @@ export class ProductCategoriesService {
     private productCategoryRepository: Repository<ProductCategory>,
   ) {}
 
-  async linkProductToCategory(createProductCategoryDto: CreateProductCategoryDto): Promise<ProductCategory> {
+  async linkProductToCategory(
+    createProductCategoryDto: CreateProductCategoryDto,
+  ): Promise<ProductCategory> {
     // Check if link already exists
     const existingLink = await this.productCategoryRepository.findOne({
       where: {
@@ -24,11 +30,16 @@ export class ProductCategoriesService {
       throw new ConflictException('Product is already linked to this category');
     }
 
-    const productCategory = this.productCategoryRepository.create(createProductCategoryDto);
+    const productCategory = this.productCategoryRepository.create(
+      createProductCategoryDto,
+    );
     return await this.productCategoryRepository.save(productCategory);
   }
 
-  async unlinkProductFromCategory(productId: number, categoryId: number): Promise<void> {
+  async unlinkProductFromCategory(
+    productId: number,
+    categoryId: number,
+  ): Promise<void> {
     const link = await this.productCategoryRepository.findOne({
       where: { productId, categoryId },
     });
@@ -67,7 +78,9 @@ export class ProductCategoriesService {
     });
 
     if (!productCategory) {
-      throw new NotFoundException(`Product-category link with ID ${id} not found`);
+      throw new NotFoundException(
+        `Product-category link with ID ${id} not found`,
+      );
     }
 
     return productCategory;

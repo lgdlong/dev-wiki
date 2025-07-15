@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Vote } from './entities/vote.entity';
@@ -44,11 +48,11 @@ export class VotesService {
       where: { id },
       relations: ['user'],
     });
-    
+
     if (!vote) {
       throw new NotFoundException(`Vote with ID ${id} not found`);
     }
-    
+
     return vote;
   }
 
@@ -63,7 +67,10 @@ export class VotesService {
     await this.voteRepository.remove(vote);
   }
 
-  async findByEntity(entityType: EntityType, entityId: number): Promise<Vote[]> {
+  async findByEntity(
+    entityType: EntityType,
+    entityId: number,
+  ): Promise<Vote[]> {
     return await this.voteRepository.find({
       where: { entityType, entityId },
       relations: ['user'],
@@ -79,14 +86,21 @@ export class VotesService {
     });
   }
 
-  async findUserVoteOnEntity(userId: number, entityType: EntityType, entityId: number): Promise<Vote | null> {
+  async findUserVoteOnEntity(
+    userId: number,
+    entityType: EntityType,
+    entityId: number,
+  ): Promise<Vote | null> {
     return await this.voteRepository.findOne({
       where: { userId, entityType, entityId },
       relations: ['user'],
     });
   }
 
-  async getVoteCounts(entityType: EntityType, entityId: number): Promise<{ upvotes: number; downvotes: number }> {
+  async getVoteCounts(
+    entityType: EntityType,
+    entityId: number,
+  ): Promise<{ upvotes: number; downvotes: number }> {
     const upvotes = await this.voteRepository.count({
       where: { entityType, entityId, voteType: VoteType.UP },
     });
@@ -98,18 +112,36 @@ export class VotesService {
     return { upvotes, downvotes };
   }
 
-  async changeVote(userId: number, entityType: EntityType, entityId: number, newVoteType: VoteType): Promise<Vote> {
-    const existingVote = await this.findUserVoteOnEntity(userId, entityType, entityId);
-    
+  async changeVote(
+    userId: number,
+    entityType: EntityType,
+    entityId: number,
+    newVoteType: VoteType,
+  ): Promise<Vote> {
+    const existingVote = await this.findUserVoteOnEntity(
+      userId,
+      entityType,
+      entityId,
+    );
+
     if (existingVote) {
       existingVote.voteType = newVoteType;
       return await this.voteRepository.save(existingVote);
     } else {
-      return await this.create({ userId, entityType, entityId, voteType: newVoteType });
+      return await this.create({
+        userId,
+        entityType,
+        entityId,
+        voteType: newVoteType,
+      });
     }
   }
 
-  async removeUserVote(userId: number, entityType: EntityType, entityId: number): Promise<void> {
+  async removeUserVote(
+    userId: number,
+    entityType: EntityType,
+    entityId: number,
+  ): Promise<void> {
     const vote = await this.findUserVoteOnEntity(userId, entityType, entityId);
     if (vote) {
       await this.voteRepository.remove(vote);

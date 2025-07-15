@@ -47,11 +47,18 @@ describe('CommentsController', () => {
   describe('findByEntity', () => {
     it('should return comments for entity', async () => {
       const result = [
-        { id: 1, content: 'Comment 1', entityType: EntityType.TUTORIAL, entityId: 1 },
+        {
+          id: 1,
+          content: 'Comment 1',
+          entityType: EntityType.TUTORIAL,
+          entityId: 1,
+        },
       ];
       mockCommentsService.findByEntity.mockResolvedValue(result);
 
-      expect(await controller.findByEntity(EntityType.TUTORIAL, 1)).toBe(result);
+      expect(await controller.findByEntity(EntityType.TUTORIAL, 1)).toBe(
+        result,
+      );
       expect(service.findByEntity).toHaveBeenCalledWith(EntityType.TUTORIAL, 1);
     });
   });

@@ -25,11 +25,11 @@ export class VideosService {
     const video = await this.videoRepository.findOne({
       where: { id },
     });
-    
+
     if (!video) {
       throw new NotFoundException(`Video with ID ${id} not found`);
     }
-    
+
     return video;
   }
 
@@ -54,11 +54,13 @@ export class VideosService {
     const video = await this.videoRepository.findOne({
       where: { youtubeId },
     });
-    
+
     if (!video) {
-      throw new NotFoundException(`Video with YouTube ID ${youtubeId} not found`);
+      throw new NotFoundException(
+        `Video with YouTube ID ${youtubeId} not found`,
+      );
     }
-    
+
     return video;
   }
 }

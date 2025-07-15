@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tag } from './entities/tag.entity';
@@ -17,9 +21,11 @@ export class TagsService {
     const existingTag = await this.tagRepository.findOne({
       where: { name: createTagDto.name },
     });
-    
+
     if (existingTag) {
-      throw new ConflictException(`Tag with name "${createTagDto.name}" already exists`);
+      throw new ConflictException(
+        `Tag with name "${createTagDto.name}" already exists`,
+      );
     }
 
     const tag = this.tagRepository.create(createTagDto);
@@ -34,11 +40,11 @@ export class TagsService {
     const tag = await this.tagRepository.findOne({
       where: { id },
     });
-    
+
     if (!tag) {
       throw new NotFoundException(`Tag with ID ${id} not found`);
     }
-    
+
     return tag;
   }
 
@@ -46,28 +52,30 @@ export class TagsService {
     const tag = await this.tagRepository.findOne({
       where: { name },
     });
-    
+
     if (!tag) {
       throw new NotFoundException(`Tag with name "${name}" not found`);
     }
-    
+
     return tag;
   }
 
   async update(id: number, updateTagDto: UpdateTagDto): Promise<Tag> {
     const tag = await this.findOne(id);
-    
+
     // Check if updating name and new name already exists
     if (updateTagDto.name && updateTagDto.name !== tag.name) {
       const existingTag = await this.tagRepository.findOne({
         where: { name: updateTagDto.name },
       });
-      
+
       if (existingTag) {
-        throw new ConflictException(`Tag with name "${updateTagDto.name}" already exists`);
+        throw new ConflictException(
+          `Tag with name "${updateTagDto.name}" already exists`,
+        );
       }
     }
-    
+
     Object.assign(tag, updateTagDto);
     return await this.tagRepository.save(tag);
   }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TutorialTag } from './entities/tutorial-tag.entity';
@@ -11,7 +15,9 @@ export class TutorialTagsService {
     private tutorialTagRepository: Repository<TutorialTag>,
   ) {}
 
-  async linkTutorialToTag(createTutorialTagDto: CreateTutorialTagDto): Promise<TutorialTag> {
+  async linkTutorialToTag(
+    createTutorialTagDto: CreateTutorialTagDto,
+  ): Promise<TutorialTag> {
     // Check if link already exists
     const existingLink = await this.tutorialTagRepository.findOne({
       where: {
@@ -28,7 +34,10 @@ export class TutorialTagsService {
     return await this.tutorialTagRepository.save(tutorialTag);
   }
 
-  async unlinkTutorialFromTag(tutorialId: number, tagId: number): Promise<void> {
+  async unlinkTutorialFromTag(
+    tutorialId: number,
+    tagId: number,
+  ): Promise<void> {
     const link = await this.tutorialTagRepository.findOne({
       where: { tutorialId, tagId },
     });

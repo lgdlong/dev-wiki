@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { VotesService } from './votes.service';
 import { CreateVoteDto } from './dto/create-vote.dto';
 import { UpdateVoteDto } from './dto/update-vote.dto';
@@ -74,7 +83,10 @@ export class VotesController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateVoteDto: UpdateVoteDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateVoteDto: UpdateVoteDto,
+  ) {
     return this.votesService.update(id, updateVoteDto);
   }
 

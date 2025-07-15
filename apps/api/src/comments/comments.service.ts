@@ -30,15 +30,18 @@ export class CommentsService {
       where: { id },
       relations: ['author', 'parent', 'replies'],
     });
-    
+
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
-    
+
     return comment;
   }
 
-  async update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
+  async update(
+    id: number,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<Comment> {
     const comment = await this.findOne(id);
     Object.assign(comment, updateCommentDto);
     return await this.commentRepository.save(comment);
@@ -49,7 +52,10 @@ export class CommentsService {
     await this.commentRepository.remove(comment);
   }
 
-  async findByEntity(entityType: EntityType, entityId: number): Promise<Comment[]> {
+  async findByEntity(
+    entityType: EntityType,
+    entityId: number,
+  ): Promise<Comment[]> {
     return await this.commentRepository.find({
       where: { entityType, entityId },
       relations: ['author', 'parent', 'replies'],
