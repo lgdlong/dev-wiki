@@ -3,8 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -69,8 +71,18 @@ export function Navbar() {
           <span className="hidden font-bold sm:inline-block">DevWiki</span>
         </Link>
 
+        {/* Search bar */}
+        <div className="relative flex-1 max-w-xs mr-6">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search ( ctrl + k )"
+            className="pl-9 pr-4 h-10 rounded-full bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+
         {/* Navigation Menu in the center */}
-        <NavigationMenu className="mx-auto" viewport={false}>
+        <NavigationMenu className="flex-1 justify-center" viewport={false}>
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Tutorials</NavigationMenuTrigger>
