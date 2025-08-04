@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { LogIn, LogOut, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,9 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { Account } from "@/types/account";
+import { UseQueryResult } from "@tanstack/react-query";
 
 const videoComponents: { title: string; href: string; description: string }[] =
   [
@@ -39,6 +42,8 @@ const videoComponents: { title: string; href: string; description: string }[] =
   ];
 
 export function Navbar() {
+  const account: UseQueryResult<Account, Error> = useCurrentUser();
+
   return (
     <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 flex h-14 items-center">
@@ -53,7 +58,6 @@ export function Navbar() {
           />
           <span className="hidden font-bold sm:inline-block">DevWiki</span>
         </Link>
-
         {/* Search bar */}
         <div className="relative flex-1 max-w-xs mr-6">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -63,7 +67,6 @@ export function Navbar() {
             className="pl-9 pr-4 h-10 rounded-full bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
-
         {/* Navigation Menu in the center */}
         <NavigationMenu className="flex-1 justify-center" viewport={false}>
           <NavigationMenuList>
@@ -136,24 +139,42 @@ export function Navbar() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Sign In button on the right */}
-        <div className="ml-auto flex items-center space-x-4">
-          <Button
-            className="flex items-center justify-center rounded-full"
-            variant="ghost"
-            size="sm"
-            asChild
-          >
-            <Link href="/login">Sign In</Link>
-          </Button>
-          <Button
-            className="flex items-center justify-center rounded-full"
-            size="sm"
-            asChild
-          >
-            <Link href="/signup">Sign Up</Link>
-          </Button>
-        </div>
+        {/* Sign In/Sign Up Buttons or Account Email Display */}
+        {account && account.data?.email ? (
+          <div className="ml-auto flex items-center space-x-4">
+            <span className="text-sm font-medium text-primary text-right">
+              {account.data.email}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                // Clear the token from localStorage
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("access_token");
+                }
+                // Reload the page to update the UI
+                window.location.reload();
+              }}
+            >
+              <LogOut className="h-4 w-4 mr-1" />
+              Sign Out
+            </Button>
+          </div>
+        ) : (
+          <div className="ml-auto flex items-center space-x-4">
+            <Button
+              className="flex items-center justify-center rounded-full px-5 py-3 text-base h-9 min-w-[100px]"
+              size="sm"
+              asChild
+            >
+              <Link href="/login">
+                <LogIn className="h-5 w-5 mr-2" />
+                Sign in
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   );
