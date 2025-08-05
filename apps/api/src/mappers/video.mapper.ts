@@ -9,8 +9,7 @@ export function toVideoEntity(
   metadata: YoutubeMetadata,
 ): Partial<Video> {
   if (!request.youtubeId) throw new Error('YouTube ID is required');
-  if (!metadata || !metadata.title || !metadata.channelTitle)
-    throw new Error('Invalid YouTube metadata');
+  if (!metadata) throw new Error('Invalid YouTube metadata');
 
   // Map fields đúng entity
   return {

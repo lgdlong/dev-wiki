@@ -2,9 +2,12 @@
 import { z } from "zod";
 
 export const postVideoSchema = z.object({
-  youtubeUrl: z.string().min(5, {
-    message: "Youtube URL không hợp lệ.",
-  }),
+  youtubeUrl: z
+    .string()
+    .regex(
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w\-]{11}(&.*)?$/,
+      { message: "Invalid Youtube URL." }
+    ),
 });
 
 export type PostVideoFormValues = z.infer<typeof postVideoSchema>;

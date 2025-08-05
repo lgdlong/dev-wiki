@@ -101,7 +101,9 @@ export class VideosService {
       });
 
       const item = res.data.items?.[0];
-      if (!item) return {};
+      if (!item) {
+        throw new HttpException('Video not found on YouTube', 404);
+      }
 
       return {
         title: item.snippet?.title ?? undefined,
