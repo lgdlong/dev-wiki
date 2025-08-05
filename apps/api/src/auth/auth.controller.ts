@@ -44,11 +44,19 @@ export class AuthController {
   // Đăng nhập
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginDto) {
+  async login(@Body() dto: LoginDto, @Res() res: Response) {
     const email = dto.email.toLowerCase();
     const password = dto.password.trim();
     const data = await this.authService.validateUser(email, password);
-    return data;
+    // Set cookie 'role' for normal login
+    res.cookie('role', data.account.role, {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    return res.json(data);
   }
 
   // Lấy thông tin người dùng hiện tại
