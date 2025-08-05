@@ -50,3 +50,11 @@ export async function meApi(): Promise<Account> {
     },
   });
 }
+
+// Logout API: calls backend to clear the role cookie
+export async function logoutApi(): Promise<{ message: string }> {
+  return fetcher("/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+}

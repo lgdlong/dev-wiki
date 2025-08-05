@@ -18,6 +18,7 @@ import {
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Account } from "@/types/account";
 import { UseQueryResult } from "@tanstack/react-query";
+import { logoutApi } from "@/utils/api/auth";
 
 const videoComponents: { title: string; href: string; description: string }[] =
   [
@@ -43,6 +44,22 @@ const videoComponents: { title: string; href: string; description: string }[] =
 
 export function Navbar() {
   const account: UseQueryResult<Account, Error> = useCurrentUser();
+
+  // Hàm xử lý logout
+  async function handleLogout() {
+    try {
+      // 1. Gọi API để backend clear cookie
+      await logoutApi();
+    } catch (err) {
+      // Tuỳ ý handle error, có thể toast ở đây
+    }
+    // 2. Xoá access_token ở localStorage (nếu còn)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("access_token");
+    }
+    // 3. Reload lại trang để cập nhật UI
+    window.location.reload();
+  }
 
   return (
     <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -145,18 +162,7 @@ export function Navbar() {
             <span className="text-sm font-medium text-primary text-right">
               {account.data.email}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                // Clear the token from localStorage
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("access_token");
-                }
-                // Reload the page to update the UI
-                window.location.reload();
-              }}
-            >
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-1" />
               Sign Out
             </Button>
