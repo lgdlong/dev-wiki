@@ -5,10 +5,10 @@ export class Video {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'youtube_id', nullable: false })
+  @Column({ name: 'youtube_id', nullable: false, unique: true })
   youtubeId: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: false })
   title: string;
 
   @Column({ type: 'text', nullable: true })
