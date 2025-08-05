@@ -76,6 +76,67 @@ export class AuthService {
     };
   }
 
+  // Handle Google login: create user if not exists, then generate JWT
+  async handleGoogleLogin(googleProfile: {
+    googleId: string;
+    email: string;
+    name: string;
+    avatar?: string;
+    provider: string;
+    emailVerified?: boolean;
+  }): Promise<{
+    access_token: string;
+    account: AuthAccountResponse;
+  }> {
+    // 1. Check if user exists by email
+    let account = await this.accountService.findByEmail(googleProfile.email);
+
+    // 2. If user doesn't exist, create a new one
+    if (!account) {
+      // Create a new account for Google user
+      // Generate a random password for Google users (they won't use it)
+      const randomPassword =
+        Math.random().toString(36).slice(-12) +
+        Math.random().toString(36).slice(-12);
+
+      account = await this.accountService.create({
+        email: googleProfile.email,
+        name: googleProfile.name,
+        password: randomPassword, // Google users won't use this password
+        role: AccountRole.USER, // Default role for Google users
+      });
+
+      // Update avatar if provided
+      if (googleProfile.avatar && account.id) {
+        await this.accountService.update(account.id, {
+          avatar_url: googleProfile.avatar,
+        });
+        account.avatar_url = googleProfile.avatar;
+      }
+    }
+
+    // 3. Generate JWT token with the database user ID
+    const payload: JwtPayload = {
+      sub: account.id, // Use database user ID, not googleId
+      email: account.email,
+      role: account.role,
+      name: account.name,
+      avatar: account.avatar_url,
+      provider: googleProfile.provider,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      account: {
+        id: account.id,
+        email: account.email,
+        role: account.role,
+        name: account.name,
+        avatar_url: account.avatar_url,
+      },
+    };
+  }
+
   // Tạo JWT từ GoogleProfile hoặc Account
   generateJwt(payload: JwtPayload) {
     // Có thể tuỳ chỉnh payload cho phù hợp
