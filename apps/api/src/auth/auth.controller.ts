@@ -97,6 +97,15 @@ export class AuthController {
         return res.redirect(`${frontendUrl}?error=incomplete_login_data`);
       }
 
+      // Trước khi redirect về FE, set cookie "role"
+      res.cookie('role', loginResult.account.role, {
+        path: '/',
+        httpOnly: false, // middleware đọc được, client-side cũng đọc được nếu muốn
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 1 tuần
+      });
+
       // Redirect to frontend with token in URL params
       const FE_CALLBACK =
         (this.configService.get<string>('FRONTEND_URL') ||
@@ -112,5 +121,17 @@ export class AuthController {
         this.configService.get<string>('FRONTEND_URL') || DEFAULT_FRONTEND_URL;
       return res.redirect(`${frontendUrl}?error=internal_error`);
     }
+  }
+
+  // Logout: remove the 'role' cookie
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('role', {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return res.json({ message: 'Logged out successfully' });
   }
 }
