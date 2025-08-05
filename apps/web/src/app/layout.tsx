@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +28,13 @@ export default function RootLayout({
   const pathname = usePathname();
 
   // Liệt kê danh sách các route cần ẩn navbar
-  const hideNavbarRoutes = ["/login", "/signup"];
+  const hideNavbar =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/mod") ||
+    pathname.startsWith("/admin");
 
-  const showNavbar = !hideNavbarRoutes.includes(pathname);
+  const showNavbar = !hideNavbar;
 
   return (
     <html lang="en">
@@ -37,6 +42,7 @@ export default function RootLayout({
         className={`dark ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProvider client={queryClient}>
+          <Toaster richColors /> {/* 👈 THÊM DÒNG NÀY */}
           {showNavbar && <Navbar />}
           {children}
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}

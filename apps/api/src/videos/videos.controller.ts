@@ -7,19 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  Query,
+  // Query,
 } from '@nestjs/common';
 import { VideosService } from './videos.service';
-import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
+import { RequestCreateVideo } from './interfaces/request-create-video.interface';
 
 @Controller('videos')
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
 
   @Post()
-  create(@Body() createVideoDto: CreateVideoDto) {
-    return this.videosService.create(createVideoDto);
+  create(@Body() reqCreateVideo: RequestCreateVideo) {
+    return this.videosService.create(reqCreateVideo);
   }
 
   @Get()
