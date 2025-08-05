@@ -63,7 +63,7 @@ export function PostVideoForm() {
               <b>YouTube ID:</b> {video.youtubeId}
             </div>
           </div>
-        )
+        ),
       });
       // Optionally: form.reset();
     } catch (err: any) {

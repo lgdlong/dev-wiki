@@ -57,7 +57,7 @@ export async function getVideosByUploader(uploader: string): Promise<Video[]> {
 // Update a video
 export async function updateVideo(
   id: number,
-  data: UpdateVideoRequest
+  data: UpdateVideoRequest,
 ): Promise<Video> {
   return fetcher<Video>(`/videos/${id}`, {
     method: "PATCH",
