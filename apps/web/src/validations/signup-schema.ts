@@ -1,5 +1,4 @@
 // apps/web/src/validations/signup-schema.ts
-
 import { z } from "zod";
 
 export const signupSchema = z
