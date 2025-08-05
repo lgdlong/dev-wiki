@@ -6,7 +6,7 @@ export const postVideoSchema = z.object({
     .string()
     .regex(
       /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w\-]{11}(&.*)?$/,
-      { message: "Invalid Youtube URL." }
+      { message: "Invalid Youtube URL." },
     ),
 });
 
