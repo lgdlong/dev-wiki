@@ -1,7 +1,12 @@
 // apps/web/src/utils/jwt.ts
 // Utility to decode JWT and check expiry
 
-export function decodeJwt(token: string): any | null {
+export interface JwtPayload {
+  exp?: number;
+  [key: string]: unknown;
+}
+
+export function decodeJwt(token: string): JwtPayload | null {
   try {
     const payload = token.split(".")[1];
     const decoded = JSON.parse(
