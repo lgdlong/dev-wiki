@@ -51,7 +51,7 @@ export function Navbar() {
       // 1. Gọi API để backend clear cookie
       await logoutApi();
     } catch (err) {
-      // Tuỳ ý handle error, có thể toast ở đây
+      // Optionally handle the error, you can show a toast here
     }
     // 2. Xoá access_token ở localStorage (nếu còn)
     if (typeof window !== "undefined") {
