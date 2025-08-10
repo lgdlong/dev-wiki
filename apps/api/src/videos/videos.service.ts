@@ -24,7 +24,7 @@ export class VideosService {
       where: { youtubeId: requestCreateVideo.youtubeId },
     });
     if (existing) {
-      throw new HttpException('Video with this YouTube ID already exists', 409);
+      throw new HttpException(`Video with YouTube ID "${requestCreateVideo.youtubeId}" already exists`, 409);
     }
 
     // Lấy metadata từ Youtube
