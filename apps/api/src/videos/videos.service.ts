@@ -108,7 +108,7 @@ export class VideosService {
       });
 
       const item = res.data.items?.[0];
-      if (!item) throw new HttpException('Video not found', 404);
+      if (!item) throw new HttpException('Video not found on YouTube', 404);
 
       const durationISO = item.contentDetails?.duration ?? '';
       const durationSeconds = this.parseDuration(durationISO);
