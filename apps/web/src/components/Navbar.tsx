@@ -53,7 +53,7 @@ export function Navbar() {
     } catch (err) {
       // Optionally handle the error, you can show a toast here
     }
-    // 2. Xoá access_token ở localStorage (nếu còn)
+    // 2. Remove access_token from localStorage (if present)
     if (typeof window !== "undefined") {
       localStorage.removeItem("access_token");
     }
