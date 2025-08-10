@@ -57,7 +57,7 @@ export function Navbar() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("access_token");
     }
-    // 3. Reload lại trang để cập nhật UI
+    // 3. Reload the page to update the UI
     window.location.reload();
   }
 
