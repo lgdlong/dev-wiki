@@ -20,8 +20,8 @@ export class Video {
   @Column({ type: 'bigint', nullable: true, comment: 'duration in seconds' })
   duration: number;
 
-  @Column({ type: 'text', nullable: true })
-  uploader: string;
+  @Column({ name: 'uploader_id', type: 'bigint', nullable: true })
+  uploaderId: number;
 
   @Column({ name: 'channel_title', type: 'text', nullable: true })
   channelTitle: string;

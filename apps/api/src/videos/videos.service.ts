@@ -19,6 +19,14 @@ export class VideosService {
 
   // Tạo video, tự động lấy metadata từ Youtube
   async create(requestCreateVideo: RequestCreateVideo): Promise<Video> {
+    // Check for duplicate YouTube ID
+    const existing = await this.videoRepository.findOne({
+      where: { youtubeId: requestCreateVideo.youtubeId },
+    });
+    if (existing) {
+      throw new HttpException('Video with this YouTube ID already exists', 409);
+    }
+
     // Lấy metadata từ Youtube
     const metadata: YoutubeMetadata | undefined = await this.getYoutubeMetadata(
       requestCreateVideo.youtubeId,
@@ -66,9 +74,9 @@ export class VideosService {
     await this.videoRepository.remove(video);
   }
 
-  async findByUploader(uploader: string): Promise<Video[]> {
+  async findByUploaderId(uploaderId: number): Promise<Video[]> {
     return await this.videoRepository.find({
-      where: { uploader },
+      where: { uploaderId },
     });
   }
 
@@ -94,31 +102,47 @@ export class VideosService {
         version: 'v3',
         auth: this.YOUTUBE_API_KEY,
       });
-
       const res = await youtube.videos.list({
         id: [youtubeId],
-        part: ['snippet'],
+        part: ['snippet', 'contentDetails'],
       });
 
       const item = res.data.items?.[0];
-      if (!item) {
-        throw new HttpException('Video not found on YouTube', 404);
-      }
+      if (!item) throw new HttpException('Video not found', 404);
+
+      const durationISO = item.contentDetails?.duration ?? '';
+      const durationSeconds = this.parseDuration(durationISO);
 
       return {
-        title: item.snippet?.title ?? undefined,
-        // full descriptions, its can be long
-        description: item.snippet?.description ?? undefined,
-        // thumbnail picture url, size medium
-        thumbnail: item.snippet?.thumbnails?.medium?.url ?? '',
-        // the channel uploaded this video on YouTube
-        channelTitle: item.snippet?.channelTitle ?? undefined,
-        // the number of this video's views
-        viewCount: item.statistics?.viewCount ?? undefined,
+        title: item.snippet?.title || 'No Title',
+        description: item.snippet?.description || 'No description',
+        thumbnail: item.snippet?.thumbnails?.medium?.url ?? 'No thumbnail',
+        duration: durationSeconds,
+        channelTitle: item.snippet?.channelTitle || 'No Channel Title',
       };
     } catch (error) {
       console.error('Error fetching YouTube metadata:', error);
-      throw new HttpException('Failed to fetch YouTube metadata', 500);
+      throw new HttpException('Failed to fetch metadata', 500);
     }
+  }
+
+  /**
+   * Parses an ISO 8601 duration string (e.g., "PT1H2M3S") and converts it to the total number of seconds.
+   *
+   * @param durationISO - The duration string to parse, typically in the format "PT#H#M#S".
+   * @returns The total duration in seconds.
+   * @example Parses "PT1H2M3S" and returns 3723 seconds
+   */
+  private parseDuration(durationISO: string): number {
+    const matches = durationISO.match(/[0-9]+[HMS]/g);
+    let seconds = 0;
+    (matches || []).forEach((part) => {
+      const unit = part.charAt(part.length - 1);
+      const amount = parseInt(part.slice(0, -1), 10);
+      if (unit === 'H') seconds += amount * 3600;
+      else if (unit === 'M') seconds += amount * 60;
+      else if (unit === 'S') seconds += amount;
+    });
+    return seconds;
   }
 }

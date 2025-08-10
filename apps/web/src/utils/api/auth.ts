@@ -2,6 +2,7 @@
 import { fetcher } from "@/lib/fetcher";
 import { Account } from "@/types/account";
 import { LoginResponse } from "@/types/auth";
+import { isJwtExpired } from "@/utils/jwt";
 
 // Đăng nhập
 export async function loginApi({
@@ -40,7 +41,16 @@ export async function meApi(): Promise<Account> {
   // Lấy token từ localStorage
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
   if (!token) throw new Error("Chưa đăng nhập hoặc không tìm thấy token!");
+  if (isJwtExpired(token)) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+  }
 
   return fetcher("/me", {
     method: "GET",

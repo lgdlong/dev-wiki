@@ -17,14 +17,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
   PostVideoFormValues,
   postVideoSchema,
 } from "@/validations/post-video-schema";
+import { YOUTUBE_URL_REGEX, YOUTUBE_ID_REGEX } from "../constant";
 
-// Regex cho nhiều dạng URL Youtube
-const YOUTUBE_ID_REGEX =
-  /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+function isValidYoutubeUrl(url: string) {
+  return YOUTUBE_URL_REGEX.test(url);
+}
 
 function extractYouTubeId(url: string) {
   const match = url.match(YOUTUBE_ID_REGEX);
@@ -33,6 +35,7 @@ function extractYouTubeId(url: string) {
 
 export function PostVideoForm() {
   const [youtubeId, setYoutubeId] = useState("");
+  const { data: currentUser } = useCurrentUser();
 
   const form = useForm<PostVideoFormValues>({
     resolver: zodResolver(postVideoSchema),
@@ -41,23 +44,49 @@ export function PostVideoForm() {
     },
   });
 
-  async function onSubmit(data: PostVideoFormValues) {
-    const youtubeId = extractYouTubeId(data.youtubeUrl);
-    if (!youtubeId) {
-      toast("Không tìm thấy Youtube ID từ URL.", {
-        description: "Vui lòng kiểm tra lại đường dẫn.",
-        // Sonner tự nhận diện lỗi = màu đỏ
+  async function onSubmit(formValues: PostVideoFormValues) {
+    // Check validity of YouTube URL
+    if (!isValidYoutubeUrl(formValues.youtubeUrl)) {
+      toast("Invalid URL", {
+        description: "Please enter a valid YouTube link.",
       });
       return;
     }
+
+    // Extract YouTube ID from URL
+    const extractedYoutubeId = extractYouTubeId(formValues.youtubeUrl);
+    if (!extractedYoutubeId) {
+      toast("Could not extract YouTube ID from URL.", {
+        description: "Please check the link again.",
+      });
+      return;
+    }
+
     try {
-      const video = await createVideo({ youtubeId });
-      console.log("[DEBUG] Video created:", video);
-      toast("Video đã được thêm thành công!", {
+      // Call API to create video
+      console.log("[DEBUG] Uploader:", currentUser);
+      const uploaderId = currentUser?.id || 0;
+      console.log("[DEBUG] ID: ", uploaderId);
+      const video = await createVideo({
+        youtubeId: extractedYoutubeId,
+        uploaderId,
+      });
+
+      // Show success toast with video details
+      toast("Video added successfully!", {
         description: (
           <div>
             <div>
-              <b>Tên video:</b> {video.title || "(Không có tiêu đề)"}
+              <b>Title:</b> {video.title || "(No title)"}
+            </div>
+            <div>
+              <b>Uploader ID:</b> {video.uploaderId ?? "(Unknown)"}
+            </div>
+            <div>
+              <b>Channel Title:</b> {video.channelTitle || "(Unknown)"}
+            </div>
+            <div>
+              <b>Duration:</b> {video.duration || "(Unknown duration)"}
             </div>
             <div>
               <b>YouTube ID:</b> {video.youtubeId}
@@ -66,9 +95,9 @@ export function PostVideoForm() {
         ),
       });
       // Optionally: form.reset();
-    } catch (err: any) {
-      toast("Lỗi khi thêm video", {
-        description: err.message || "Đã xảy ra lỗi.",
+    } catch (error: any) {
+      toast("Error adding video", {
+        description: error.message || "An error occurred.",
       });
     }
   }
@@ -96,7 +125,7 @@ export function PostVideoForm() {
                   onChange={handleUrlChange}
                 />
               </FormControl>
-              <FormDescription>Nhập link video Youtube bất kỳ.</FormDescription>
+              <FormDescription>Enter any Youtube video link.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -112,7 +141,8 @@ export function PostVideoForm() {
             />
           </FormControl>
           <FormDescription>
-            Youtube video ID sẽ tự động hiển thị ở đây sau khi bạn nhập URL.
+            The YouTube video ID will automatically appear here after you enter
+            the URL.
           </FormDescription>
         </FormItem>
         {/* Button submit form */}

@@ -4,7 +4,7 @@ import { Video } from "@/types/video";
 // Interface for creating a video
 export interface CreateVideoRequest {
   youtubeId: string;
-  uploader?: string;
+  uploaderId?: number;
 }
 
 // Interface for updating a video (partial Video without id and createdAt)
@@ -14,7 +14,7 @@ export interface UpdateVideoRequest {
   description?: string;
   thumbnailUrl?: string;
   duration?: number;
-  uploader?: string;
+  uploaderId?: number;
   metadata?: Record<string, any>;
 }
 
@@ -48,8 +48,10 @@ export async function getVideoByYoutubeId(youtubeId: string): Promise<Video> {
 }
 
 // Get videos by uploader
-export async function getVideosByUploader(uploader: string): Promise<Video[]> {
-  return fetcher<Video[]>(`/videos/uploader/${uploader}`, {
+export async function getVideosByUploader(
+  uploaderId: number,
+): Promise<Video[]> {
+  return fetcher<Video[]>(`/videos/uploader/${uploaderId}`, {
     method: "GET",
   });
 }

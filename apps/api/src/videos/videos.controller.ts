@@ -32,9 +32,9 @@ export class VideosController {
     return this.videosService.findByYoutubeId(youtubeId);
   }
 
-  @Get('uploader/:uploader')
-  findByUploader(@Param('uploader') uploader: string) {
-    return this.videosService.findByUploader(uploader);
+  @Get('uploader/:uploaderId')
+  findByUploaderId(@Param('uploaderId', ParseIntPipe) uploaderId: number) {
+    return this.videosService.findByUploaderId(uploaderId);
   }
 
   @Get(':id')
