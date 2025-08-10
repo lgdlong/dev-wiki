@@ -55,17 +55,6 @@ import { GoogleStrategy } from './auth/google.strategy';
           TutorialTag,
         ],
         synchronize: true,
-        ssl: {
-          rejectUnauthorized: false, // Required for Render.com hosted databases
-        },
-        // ssl:
-        //   process.env.NODE_ENV === 'production'
-        //     ? {
-        //         rejectUnauthorized: true,
-        //       }
-        //     : {
-        //         rejectUnauthorized: false,
-        //       }, // Only for development
         connectTimeoutMS: 60000, // 60 seconds
         acquireTimeoutMillis: 60000,
         timeout: 60000,
