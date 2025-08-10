@@ -5,17 +5,17 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const role = request.cookies.get("role")?.value;
 
-  // Chặn nếu vào /admin mà không phải admin
+  // Block access to /admin if the user is not an admin
   if (pathname.startsWith("/admin") && role !== "admin") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Chặn nếu vào /mod mà không phải mod hoặc admin
+  // Block access to /mod if the user is not a mod or admin
   if (pathname.startsWith("/mod") && role !== "mod" && role !== "admin") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Các trường hợp còn lại được đi tiếp
+  // Allow all other cases to proceed
   return NextResponse.next();
 }
 
