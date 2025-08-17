@@ -1,60 +1,273 @@
-# Dev Wiki
+# Dev Wiki Monorepo
 
-A comprehensive development wiki platform built with modern web technologies. This monorepo contains multiple applications and shared packages for creating, managing, and consuming developer documentation and tutorials.
+> A comprehensive developer knowledge-sharing platform built with TypeScript, featuring video tutorials, product reviews, and community discussions.
 
-## 🚀 Project Overview
+## 🏗️ Architecture Overview
 
-Dev Wiki is a full-stack monorepo application designed to provide a seamless platform for developer documentation and knowledge sharing. The project leverages the power of Turborepo for efficient development and build processes across multiple interconnected applications.
+Dev Wiki is a modern TypeScript-first monorepo that enables developers to share knowledge through interactive tutorials, video content, and product reviews. Built with scalability and developer experience in mind.
 
-### 🛠 Tech Stack
+### 🚀 Tech Stack
 
-- **Frontend**: Next.js 15.3.0 with React 19
-- **Backend**: NestJS with TypeScript
-- **Monorepo Management**: Turborepo 2.5.4
-- **Package Manager**: pnpm 9.0.0
-- **Language**: TypeScript 5.8.3
-- **Styling**: Shared UI component library
-- **Code Quality**: ESLint + Prettier
-- **Runtime**: Node.js 18+
+- **Frontend**: Next.js 15 (React 19) + Tailwind CSS + Shadcn/ui
+- **Backend**: NestJS + TypeORM + PostgreSQL
+- **Authentication**: JWT + Google OAuth + Role-based Access Control (RBAC)
+- **Monorepo**: Turborepo + pnpm workspaces
+- **Language**: TypeScript (strict mode)
+- **Code Quality**: ESLint + Prettier + shared configurations
 
-## 📁 Project Structure
+### � Project Structure
 
-This monorepo includes the following applications and packages:
+```
+dev-wiki/
+├── apps/
+│   ├── web/                 # Next.js frontend (port 3000)
+│   ├── api/                 # NestJS backend (port 8000)
+│   └── db/                  # Database scripts & Docker setup
+├── packages/
+│   ├── eslint-config/       # Shared ESLint rules
+│   ├── typescript-config/   # Shared TypeScript configs
+│   └── ui/                  # Shared React components (@repo/ui)
+└── docker-compose.yml       # PostgreSQL + development services
+```
 
-### Applications
+## 🚀 Quick Start
 
-- **`web`**: Main web application built with Next.js (runs on port 3000)
-- **`docs`**: Documentation site built with Next.js (runs on port 3001)
-- **`api`**: Backend API server built with NestJS
+### Prerequisites
 
-### Shared Packages
+- **Node.js** 18+ 
+- **pnpm** 9.0.0+
+- **Docker** (for PostgreSQL)
 
-- **`@repo/ui`**: Shared React component library used across all applications
-- **`@repo/eslint-config`**: ESLint configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- **`@repo/typescript-config`**: Shared TypeScript configurations for the monorepo
+### Setup
 
-All packages and applications are written in 100% TypeScript for enhanced developer experience and type safety.
-
-## 📋 Prerequisites
-
-Before getting started, ensure you have the following installed on your system:
-
-### Required Software
-
-1. **Node.js** (version 18 or higher)
-
+1. **Clone and install dependencies:**
    ```bash
-   node --version  # Should show v18.0.0 or higher
+   git clone <repository-url>
+   cd dev-wiki
+   pnpm install
    ```
 
-2. **pnpm** (version 9.0.0 or higher) - Required package manager
+2. **Start database:**
+   ```bash
+   docker compose up -d
+   ```
+
+3. **Configure environment variables:**
+   ```bash
+   # Copy environment files for each app
+   cp apps/api/.env.example apps/api/.env
+   cp apps/web/.env.example apps/web/.env
+   ```
+
+4. **Start development servers:**
+   ```bash
+   pnpm dev
+   ```
+
+### Access Points
+
+- **Frontend**: http://localhost:3000
+- **API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/api (Swagger)
+- **Database**: PostgreSQL on localhost:5432
+
+## ⚡ Development Workflow
+
+### Essential Commands
+
+```bash
+# Install dependencies
+pnpm install
+
+# Development (all apps)
+pnpm dev
+
+# Individual apps
+pnpm dev --filter=web    # Frontend only
+pnpm dev --filter=api    # Backend only
+
+# Build
+pnpm build               # All apps
+pnpm build --filter=api  # Backend only
+
+# Testing
+pnpm test               # All tests
+pnpm test:e2e          # End-to-end tests
+pnpm test:cov          # Coverage report
+
+# Code quality
+pnpm lint              # Lint all code
+pnpm lint --fix        # Auto-fix issues
+pnpm format            # Format code
+```
+
+### Database Management
+
+```bash
+# Start PostgreSQL
+docker compose up -d
+
+# View logs
+docker compose logs postgres
+
+# Connect to database
+docker exec -it dev-wiki-postgres psql -U devwiki -d devwiki
+```
+
+## 🏛️ Architecture Details
+
+### Authentication Flow
+1. **JWT Tokens**: Stored in localStorage for API authentication
+2. **Role Cookies**: Set by backend, read by frontend middleware for RBAC
+3. **Google OAuth**: Integrated via Passport.js
+4. **Roles**: `user`, `mod`, `admin` with route-level protection
+
+### Key Features
+- **Video Management**: YouTube integration with metadata fetching
+- **Tutorial System**: Rich content creation and management
+- **Comment System**: Nested comments with replies
+- **Voting System**: Upvote/downvote for content
+- **Product Reviews**: Community-driven product evaluations
+- **Category System**: Organized content discovery
+
+### Data Flow
+```
+Frontend (Next.js) → API Routes → Backend (NestJS) → Database (PostgreSQL)
+       ↑                                    ↓
+   React Query Cache ←────── JWT Auth ──────┘
+```
+
+## 🛠️ Development Guidelines
+
+### Code Standards
+- **TypeScript strict mode** - No `any` types
+- **Shared configurations** - ESLint/Prettier/TypeScript
+- **Component patterns** - Reusable UI components in `@repo/ui`
+- **API patterns** - DTOs, Guards, Services, Controllers
+
+### Best Practices
+1. **Use pnpm** for all package management
+2. **Follow RBAC patterns** - Backend sets cookies, frontend enforces
+3. **Type-safe APIs** - Share types between frontend/backend
+4. **Test thoroughly** - Unit tests, E2E tests, coverage reports
+5. **Error handling** - Structured errors with user-friendly messages
+
+### Project Conventions
+- **File naming**: kebab-case for files, PascalCase for components
+- **Import order**: External → Internal → Relative
+- **Error handling**: Try/catch with specific error types
+- **Validation**: DTOs (backend) + Zod schemas (frontend)
+
+## 📚 Documentation
+
+### Application READMEs
+- [Frontend (Web App)](./apps/web/README.md)
+- [Backend (API)](./apps/api/README.md)
+- [Database Setup](./apps/db/README.md)
+
+### API Documentation
+- **Swagger UI**: http://localhost:8000/api (when running)
+- **Endpoints**: See `apps/api/README.md` for detailed API documentation
+- **Authentication**: JWT bearer tokens + role-based access
+
+### Deployment
+- **Frontend**: Vercel-ready (Next.js)
+- **Backend**: Docker-ready (NestJS)
+- **Database**: PostgreSQL with TypeORM migrations
+- **Environment**: Separate configs for dev/staging/production
+
+## 🤝 Contributing
+
+### Before Making Changes
+1. **Understand the structure** - Review this README and app-specific docs
+2. **Check existing patterns** - Follow established conventions
+3. **Run tests** - Ensure all tests pass before committing
+4. **Type safety** - Verify TypeScript compilation
+
+### Common Tasks
+- **New API endpoint**: Create controller → service → DTO → entity
+- **New frontend page**: Use App Router → hooks → API integration
+- **Database changes**: Update entities → run migrations → update types
+- **UI components**: Add to `@repo/ui` for reusability
+
+### Development Flow
+```bash
+# 1. Create feature branch
+git checkout -b feature/your-feature
+
+# 2. Make changes and test
+pnpm dev
+pnpm test
+pnpm lint
+
+# 3. Build and verify
+pnpm build
+
+# 4. Commit and push
+git commit -m "feat: your feature description"
+git push origin feature/your-feature
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Database connection failed:**
+```bash
+# Ensure PostgreSQL is running
+docker compose up -d
+# Check logs
+docker compose logs postgres
+```
+
+**TypeScript errors:**
+```bash
+# Check shared configs
+ls packages/typescript-config/
+# Rebuild types
+pnpm build --filter=api
+```
+
+**Port conflicts:**
+```bash
+# Check running processes
+lsof -i :3000  # Frontend
+lsof -i :8000  # Backend
+lsof -i :5432  # Database
+```
+
+**Build failures:**
+```bash
+# Clean and reinstall
+rm -rf node_modules apps/*/node_modules
+pnpm install
+pnpm build
+```
+
+### Getting Help
+- Check app-specific READMEs for detailed setup
+- Review error logs in terminal output
+- Ensure all environment variables are configured
+- Verify Node.js and pnpm versions match requirements
+
+---
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🔗 Links
+
+- [Frontend Documentation](./apps/web/README.md)
+- [API Documentation](./apps/api/README.md)
+- [Copilot Instructions](./.github/copilot-instructions.md)
 
    ```bash
    npm install -g pnpm
    pnpm --version  # Should show 9.0.0 or higher
    ```
 
-3. **Git** (for cloning the repository)
+1. **Git** (for cloning the repository)
    ```bash
    git --version
    ```
