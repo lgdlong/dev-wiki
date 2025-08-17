@@ -2,21 +2,21 @@
 
 > Robust NestJS backend API providing authentication, content management, and community features for the Dev Wiki platform.
 
-## 🏗️ Overview
+## Overview
 
 The **API** is the core backend service for Dev Wiki, built with NestJS and TypeScript. It provides a comprehensive REST API with JWT authentication, role-based access control, and full CRUD operations for all platform features.
 
-### ✨ Key Features
+### Key Features
 
-- **🔐 Authentication**: JWT + Google OAuth with Passport.js
-- **👥 Role-Based Access Control**: User, Moderator, and Admin roles
-- **📚 Content Management**: Videos, tutorials, categories, and tags
-- **💬 Community Features**: Comments, voting, and user interactions
-- **📊 Product Reviews**: Product management and categorization
-- **🛡️ Security**: Guards, validation, and error handling
-- **📖 API Documentation**: Automatic Swagger/OpenAPI generation
+- ** Authentication**: JWT + Google OAuth with Passport.js
+- ** Role-Based Access Control**: User, Moderator, and Admin roles
+- ** Content Management**: Videos, tutorials, categories, and tags
+- ** Community Features**: Comments, voting, and user interactions
+- ** Product Reviews**: Product management and categorization
+- ** Security**: Guards, validation, and error handling
+- ** API Documentation**: Automatic Swagger/OpenAPI generation
 
-### 🛠️ Tech Stack
+### Tech Stack
 
 - **Framework**: NestJS (Node.js/Express)
 - **Database**: PostgreSQL with TypeORM
@@ -26,7 +26,7 @@ The **API** is the core backend service for Dev Wiki, built with NestJS and Type
 - **Testing**: Jest + Supertest
 - **TypeScript**: Strict mode for type safety
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -102,7 +102,7 @@ NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 apps/api/
@@ -142,7 +142,7 @@ apps/api/
 └── package.json
 ```
 
-## 🔐 Authentication & Authorization
+## Authentication & Authorization
 
 ### Authentication Architecture
 
@@ -243,7 +243,7 @@ export class AuthController {
 }
 ```
 
-## 🗄️ Database Design
+## Database Design
 
 ### TypeORM Configuration
 
@@ -300,7 +300,7 @@ pnpm migration:run
 pnpm migration:revert
 ```
 
-## 📝 API Modules
+## API Modules
 
 ### Video Management
 
@@ -380,7 +380,7 @@ export class VideosService {
 }
 ```
 
-## 🛡️ Security & Validation
+## Security & Validation
 
 ### Input Validation
 
@@ -433,7 +433,7 @@ app.enableCors({
 });
 ```
 
-## 📖 API Documentation
+## API Documentation
 
 ### Swagger Configuration
 
@@ -464,7 +464,7 @@ Local: http://localhost:8000/api
 Production: https://your-domain.com/api
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Unit Tests
 
@@ -539,7 +539,7 @@ pnpm test:e2e
 pnpm test:cov
 ```
 
-## 🔧 Development Commands
+## Development Commands
 
 ```bash
 # Development
@@ -560,7 +560,7 @@ pnpm test:e2e         # End-to-end tests
 pnpm test:cov         # Coverage report
 ```
 
-## 🚀 Performance & Optimization
+## Performance & Optimization
 
 ### Database Optimization
 
@@ -599,7 +599,7 @@ export class VideosService {
 - **Response Compression**: gzip enabled
 - **Rate Limiting**: Implement for production
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -652,7 +652,7 @@ DEBUG=nest:* pnpm dev
 # Set in app.module.ts: logging: true
 ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### NestJS Documentation
 - [Official Docs](https://docs.nestjs.com/)

@@ -2,13 +2,13 @@
 
 > Database initialization scripts and sample data for the Dev Wiki platform.
 
-## 📁 Directory Contents
+## Directory Contents
 
 - **`init.sh`** - Database initialization script that automatically restores from dump files
 - **`*.dump`** - PostgreSQL database dump files with sample data
 - **`sample_accounts.json`** - Sample user accounts for testing and development
 
-## 🚀 Quick Setup
+## Quick Setup
 
 ### Using Docker (Recommended)
 
@@ -33,7 +33,7 @@ pg_dump -U postgres -h localhost dev_wiki > backup_$(date +%Y%m%d_%H%M).dump
 psql -U postgres -h localhost -d dev_wiki < backup_file.dump
 ```
 
-## 📊 Sample Data
+## Sample Data
 
 The database includes:
 - Sample user accounts (see `sample_accounts.json`)
@@ -48,7 +48,7 @@ The database includes:
 | admin@admin.com | Abcd1234@ | Admin |
 | phungluuhoanglong@gmail.com | Abcd1234@ | User |
 
-## 🔧 Configuration
+## Configuration
 
 Database runs on (development local defaults):
 
@@ -60,7 +60,7 @@ USERNAME=postgres
 PASSWORD=postgres
 ```
 
-## 📝 Notes
+## Notes
 
 - The `init.sh` script automatically runs when the container starts
 - Only restores data if the database is empty

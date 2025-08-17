@@ -2,20 +2,20 @@
 
 > Modern Next.js 15 frontend application with React 19, providing a rich user interface for the Dev Wiki platform.
 
-## 🏗️ Overview
+## Overview
 
 The **Web App** is the primary frontend application for Dev Wiki, built with Next.js 15 and React 19. It provides an intuitive interface for users to browse tutorials, manage videos, interact with the community, and access administrative features.
 
-### ✨ Key Features
+### Key Features
 
-- **🔐 Authentication**: JWT + Google OAuth with role-based access control
-- **📚 Content Management**: Tutorial creation, video management, and categorization
-- **💬 Community Features**: Comments, voting, and user interactions
-- **📱 Responsive Design**: Mobile-first approach with Tailwind CSS
-- **⚡ Performance**: Server-side rendering, caching, and optimized loading
-- **🎨 Modern UI**: Shadcn/ui components with consistent design system
+- ** Authentication**: JWT + Google OAuth with role-based access control
+- ** Content Management**: Tutorial creation, video management, and categorization
+- ** Community Features**: Comments, voting, and user interactions
+- ** Responsive Design**: Mobile-first approach with Tailwind CSS
+- ** Performance**: Server-side rendering, caching, and optimized loading
+- ** Modern UI**: Shadcn/ui components with consistent design system
 
-### 🛠️ Tech Stack
+### Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **React**: React 19 with React Query for state management
@@ -25,7 +25,7 @@ The **Web App** is the primary frontend application for Dev Wiki, built with Nex
 - **Notifications**: Sonner toast system
 - **TypeScript**: Strict mode for type safety
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -76,7 +76,7 @@ NEXT_PUBLIC_APP_NAME=Dev Wiki
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 apps/web/
@@ -106,7 +106,7 @@ apps/web/
 └── package.json
 ```
 
-## 🔐 Authentication & Authorization
+## Authentication & Authorization
 
 ### Authentication Flow
 
@@ -149,7 +149,7 @@ apps/web/
 - **Refresh**: Handled automatically by API client
 - **Security**: HttpOnly cookies for role information
 
-## 🎨 UI Components & Styling
+## UI Components & Styling
 
 ### Design System
 
@@ -193,7 +193,7 @@ module.exports = {
 - **Components**: Responsive by default
 - **Navigation**: Collapsible mobile menu
 
-## 📊 State Management
+## State Management
 
 ### React Query Setup
 
@@ -241,7 +241,7 @@ const form = useForm<VideoFormValues>({
 });
 ```
 
-## 🛣️ Routing & Navigation
+## Routing & Navigation
 
 ### App Router Structure
 
@@ -279,7 +279,7 @@ export function middleware(request: NextRequest) {
 }
 ```
 
-## 📝 Forms & Validation
+## Forms & Validation
 
 ### Zod Schemas
 
@@ -322,7 +322,7 @@ export function PostVideoForm() {
 }
 ```
 
-## 🔧 Development Commands
+## Development Commands
 
 ```bash
 # Development
@@ -341,7 +341,7 @@ pnpm test:coverage    # Coverage report
 pnpm type-check       # TypeScript validation
 ```
 
-## 🚀 Performance Optimization
+## Performance Optimization
 
 ### Next.js Features
 
@@ -370,7 +370,7 @@ const queryClient = new QueryClient({
 - **Component splitting**: Dynamic imports for heavy components
 - **Lazy loading**: React.lazy for non-critical components
 
-## 🧪 Testing
+## Testing
 
 ### Testing Setup
 
@@ -398,7 +398,7 @@ test('renders video form', () => {
 });
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -446,7 +446,7 @@ pnpm install
 3. **Network Tab**: Monitor API calls and responses
 4. **React DevTools**: Install browser extension for debugging
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [React Query Guide](https://tanstack.com/query/latest)
@@ -454,7 +454,7 @@ pnpm install
 - [Shadcn/ui Components](https://ui.shadcn.com/docs)
 - [React Hook Form](https://react-hook-form.com/docs)
 
-## 🤝 Contributing
+## Contributing
 
 ### Code Style
 
