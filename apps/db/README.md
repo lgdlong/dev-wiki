@@ -47,6 +47,7 @@ The database includes:
 |-------|----------|------|
 | admin@admin.com | Abcd1234@ | Admin |
 | phungluuhoanglong@gmail.com | Abcd1234@ | User |
+| mod@mod.com | Abcd1234@ | Moderator |
 
 ## Configuration
 
