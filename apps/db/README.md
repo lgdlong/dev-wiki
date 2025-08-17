@@ -23,16 +23,6 @@ docker compose down -v
 docker compose up -d
 ```
 
-### Manual Database Operations
-
-```bash
-# Create database backup
-pg_dump -U postgres -h localhost dev_wiki > backup_$(date +%Y%m%d_%H%M).dump
-
-# Restore from backup
-psql -U postgres -h localhost -d dev_wiki < backup_file.dump
-```
-
 ## Sample Data
 
 The database includes:
