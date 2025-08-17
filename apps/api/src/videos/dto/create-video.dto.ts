@@ -27,9 +27,9 @@ export class CreateVideoDto {
   @IsOptional()
   duration?: number;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  uploader?: string;
+  uploaderId?: number;
 
   @IsObject()
   @IsOptional()

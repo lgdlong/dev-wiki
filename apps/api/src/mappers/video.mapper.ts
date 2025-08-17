@@ -15,9 +15,10 @@ export function toVideoEntity(
   return {
     youtubeId: request.youtubeId,
     title: metadata.title,
-    uploader: request.uploader || metadata.channelTitle || 'Unknown',
+    uploaderId: request.uploaderId || 0,
     description: metadata.description,
     thumbnailUrl: metadata.thumbnail,
+    duration: metadata.duration,
     channelTitle: metadata.channelTitle,
     metadata, // nếu Video entity có field metadata (jsonb)
   };

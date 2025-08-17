@@ -21,9 +21,7 @@ import { AppService } from 'src/app.service';
 import { ConfigService } from '@nestjs/config';
 import { DEFAULT_FRONTEND_URL } from 'src/common/constants';
 import { Response, Request } from 'express';
-import { GoogleProfile } from './interfaces/google-profile.interface';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { AccountRole } from 'src/common/enums/account-role.enum';
+import { AuthAccountResponse } from './interfaces/auth-account-response.interface';
 
 @Controller()
 export class AuthController {
@@ -46,11 +44,19 @@ export class AuthController {
   // Đăng nhập
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginDto) {
+  async login(@Body() dto: LoginDto, @Res() res: Response) {
     const email = dto.email.toLowerCase();
     const password = dto.password.trim();
     const data = await this.authService.validateUser(email, password);
-    return data;
+    // Set cookie 'role' for normal login
+    res.cookie('role', data.account.role, {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    return res.json(data);
   }
 
   // Lấy thông tin người dùng hiện tại
@@ -73,9 +79,9 @@ export class AuthController {
   // Google OAuth callback
   @Get('google-redirect')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     try {
-      // Get user data from Google OAuth
+      // Get result from Google OAuth strategy
       const result = this.appService.googleLogin(req);
 
       if (!('user' in result)) {
@@ -85,28 +91,28 @@ export class AuthController {
         return res.redirect(`${frontendUrl}?error=google_auth_failed`);
       }
 
-      const user: GoogleProfile = result.user;
+      // The strategy now returns the login result with access_token and account
+      const loginResult = result.user as unknown as {
+        access_token: string;
+        account: AuthAccountResponse;
+      };
 
-      // Validate required user properties
-      if (!user.googleId || !user.email || !user.name) {
+      // Validate login result
+      if (!loginResult.access_token || !loginResult.account) {
         const frontendUrl =
           this.configService.get<string>('FRONTEND_URL') ||
           DEFAULT_FRONTEND_URL;
-        return res.redirect(`${frontendUrl}?error=incomplete_user_data`);
+        return res.redirect(`${frontendUrl}?error=incomplete_login_data`);
       }
 
-      // Create JWT payload for Google user
-      const payload: JwtPayload = {
-        sub: user.googleId, // Use googleId as sub for Google users
-        email: user.email,
-        role: AccountRole.USER, // Default role for Google login
-        name: user.name,
-        avatar: user.avatar,
-        provider: user.provider ?? 'google',
-      };
-
-      // Generate JWT token
-      const access_token = this.authService.generateJwt(payload);
+      // Trước khi redirect về FE, set cookie "role"
+      res.cookie('role', loginResult.account.role, {
+        path: '/',
+        httpOnly: false, // middleware đọc được, client-side cũng đọc được nếu muốn
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 1 tuần
+      });
 
       // Redirect to frontend with token in URL params
       const FE_CALLBACK =
@@ -114,7 +120,7 @@ export class AuthController {
           DEFAULT_FRONTEND_URL) + '/google-callback';
 
       // Encode the token and user data for URL
-      const redirectUrl = `${FE_CALLBACK}?token=${encodeURIComponent(access_token)}&provider=google&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`;
+      const redirectUrl = `${FE_CALLBACK}?token=${encodeURIComponent(loginResult.access_token)}&provider=google&name=${encodeURIComponent(loginResult.account.name || '')}&email=${encodeURIComponent(loginResult.account.email)}&role=${encodeURIComponent(loginResult.account.role)}`;
 
       return res.redirect(redirectUrl);
     } catch (err) {
@@ -123,5 +129,17 @@ export class AuthController {
         this.configService.get<string>('FRONTEND_URL') || DEFAULT_FRONTEND_URL;
       return res.redirect(`${frontendUrl}?error=internal_error`);
     }
+  }
+
+  // Logout: remove the 'role' cookie
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('role', {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return res.json({ message: 'Logged out successfully' });
   }
 }

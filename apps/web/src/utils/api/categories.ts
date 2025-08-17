@@ -38,7 +38,7 @@ export async function getCategoryByName(name: string): Promise<Category> {
 
 // Create new category
 export async function createCategory(
-  categoryData: CategoryCreate
+  categoryData: CategoryCreate,
 ): Promise<Category> {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
@@ -54,7 +54,7 @@ export async function createCategory(
 // Update category
 export async function updateCategory(
   id: number,
-  categoryData: CategoryUpdate
+  categoryData: CategoryUpdate,
 ): Promise<Category> {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
