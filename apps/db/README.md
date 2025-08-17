@@ -51,15 +51,15 @@ The database includes:
 
 ## Configuration
 
-Database runs on (development local defaults):
+Connection info:
 
-```env
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_NAME=dev_wiki_local
-USERNAME=postgres
-PASSWORD=postgres
-```
+| Variable      | Value           |
+|--------------|-----------------|
+| DB_HOST      | `127.0.0.1` (or `localhost`)       |
+| DB_PORT      | `5432`           |
+| DB_NAME      | `dev_wiki_local`  |
+| USERNAME     | `postgres`        |
+| PASSWORD     | `postgres`        |
 
 ## Notes
 
