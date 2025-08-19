@@ -152,7 +152,7 @@ export function useTagSearch(opts: Options = {}) {
   const loadMore = useCallback(() => {
     if (!enabled) return;
     if (!nextCursor) return;
-    const query = q.trim().toLowerCase();
+    const query = normalizeTagName(q);
     fetchPage(query, nextCursor);
   }, [enabled, nextCursor, q, fetchPage]);
 
