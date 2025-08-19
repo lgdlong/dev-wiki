@@ -42,7 +42,7 @@ describe('VideosService', () => {
   });
 
   describe('create', () => {
-    it('should create a video', async () => {
+    it('should create a videos', async () => {
       const createVideoDto: CreateVideoDto = {
         title: 'Test Video',
         description: 'Test Description',
@@ -63,7 +63,7 @@ describe('VideosService', () => {
   });
 
   describe('findByYoutubeId', () => {
-    it('should return video by YouTube ID', async () => {
+    it('should return videos by YouTube ID', async () => {
       const video = { id: 1, title: 'Test Video', youtubeId: 'abc123' };
 
       mockRepository.findOne.mockResolvedValue(video);
@@ -76,7 +76,7 @@ describe('VideosService', () => {
       expect(result).toEqual(video);
     });
 
-    it('should throw NotFoundException if video not found', async () => {
+    it('should throw NotFoundException if videos not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findByYoutubeId('nonexistent')).rejects.toThrow(
@@ -104,7 +104,7 @@ describe('VideosService', () => {
   });
 
   describe('findOne', () => {
-    it('should throw NotFoundException if video not found', async () => {
+    it('should throw NotFoundException if videos not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne(1)).rejects.toThrow(NotFoundException);

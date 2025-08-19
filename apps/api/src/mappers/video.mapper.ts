@@ -1,4 +1,4 @@
-// src/videos/mappers/video.mapper.ts
+// src/videos/mappers/videos.mapper.ts
 import { Video } from 'src/videos/entities/video.entity';
 import { RequestCreateVideo } from 'src/videos/interfaces/request-create-video.interface';
 import { YoutubeMetadata } from 'src/videos/interfaces/youtube-metadata.interface';

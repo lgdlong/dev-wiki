@@ -63,7 +63,7 @@ export function PostVideoForm() {
     }
 
     try {
-      // Call API to create video
+      // Call API to create videos
       console.log("[DEBUG] Uploader:", currentUser);
       const uploaderId = currentUser?.id || 0;
       console.log("[DEBUG] ID: ", uploaderId);
@@ -72,7 +72,7 @@ export function PostVideoForm() {
         uploaderId,
       });
 
-      // Show success toast with video details
+      // Show success toast with videos details
       toast("Video added successfully!", {
         description: (
           <div>
@@ -96,7 +96,7 @@ export function PostVideoForm() {
       });
       // Optionally: form.reset();
     } catch (error: any) {
-      toast("Error adding video", {
+      toast("Error adding videos", {
         description: error.message || "An error occurred.",
       });
     }

@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Tag } from './entities/tag.entity';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { TagSearchParams, TagSearchResult } from './interfaces';
 
 @Injectable()
 export class TagsService {
@@ -34,6 +35,42 @@ export class TagsService {
 
   async findAll(): Promise<Tag[]> {
     return await this.tagRepository.find();
+  }
+
+  /**
+   * Prefix search (tối ưu cho index text_pattern_ops):
+   * WHERE name LIKE :prefix
+   * ORDER BY name ASC
+   * Keyset: name > :cursor
+   */
+  async search(params: TagSearchParams): Promise<TagSearchResult> {
+    const term = (params.q ?? '').trim().toLowerCase();
+    const take = Math.min(Math.max(Number(params.limit) || 10, 1), 50);
+    const cursor = params.cursor ?? null;
+    const minChars = params.minChars ?? 2;
+
+    // Không query khi query quá ngắn để giảm tải
+    if (term.length < minChars) {
+      return { items: [], nextCursor: null };
+    }
+
+    const qb = this.tagRepository
+      .createQueryBuilder('t')
+      .select(['t.id', 't.name'])
+      .where('t.name LIKE :prefix', { prefix: `${term}%` })
+      .orderBy('t.name', 'ASC')
+      .limit(take + 1); // lấy dư 1 để biết còn trang sau
+
+    if (cursor) {
+      qb.andWhere('t.name > :cursor', { cursor });
+    }
+
+    const rows = await qb.getMany();
+    const hasMore = rows.length > take;
+    const items = hasMore ? rows.slice(0, take) : rows;
+    const nextCursor = hasMore ? items[items.length - 1].name : null;
+
+    return { items, nextCursor };
   }
 
   async findOne(id: number): Promise<Tag> {

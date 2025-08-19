@@ -25,6 +25,7 @@ import { ProductCategory } from './product-categories/entities/product-category.
 import { TutorialTag } from './tutorial-tags/entities/tutorial-tag.entity';
 import { AuthModule } from './auth/auth.module';
 import { GoogleStrategy } from './auth/google.strategy';
+import { VideoTagsModule } from './video-tags/video-tags.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { GoogleStrategy } from './auth/google.strategy';
           ProductCategory,
           TutorialTag,
         ],
+        autoLoadEntities: true,
         synchronize: true,
         connectTimeoutMS: 60000, // 60 seconds
         acquireTimeoutMillis: 60000,
@@ -81,6 +83,7 @@ import { GoogleStrategy } from './auth/google.strategy';
     ProductCategoriesModule,
     TutorialTagsModule,
     AuthModule,
+    VideoTagsModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy],

@@ -26,7 +26,7 @@ const videoComponents: { title: string; href: string; description: string }[] =
       title: "Getting Started",
       href: "/videos/getting-started",
       description:
-        "Learn the basics of development with our introductory video series.",
+        "Learn the basics of development with our introductory videos series.",
     },
     {
       title: "Advanced Tutorials",

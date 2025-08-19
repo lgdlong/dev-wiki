@@ -1,24 +1,14 @@
 import { fetcher } from "@/lib/fetcher";
-import { Video } from "@/types/video";
+import { Video, UpdateVideoRequest, CreateVideoRequest } from "@/types/video";
+import { getAccessToken } from "@/utils/auth";
+import { Tag } from "@/types/tag";
 
-// Interface for creating a video
-export interface CreateVideoRequest {
-  youtubeId: string;
-  uploaderId?: number;
-}
-
-// Interface for updating a video (partial Video without id and createdAt)
-export interface UpdateVideoRequest {
-  youtubeId?: string;
-  title?: string;
-  description?: string;
-  thumbnailUrl?: string;
-  duration?: number;
-  uploaderId?: number;
-  metadata?: Record<string, any>;
-}
-
-// Create a new video
+/**
+ * Create a new videos
+ * POST /videos
+ * @param data
+ * @returns Promise<Video>
+ */
 export async function createVideo(data: CreateVideoRequest): Promise<Video> {
   return fetcher<Video>("/videos", {
     method: "POST",
@@ -26,21 +16,25 @@ export async function createVideo(data: CreateVideoRequest): Promise<Video> {
   });
 }
 
-// Get all videos
+/**
+ * Get all videos
+ * GET /videos
+ * @return Promise<Video[]>
+ */
 export async function getAllVideos(): Promise<Video[]> {
   return fetcher<Video[]>("/videos", {
     method: "GET",
   });
 }
 
-// Get a video by ID
+// Get a videos by ID
 export async function getVideoById(id: number): Promise<Video> {
   return fetcher<Video>(`/videos/${id}`, {
     method: "GET",
   });
 }
 
-// Get a video by YouTube ID
+// Get a videos by YouTube ID
 export async function getVideoByYoutubeId(youtubeId: string): Promise<Video> {
   return fetcher<Video>(`/videos/youtube/${youtubeId}`, {
     method: "GET",
@@ -56,7 +50,7 @@ export async function getVideosByUploader(
   });
 }
 
-// Update a video
+// Update a videos
 export async function updateVideo(
   id: number,
   data: UpdateVideoRequest,
@@ -67,9 +61,41 @@ export async function updateVideo(
   });
 }
 
-// Delete a video
+/**
+ * Delete a videos
+ * DELETE /videos/:id
+ * @param id
+ * @returns Promise<void>
+ */
 export async function deleteVideo(id: number): Promise<void> {
   return fetcher<void>(`/videos/${id}`, {
     method: "DELETE",
+  });
+}
+
+export async function upsertVideoTags(
+  videoId: number,
+  tagIds: number[],
+): Promise<{ success: boolean }> {
+  const token = getAccessToken();
+  return fetcher<{ success: boolean }>(`/videos/${videoId}/tags`, {
+    method: "PATCH",
+    body: JSON.stringify({ tagIds }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+// @Get('videos/:id/tags')
+export async function getVideoTags(videoId: number): Promise<Tag[]> {
+  const token = getAccessToken();
+  return fetcher<Tag[]>(`/videos/${videoId}/tags`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
 }

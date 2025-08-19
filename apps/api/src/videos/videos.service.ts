@@ -17,14 +17,17 @@ export class VideosService {
 
   private YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
 
-  // Tạo video, tự động lấy metadata từ Youtube
+  // Tạo videos, tự động lấy metadata từ Youtube
   async create(requestCreateVideo: RequestCreateVideo): Promise<Video> {
     // Check for duplicate YouTube ID
     const existing = await this.videoRepository.findOne({
       where: { youtubeId: requestCreateVideo.youtubeId },
     });
     if (existing) {
-      throw new HttpException(`Video with YouTube ID "${requestCreateVideo.youtubeId}" already exists`, 409);
+      throw new HttpException(
+        `Video with YouTube ID "${requestCreateVideo.youtubeId}" already exists`,
+        409,
+      );
     }
 
     // Lấy metadata từ Youtube
@@ -32,7 +35,7 @@ export class VideosService {
       requestCreateVideo.youtubeId,
     );
     if (!metadata) {
-      throw new HttpException('Cannot fetch video metadata', 400);
+      throw new HttpException('Cannot fetch videos metadata', 400);
     }
 
     // Mapping qua hàm mapper
@@ -110,7 +113,10 @@ export class VideosService {
       const item = res.data.items?.[0];
       if (!item) throw new HttpException('Video not found on YouTube', 404);
 
-      const durationISO = item.contentDetails?.duration ?? '';
+      const durationISO = item.contentDetails?.duration;
+      if (!durationISO)
+        throw new HttpException('Missing YouTube duration', 502);
+
       const durationSeconds = this.parseDuration(durationISO);
 
       return {

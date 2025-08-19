@@ -5,3 +5,5 @@ export const DEFAULT_FRONTEND_URL =
   process.env.DEFAULT_FRONTEND_URL || "http://localhost:3000"; // URL mặc định cho frontend
 export const NEXT_PUBLIC_GOOGLE_AUTH_URL =
   process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:8000/google"; // URL đăng nhập Google mặc định
+
+export const ACCESS_TOKEN_KEY = "access_token";
