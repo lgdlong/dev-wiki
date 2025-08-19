@@ -37,29 +37,34 @@ The **API** is the core backend service for Dev Wiki, built with NestJS and Type
 ### Development Setup
 
 1. **From monorepo root, install dependencies:**
+
    ```bash
    pnpm install
    ```
 
 2. **Start PostgreSQL database:**
+
    ```bash
    # From monorepo root
    docker compose up -d
    ```
 
 3. **Configure environment:**
+
    ```bash
    cd apps/api
    cp .env.example .env
    ```
 
 4. **Run database migrations:**
+
    ```bash
    # From apps/api directory
    pnpm migration:run
    ```
 
 5. **Start development server:**
+
    ```bash
    # From monorepo root
    pnpm dev --filter=api
@@ -198,7 +203,7 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    
+
     return roles.some(role => user.role === role);
   }
 }
@@ -274,14 +279,14 @@ export class Video {
   @Column({ unique: true })
   youtubeId: string;
 
-  @ManyToOne(() => Account, account => account.videos)
+  @ManyToOne(() => Account, (account) => account.videos)
   uploader: Account;
 
-  @OneToMany(() => Comment, comment => comment.video)
+  @OneToMany(() => Comment, (comment) => comment.video)
   @ApiHideProperty() // Prevents Swagger circular dependency
   comments: Comment[];
 
-  @OneToMany(() => Vote, vote => vote.video)
+  @OneToMany(() => Vote, (vote) => vote.video)
   @ApiHideProperty()
   votes: Vote[];
 }
@@ -406,7 +411,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    const status = 
+    const status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -492,7 +497,7 @@ describe('VideosService', () => {
   it('should create a video', async () => {
     const createVideoDto = { youtubeId: 'test123' };
     jest.spyOn(repository, 'save').mockResolvedValue(createVideoDto as Video);
-    
+
     const result = await service.create(createVideoDto);
     expect(result).toEqual(createVideoDto);
   });
@@ -516,9 +521,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/videos (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/videos')
-      .expect(200);
+    return request(app.getHttpServer()).get('/videos').expect(200);
   });
 });
 ```
@@ -604,6 +607,7 @@ export class VideosService {
 ### Common Issues
 
 **Database connection failed:**
+
 ```bash
 # Check PostgreSQL status
 docker compose ps
@@ -616,6 +620,7 @@ cat .env
 ```
 
 **JWT authentication not working:**
+
 ```bash
 # Verify JWT secret is set
 echo $JWT_SECRET
@@ -625,6 +630,7 @@ curl -H "Authorization: Bearer <token>" http://localhost:8000/auth/me
 ```
 
 **Swagger circular dependency:**
+
 ```typescript
 // Add @ApiHideProperty() to entity relationships
 @OneToMany(() => Comment, comment => comment.video)
@@ -633,6 +639,7 @@ comments: Comment[];
 ```
 
 **Migration errors:**
+
 ```bash
 # Reset database (development only)
 docker compose down -v
@@ -655,17 +662,20 @@ DEBUG=nest:* pnpm dev
 ## Additional Resources
 
 ### NestJS Documentation
+
 - [Official Docs](https://docs.nestjs.com/)
 - [TypeORM Integration](https://docs.nestjs.com/techniques/database)
 - [Authentication](https://docs.nestjs.com/security/authentication)
 - [Swagger Module](https://docs.nestjs.com/openapi/introduction)
 
 ### Database & ORM
+
 - [TypeORM Documentation](https://typeorm.io/)
 - [PostgreSQL Docs](https://www.postgresql.org/docs/)
 - [Database Migrations](https://typeorm.io/migrations)
 
 ### Testing Resources
+
 - [Jest Documentation](https://jestjs.io/docs/getting-started)
 - [NestJS Testing](https://docs.nestjs.com/fundamentals/testing)
 - [Supertest](https://github.com/visionmedia/supertest)

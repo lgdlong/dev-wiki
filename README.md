@@ -34,13 +34,14 @@ dev-wiki/
 
 ### Prerequisites
 
-- **Node.js** 18+ 
+- **Node.js** 18+
 - **pnpm** 9.0.0+
 - **Docker** (for PostgreSQL)
 
 ### Setup
 
 1. **Clone and install dependencies:**
+
    ```bash
    git clone <repository-url>
    cd dev-wiki
@@ -48,11 +49,13 @@ dev-wiki/
    ```
 
 2. **Start database:**
+
    ```bash
    docker compose up -d
    ```
 
 3. **Configure environment variables:**
+
    ```bash
    # Copy environment files for each app
    cp apps/api/.env.example apps/api/.env
@@ -130,12 +133,14 @@ For step-by-step backup instructions with DBeaver, see [Database Backup Guide](.
 ## Development Guidelines
 
 ### Code Standards
+
 - **TypeScript strict mode** - No `any` types
 - **Shared configurations** - ESLint/Prettier/TypeScript
 - **Component patterns** - Reusable UI components in `@repo/ui`
 - **API patterns** - DTOs, Guards, Services, Controllers
 
 ### Best Practices
+
 1. **Use pnpm** for all package management
 2. **Follow RBAC patterns** - Backend sets cookies, frontend enforces
 3. **Type-safe APIs** - Share types between frontend/backend
@@ -143,6 +148,7 @@ For step-by-step backup instructions with DBeaver, see [Database Backup Guide](.
 5. **Error handling** - Structured errors with user-friendly messages
 
 ### Project Conventions
+
 - **File naming**: kebab-case for files, PascalCase for components
 - **Import order**: External → Internal → Relative
 - **Error handling**: Try/catch with specific error types
@@ -151,11 +157,13 @@ For step-by-step backup instructions with DBeaver, see [Database Backup Guide](.
 ## Documentation
 
 ### Application READMEs
+
 - [Frontend (Web App)](./apps/web/README.md)
 - [Backend (API)](./apps/api/README.md)
 - [Database Setup](./apps/db/README.md)
 
 ### API Documentation
+
 - **Swagger UI**: http://localhost:8000/api (when running)
 
 ## Troubleshooting
@@ -163,18 +171,21 @@ For step-by-step backup instructions with DBeaver, see [Database Backup Guide](.
 ### Common Issues
 
 **Database connection failed:**
+
 ```bash
 # Ensure PostgreSQL is running
 docker compose up -d
 ```
 
 **TypeScript errors:**
+
 ```bash
 # Rebuild types
 pnpm build
 ```
 
 **Port conflicts:**
+
 ```bash
 # Check running processes
 lsof -i :3000  # Frontend
@@ -183,6 +194,7 @@ lsof -i :5432  # Database
 ```
 
 **Build failures:**
+
 ```bash
 # Clean and reinstall
 rm -rf node_modules

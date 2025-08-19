@@ -1,6 +1,6 @@
 # Backup PostgreSQL Database Dump Using DBeaver
 
->This guide shows how to create a PostgreSQL backup dump file using DBeaver, with screenshots and recommended settings. The output file will be saved directly in `/apps/db/`.
+> This guide shows how to create a PostgreSQL backup dump file using DBeaver, with screenshots and recommended settings. The output file will be saved directly in `/apps/db/`.
 
 ## 1. Open DBeaver and Select Your Database
 
@@ -19,14 +19,14 @@
 ## 3. Configure Backup Settings
 
 1. In the backup settings:
-	 - **Format**: Choose `Custom`
-	 - **Options**: Tick these 4 checkboxes:
-		 - Use SQL INSERT commands instead of COPY
-		 - Discard objects owner
-		 - Add DROP database statement
-		 - Add CREATE database statement
-	 - **Output folder**: Set to `/apps/db/` in your project
-	 - **File name pattern**: `dump-${database}-${timestamp}.dump`
+   - **Format**: Choose `Custom`
+   - **Options**: Tick these 4 checkboxes:
+     - Use SQL INSERT commands instead of COPY
+     - Discard objects owner
+     - Add DROP database statement
+     - Add CREATE database statement
+   - **Output folder**: Set to `/apps/db/` in your project
+   - **File name pattern**: `dump-${database}-${timestamp}.dump`
 2. Click **Start** to begin the backup.
 
 <img src="instructions/backup3.png" alt="Backup settings: format, checkboxes, output folder, file name" width="600">
@@ -34,5 +34,6 @@
 ---
 
 **Result:**
+
 - Your backup file (e.g., `dump-dev_wiki_local-20250818.dump`) will appear in `/apps/db/`.
 - You can now use this file for local development or restore.

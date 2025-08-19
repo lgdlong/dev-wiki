@@ -11,9 +11,28 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, FileText, LinkIcon, Box, Tag, ListPlus, RefreshCw, Edit, EyeOff, Trash2, MessageCircle } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  LinkIcon,
+  Box,
+  Tag,
+  ListPlus,
+  RefreshCw,
+  Edit,
+  EyeOff,
+  Trash2,
+  MessageCircle,
+} from "lucide-react";
 
 // ---- Types (có thể tách ra /types trong dự án thật) ------------------------
 
@@ -55,26 +74,74 @@ async function getModDashboardData() {
     totalVotes: 907,
   };
 
-  const recentActivity: Array<{ type: "post" | "link" | "product"; title: string; when: string }>= [
-    { type: "post", title: "Tối ưu hóa SQL với EXPLAIN ANALYZE", when: "2025-08-18T09:00:00Z" },
-    { type: "link", title: "Video: NestJS Guards & Interceptors", when: "2025-08-18T07:00:00Z" },
+  const recentActivity: Array<{
+    type: "post" | "link" | "product";
+    title: string;
+    when: string;
+  }> = [
+    {
+      type: "post",
+      title: "Tối ưu hóa SQL với EXPLAIN ANALYZE",
+      when: "2025-08-18T09:00:00Z",
+    },
+    {
+      type: "link",
+      title: "Video: NestJS Guards & Interceptors",
+      when: "2025-08-18T07:00:00Z",
+    },
     { type: "product", title: "Turborepo", when: "2025-08-17T10:00:00Z" },
   ];
 
   const posts: ContentItem[] = [
-    { id: "p1", title: "Hướng dẫn Next.js App Router", author: "you", updatedAt: "2025-08-17T10:30:00Z", status: "published" },
-    { id: "p2", title: "So sánh Prisma vs TypeORM", author: "alice", updatedAt: "2025-08-15T12:00:00Z", status: "published" },
+    {
+      id: "p1",
+      title: "Hướng dẫn Next.js App Router",
+      author: "you",
+      updatedAt: "2025-08-17T10:30:00Z",
+      status: "published",
+    },
+    {
+      id: "p2",
+      title: "So sánh Prisma vs TypeORM",
+      author: "alice",
+      updatedAt: "2025-08-15T12:00:00Z",
+      status: "published",
+    },
   ];
   const links: ContentItem[] = [
-    { id: "l1", title: "YouTube: Shadcn UI Crash Course", author: "you", updatedAt: "2025-08-16T20:00:00Z", status: "published" },
+    {
+      id: "l1",
+      title: "YouTube: Shadcn UI Crash Course",
+      author: "you",
+      updatedAt: "2025-08-16T20:00:00Z",
+      status: "published",
+    },
   ];
   const products: ContentItem[] = [
-    { id: "pr1", title: "Vite", author: "mod-team", updatedAt: "2025-08-14T08:00:00Z", status: "published" },
+    {
+      id: "pr1",
+      title: "Vite",
+      author: "mod-team",
+      updatedAt: "2025-08-14T08:00:00Z",
+      status: "published",
+    },
   ];
 
   const latestComments: CommentItem[] = [
-    { id: "c1", excerpt: "Bài này rất hữu ích, nhưng phần Prisma...", by: "bob", on: "So sánh Prisma vs TypeORM", at: "2025-08-18T01:23:00Z" },
-    { id: "c2", excerpt: "Có thể thêm ví dụ về caching không?", by: "mini", on: "Hướng dẫn Next.js App Router", at: "2025-08-17T13:10:00Z" },
+    {
+      id: "c1",
+      excerpt: "Bài này rất hữu ích, nhưng phần Prisma...",
+      by: "bob",
+      on: "So sánh Prisma vs TypeORM",
+      at: "2025-08-18T01:23:00Z",
+    },
+    {
+      id: "c2",
+      excerpt: "Có thể thêm ví dụ về caching không?",
+      by: "mini",
+      on: "Hướng dẫn Next.js App Router",
+      at: "2025-08-17T13:10:00Z",
+    },
   ];
 
   return { metrics, recentActivity, posts, links, products, latestComments };
@@ -103,15 +170,20 @@ function timeAgo(iso: string) {
 // ---- Page ---------------------------------------------------------------
 
 export default async function ModPage() {
-  const { metrics, recentActivity, posts, links, products, latestComments } = await getModDashboardData();
+  const { metrics, recentActivity, posts, links, products, latestComments } =
+    await getModDashboardData();
 
   return (
     <div className="space-y-8 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Moderator Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Tổng quan nội dung & hoạt động gần đây</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Moderator Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Tổng quan nội dung & hoạt động gần đây
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" asChild>
@@ -128,19 +200,29 @@ export default async function ModPage() {
       {/* Quick Actions */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/posts/new"><FileText className="h-4 w-4" /> Bài viết mới</Link>
+          <Link href="/mod/posts/new">
+            <FileText className="h-4 w-4" /> Bài viết mới
+          </Link>
         </Button>
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/links/new"><LinkIcon className="h-4 w-4" /> Thêm Link/Youtube</Link>
+          <Link href="/mod/links/new">
+            <LinkIcon className="h-4 w-4" /> Thêm Link/Youtube
+          </Link>
         </Button>
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/products/new"><Box className="h-4 w-4" /> Thêm Sản phẩm</Link>
+          <Link href="/mod/products/new">
+            <Box className="h-4 w-4" /> Thêm Sản phẩm
+          </Link>
         </Button>
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/tags/new"><Tag className="h-4 w-4" /> Thêm Tag</Link>
+          <Link href="/mod/tags/new">
+            <Tag className="h-4 w-4" /> Thêm Tag
+          </Link>
         </Button>
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/playlists/new"><ListPlus className="h-4 w-4" /> Tạo Playlist</Link>
+          <Link href="/mod/playlists/new">
+            <ListPlus className="h-4 w-4" /> Tạo Playlist
+          </Link>
         </Button>
       </div>
 
@@ -164,10 +246,14 @@ export default async function ModPage() {
             {recentActivity.map((it, idx) => (
               <li key={idx} className="flex items-center justify-between">
                 <div className="truncate">
-                  <span className="inline-block rounded bg-muted px-2 py-0.5 text-xs capitalize mr-2">{it.type}</span>
+                  <span className="inline-block rounded bg-muted px-2 py-0.5 text-xs capitalize mr-2">
+                    {it.type}
+                  </span>
                   <span className="font-medium">{it.title}</span>
                 </div>
-                <span className="text-xs text-muted-foreground">{timeAgo(it.when)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {timeAgo(it.when)}
+                </span>
               </li>
             ))}
           </ul>
@@ -218,11 +304,17 @@ export default async function ModPage() {
             <TableBody>
               {latestComments.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="text-muted-foreground"><MessageCircle className="h-4 w-4" /></TableCell>
-                  <TableCell className="max-w-[480px] truncate">{c.excerpt}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    <MessageCircle className="h-4 w-4" />
+                  </TableCell>
+                  <TableCell className="max-w-[480px] truncate">
+                    {c.excerpt}
+                  </TableCell>
                   <TableCell className="capitalize">{c.by}</TableCell>
                   <TableCell className="truncate">{c.on}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{timeAgo(c.at)}</TableCell>
+                  <TableCell className="text-right text-muted-foreground">
+                    {timeAgo(c.at)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -239,7 +331,9 @@ function StatCard({ title, value }: { title: string; value: number }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-semibold">{formatNumber(value)}</div>
@@ -248,7 +342,13 @@ function StatCard({ title, value }: { title: string; value: number }) {
   );
 }
 
-function ContentTable({ items, baseHref }: { items: ContentItem[]; baseHref: string }) {
+function ContentTable({
+  items,
+  baseHref,
+}: {
+  items: ContentItem[];
+  baseHref: string;
+}) {
   return (
     <Card>
       <CardContent className="pt-6">
@@ -265,28 +365,44 @@ function ContentTable({ items, baseHref }: { items: ContentItem[]; baseHref: str
           <TableBody>
             {items.map((it, idx) => (
               <TableRow key={it.id}>
-                <TableCell className="text-muted-foreground">{idx + 1}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {idx + 1}
+                </TableCell>
                 <TableCell className="max-w-[420px] truncate">
-                  <Link href={`${baseHref}/${it.id}/edit`} className="hover:underline">
+                  <Link
+                    href={`${baseHref}/${it.id}/edit`}
+                    className="hover:underline"
+                  >
                     {it.title}
                   </Link>
                 </TableCell>
                 <TableCell className="capitalize">{it.author}</TableCell>
-                <TableCell className="hidden md:table-cell text-muted-foreground">{timeAgo(it.updatedAt)}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">
+                  {timeAgo(it.updatedAt)}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button size="icon" variant="outline" asChild>
-                      <Link href={`${baseHref}/${it.id}/edit`} aria-label="Edit">
+                      <Link
+                        href={`${baseHref}/${it.id}/edit`}
+                        aria-label="Edit"
+                      >
                         <Edit className="h-4 w-4" />
                       </Link>
                     </Button>
                     <Button size="icon" variant="outline" asChild>
-                      <Link href={`${baseHref}/${it.id}/hide`} aria-label="Hide">
+                      <Link
+                        href={`${baseHref}/${it.id}/hide`}
+                        aria-label="Hide"
+                      >
                         <EyeOff className="h-4 w-4" />
                       </Link>
                     </Button>
                     <Button size="icon" variant="destructive" asChild>
-                      <Link href={`${baseHref}/${it.id}/delete`} aria-label="Delete">
+                      <Link
+                        href={`${baseHref}/${it.id}/delete`}
+                        aria-label="Delete"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Link>
                     </Button>
