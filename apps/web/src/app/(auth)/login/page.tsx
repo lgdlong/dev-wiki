@@ -29,7 +29,15 @@ export default function LoginPage() {
         console.log("[DEBUG] Token:", data.access_token);
       }
       console.log("[DEBUG] Login successful:", data.account);
-      router.push("/");
+
+      // redirect mod, admin, user base on roles
+      if (data.account.role === "mod") {
+        router.push("/mod");
+      } else if (data.account.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     },
   });
 
