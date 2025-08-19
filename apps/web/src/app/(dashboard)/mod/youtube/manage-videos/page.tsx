@@ -57,7 +57,7 @@ export default function ManageVideoPage() {
     () =>
       makeVideoColumns({
         onEdit: (id: number) =>
-          router.push(`/mod/youtube/manage-video/${id}/edit`),
+          router.push(`/mod/youtube/manage-videos/${id}/edit`),
         onRequestDelete: (id: number) => {
           setPendingId(id);
           setOpenDelete(true);
