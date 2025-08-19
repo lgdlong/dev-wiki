@@ -1,20 +1,12 @@
-// app/mod/youtube/manage-video/columns.tsx
+// app/mod/youtube/manage-videos/columns.tsx
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
+import { formatDuration } from "@/utils/youtube";
 import type { Video } from "@/types/video";
-
-/** Định dạng thời lượng thành HH:MM:SS */
-function formatDuration(seconds: number | null | undefined): string {
-  if (seconds == null) return "-";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
-}
 
 export function makeVideoColumns({
   onEdit,

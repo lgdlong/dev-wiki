@@ -1,11 +1,10 @@
 import { fetcher } from "@/lib/fetcher";
 import { Category, CategoryCreate, CategoryUpdate } from "@/types/category";
+import { getAccessToken } from "@/utils/auth";
 
 // Helper function to get auth headers
 function getAuthHeaders() {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-
+  const token = getAccessToken();
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -40,8 +39,7 @@ export async function getCategoryByName(name: string): Promise<Category> {
 export async function createCategory(
   categoryData: CategoryCreate,
 ): Promise<Category> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = getAccessToken();
   if (!token) throw new Error("Authentication required to create category!");
 
   return fetcher("/categories", {
@@ -56,8 +54,7 @@ export async function updateCategory(
   id: number,
   categoryData: CategoryUpdate,
 ): Promise<Category> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = getAccessToken();
   if (!token) throw new Error("Authentication required to update category!");
 
   return fetcher(`/categories/${id}`, {
@@ -69,8 +66,7 @@ export async function updateCategory(
 
 // Delete category
 export async function deleteCategory(id: number): Promise<void> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = getAccessToken();
   if (!token) throw new Error("Authentication required to delete category!");
 
   return fetcher(`/categories/${id}`, {
