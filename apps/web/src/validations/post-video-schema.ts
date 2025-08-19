@@ -1,5 +1,5 @@
 // apps/web/src/validations/post-video-schema.ts
-import { YOUTUBE_URL_REGEX } from "@/app/mod/youtube/constant";
+import { YOUTUBE_URL_REGEX } from "@/app/(dashboard)/mod/youtube/constant";
 import { z } from "zod";
 
 export const postVideoSchema = z.object({
