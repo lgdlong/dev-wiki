@@ -30,7 +30,7 @@ type ContentItem = {
   id: string;
   title: string;
   author: string;
-  updatedAt: string; // ISO date string
+  updatedAt: string; // ISO 8601 date string, e.g. '2025-08-18T09:00:00Z'
   status?: "published" | "hidden";
 };
 
@@ -39,7 +39,7 @@ type CommentItem = {
   excerpt: string;
   by: string;
   on: string; // content title
-  at: string; // ISO
+  at: string; // ISO 8601 date string
 };
 
 // ---- Mock fetchers (thay bằng gọi API thật /server actions) ----------------
