@@ -18,12 +18,10 @@ function formatDuration(seconds: number | null | undefined): string {
 
 export function makeVideoColumns({
   onEdit,
-  onDelete,
+  onRequestDelete,
 }: {
-  /** id number */
   onEdit: (id: number) => void;
-  /** id number */
-  onDelete: (id: number) => Promise<void> | void;
+  onRequestDelete: (id: number) => void;
 }): ColumnDef<Video>[] {
   return [
     {
@@ -118,7 +116,7 @@ export function makeVideoColumns({
               size="icon"
               variant="destructive"
               aria-label="Delete video"
-              onClick={() => onDelete(v.id as unknown as number)}
+              onClick={() => onRequestDelete(row.original.id)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

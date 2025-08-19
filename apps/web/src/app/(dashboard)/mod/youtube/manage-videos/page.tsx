@@ -12,6 +12,7 @@ import type { Video } from "@/types/video";
 import { getAllVideos, deleteVideo } from "@/utils/api/video";
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
+import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 
 const DEFAULT_SORT: SortingState = [{ id: "createdAt", desc: true }];
 
@@ -21,6 +22,9 @@ export default function ManageVideoPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  // state cho dialog
+  const [openDelete, setOpenDelete] = useState(false);
+  const [pendingId, setPendingId] = useState<number | null>(null);
 
   async function load() {
     try {
@@ -54,15 +58,21 @@ export default function ManageVideoPage() {
       makeVideoColumns({
         onEdit: (id: number) =>
           router.push(`/mod/youtube/manage-video/${id}/edit`),
-        onDelete: async (id: number) => {
-          if (!confirm("Delete this video? This action cannot be undone."))
-            return;
-          await deleteVideo(id);
-          setVideos((prev) => prev.filter((x) => x.id !== id));
+        onRequestDelete: (id: number) => {
+          setPendingId(id);
+          setOpenDelete(true);
         },
       }),
     [router],
   );
+
+  // Hàm xoá thực sự (gọi từ dialog)
+  async function confirmDelete() {
+    if (pendingId == null) return;
+    await deleteVideo(pendingId);
+    setVideos((prev) => prev.filter((x) => x.id !== pendingId));
+    setPendingId(null);
+  }
 
   return (
     <div className="space-y-6 p-6">
@@ -80,7 +90,7 @@ export default function ManageVideoPage() {
             <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
           <Button asChild className="gap-2">
-            <Link href="/mod/youtube/manage-video/new">
+            <Link href="/mod/youtube/post-video">
               <Plus className="h-4 w-4" /> Add Video
             </Link>
           </Button>
@@ -118,6 +128,19 @@ export default function ManageVideoPage() {
         whitelist <code>i.ytimg.com</code> in <code>next.config.js</code> (
         <code>images.remotePatterns</code>) or set <code>unoptimized</code>.
       </p>
+
+      {/* Dialog xác nhận xoá (mobile-friendly) */}
+      <DeleteConfirmDialog
+        open={openDelete}
+        onOpenChange={(v: boolean) => {
+          setOpenDelete(v);
+          if (!v) setPendingId(null);
+        }}
+        title="Delete this video?"
+        description="This action cannot be undone. The video will be permanently removed."
+        confirmText="Delete video"
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
