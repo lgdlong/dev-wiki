@@ -220,7 +220,7 @@ const [queryClient] = useState(
 ### API Integration
 
 ```typescript
-// utils/api/video.ts - Type-safe API calls
+// utils/api/videos.ts - Type-safe API calls
 export async function createVideo(data: CreateVideoRequest): Promise<Video> {
   return fetcher<Video>("/videos", {
     method: "POST",
@@ -292,7 +292,7 @@ export function middleware(request: NextRequest) {
 ### Zod Schemas
 
 ```typescript
-// validations/post-video-schema.ts
+// validations/post-videos-schema.ts
 export const postVideoSchema = z.object({
   youtubeUrl: z.string().regex(YOUTUBE_URL_REGEX, {
     message: "Invalid YouTube URL format",
@@ -314,7 +314,7 @@ export function PostVideoForm() {
       await createVideo(data);
       toast.success("Video added successfully!");
     } catch (error) {
-      toast.error("Failed to add video");
+      toast.error("Failed to add videos");
     }
   };
 
@@ -398,7 +398,7 @@ pnpm test:coverage
 import { render, screen } from '@testing-library/react';
 import { VideoForm } from './VideoForm';
 
-test('renders video form', () => {
+test('renders videos form', () => {
   render(<VideoForm />);
   expect(screen.getByLabelText(/youtube url/i)).toBeInTheDocument();
 });

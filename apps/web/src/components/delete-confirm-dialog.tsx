@@ -23,14 +23,14 @@ type Props = {
 };
 
 export function DeleteConfirmDialog({
-                                      open,
-                                      onOpenChange,
-                                      title = "Delete this item?",
-                                      description = "This action cannot be undone.",
-                                      confirmText = "Delete",
-                                      cancelText = "Cancel",
-                                      onConfirm,
-                                    }: Props) {
+  open,
+  onOpenChange,
+  title = "Delete this item?",
+  description = "This action cannot be undone.",
+  confirmText = "Delete",
+  cancelText = "Cancel",
+  onConfirm,
+}: Props) {
   const [loading, setLoading] = React.useState(false);
 
   async function handleConfirm() {

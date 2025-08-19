@@ -17,7 +17,7 @@ export class VideosService {
 
   private YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
 
-  // Tạo video, tự động lấy metadata từ Youtube
+  // Tạo videos, tự động lấy metadata từ Youtube
   async create(requestCreateVideo: RequestCreateVideo): Promise<Video> {
     // Check for duplicate YouTube ID
     const existing = await this.videoRepository.findOne({
@@ -35,7 +35,7 @@ export class VideosService {
       requestCreateVideo.youtubeId,
     );
     if (!metadata) {
-      throw new HttpException('Cannot fetch video metadata', 400);
+      throw new HttpException('Cannot fetch videos metadata', 400);
     }
 
     // Mapping qua hàm mapper

@@ -42,7 +42,7 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "Post video",
+          title: "Post videos",
           url: "/mod/youtube/post-video",
         },
         {

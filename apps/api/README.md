@@ -270,7 +270,7 @@ TypeOrmModule.forRoot({
 ### Entity Relationships
 
 ```typescript
-// entities/video.entity.ts
+// entities/videos.entity.ts
 @Entity()
 export class Video {
   @PrimaryGeneratedColumn()
@@ -324,7 +324,7 @@ export class VideosController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MOD, Role.ADMIN)
-  @ApiOperation({ summary: 'Create a new video' })
+  @ApiOperation({ summary: 'Create a new videos' })
   async create(@Body() createVideoDto: CreateVideoDto): Promise<Video> {
     return this.videosService.create(createVideoDto);
   }
@@ -334,11 +334,11 @@ export class VideosController {
 ### Data Transfer Objects (DTOs)
 
 ```typescript
-// dto/create-video.dto.ts
+// dto/create-videos.dto.ts
 export class CreateVideoDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: 'YouTube video ID' })
+  @ApiProperty({ description: 'YouTube videos ID' })
   youtubeId: string;
 
   @IsString()
@@ -494,7 +494,7 @@ describe('VideosService', () => {
     repository = module.get<Repository<Video>>(getRepositoryToken(Video));
   });
 
-  it('should create a video', async () => {
+  it('should create a videos', async () => {
     const createVideoDto = { youtubeId: 'test123' };
     jest.spyOn(repository, 'save').mockResolvedValue(createVideoDto as Video);
 
