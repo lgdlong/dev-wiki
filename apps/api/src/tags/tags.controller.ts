@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
@@ -24,6 +25,19 @@ export class TagsController {
   @Get()
   findAll() {
     return this.tagsService.findAll();
+  }
+
+  @Get('search')
+  search(
+    @Query('q') q = '',
+    @Query('limit') limit = 10,
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.tagsService.search({
+      q,
+      limit: +limit,
+      cursor: cursor ?? null,
+    });
   }
 
   @Get('name/:name')
