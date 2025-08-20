@@ -14,6 +14,6 @@ export const envValidationSchema: Joi.ObjectSchema<EnvVars> =
     DB_HOST: Joi.string().required(),
     DB_PORT: Joi.number().default(5432),
     USERNAME: Joi.string().required(),
-    PASSWORD: Joi.string().allow(''),
+    PASSWORD: Joi.string().min(1).required(),
     DB_NAME: Joi.string().required(),
   });

@@ -40,41 +40,42 @@ import { VideoTag } from './modules/video-tags/entities/video-tag.entity';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST'),
-        port: Number(config.get<number>('DB_PORT') ?? 5432),
-        username: config.get<string>('USERNAME'),
-        password: config.get<string>('PASSWORD'),
-        database: config.get<string>('DB_NAME'),
+      useFactory: (config: ConfigService) => {
+        const isDev = config.get<string>('NODE_ENV') === 'development';
 
-        entities: [
-          Account,
-          Tutorial,
-          Product,
-          Video,
-          Tag,
-          Category,
-          Comment,
-          Vote,
-          ProductCategory,
-          TutorialTag,
-          VideoTag,
-        ],
-
-        autoLoadEntities: true,
-        synchronize: true, // ⚠️ chỉ dev mới nên bật, nhưng giờ bạn không check NODE_ENV thì luôn bật
-        retryAttempts: 5,
-        retryDelay: 3000,
-        logging: true, // luôn bật log
-
-        extra: {
-          max: 10,
-          min: 2,
-          idleTimeoutMillis: 600_000,
-          connectionTimeoutMillis: 60_000,
-        },
-      }),
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST'),
+          port: Number(config.get<number>('DB_PORT') ?? 5432),
+          username: config.get<string>('USERNAME'),
+          password: config.get<string>('PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+          entities: [
+            Account,
+            Tutorial,
+            Product,
+            Video,
+            Tag,
+            Category,
+            Comment,
+            Vote,
+            ProductCategory,
+            TutorialTag,
+            VideoTag,
+          ],
+          autoLoadEntities: true,
+          synchronize: isDev, // chỉ tự động đồng bộ hóa CSDL ở môi trường development
+          retryAttempts: 5,
+          retryDelay: 3000,
+          logging: isDev, // chỉ bật log ở môi trường development
+          extra: {
+            max: 10,
+            min: 2,
+            idleTimeoutMillis: 600_000,
+            connectionTimeoutMillis: 60_000,
+          },
+        };
+      },
     }),
     AccountModule,
     TutorialModule,
