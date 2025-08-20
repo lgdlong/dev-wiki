@@ -8,7 +8,7 @@ import type { Video } from "@/types/video";
 import type { Tag } from "@/components/tags/TagBadgeList";
 
 import { Button } from "@/components/ui/button";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, ChevronLeft } from "lucide-react";
 import TagManager from "@/components/tags/TagManager";
 import VideoInfoCard from "@/components/videos/VideoInfoCard";
 import { isValidTagName } from "@/utils/tag";
@@ -126,16 +126,17 @@ export default function EditVideoPage() {
 
   return (
     <main className="p-6 space-y-6">
+      <Button
+        variant="outline"
+        onClick={() => router.back()}
+        disabled={saving}
+      >
+        <ChevronLeft />
+        Back
+      </Button>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Add tags to video #{videoId}</h1>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={saving}
-          >
-            Cancel
-          </Button>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? (
               <>
