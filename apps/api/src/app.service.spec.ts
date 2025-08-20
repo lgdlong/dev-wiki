@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from './app.service';
 import { DataSource } from 'typeorm';
 import { Request } from 'express';
-import { GoogleProfile } from './auth/interfaces/google-profile.interface';
-import { GoogleLoginResult } from './types/google-login-result.type';
+import { GoogleProfile } from './modules/auth/interfaces/google-profile.interface';
+import { GoogleLoginResult } from './shared/types/google-login-result.type';
 
 describe('AppService', () => {
   let service: AppService;

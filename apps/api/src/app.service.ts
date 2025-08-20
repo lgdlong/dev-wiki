@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { GoogleProfile } from './auth/interfaces/google-profile.interface';
+import { GoogleProfile } from './modules/auth/interfaces/google-profile.interface';
 import { Request } from 'express';
-import { GoogleLoginResult } from './types/google-login-result.type';
+import { GoogleLoginResult } from './shared/types/google-login-result.type';
 
 @Injectable()
 export class AppService {

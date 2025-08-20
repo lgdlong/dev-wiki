@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { DEFAULT_FRONTEND_URL, DEFAULT_PORT } from './common/constants';
+import { DEFAULT_FRONTEND_URL, DEFAULT_PORT } from './shared/constants';
 // import { DocumentBuilder } from '@nestjs/swagger';
 // import { SwaggerModule } from '@nestjs/swagger';
 
