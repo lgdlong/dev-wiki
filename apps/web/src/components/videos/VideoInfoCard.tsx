@@ -28,8 +28,8 @@ export default function VideoInfoCard({
       <CardContent>
         <div className="flex flex-col md:flex-row gap-4">
           {/* Thumbnail */}
-          <div className="w-full md:w-1/2">
-            <div className="w-full max-w-[480px] overflow-hidden rounded-md border bg-muted">
+          <div className="w-full md:w-1/3">
+            <div className="w-full max-w-[240px] overflow-hidden rounded-md border bg-muted">
               {thumb ? (
                 <img
                   src={thumb}
