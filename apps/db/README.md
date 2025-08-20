@@ -26,6 +26,7 @@ docker compose up -d
 ## Sample Data
 
 The database includes:
+
 - Sample user accounts (see `sample_accounts.json`)
 - Test categories and tags
 - Example videos and tutorials
@@ -33,23 +34,23 @@ The database includes:
 
 ### Default Accounts
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@admin.com | Abcd1234@ | Admin |
-| phungluuhoanglong@gmail.com | Abcd1234@ | User |
-| mod@mod.com | Abcd1234@ | Moderator |
+| Email                       | Password  | Role      |
+| --------------------------- | --------- | --------- |
+| admin@admin.com             | Abcd1234@ | Admin     |
+| phungluuhoanglong@gmail.com | Abcd1234@ | User      |
+| mod@mod.com                 | Abcd1234@ | Moderator |
 
 ## Configuration
 
 Connection info:
 
-| Variable      | Value           |
-|--------------|-----------------|
-| DB_HOST      | `127.0.0.1` (or `localhost`)       |
-| DB_PORT      | `5432`           |
-| DB_NAME      | `dev_wiki_local`  |
-| USERNAME     | `postgres`        |
-| PASSWORD     | `postgres`        |
+| Variable | Value                        |
+| -------- | ---------------------------- |
+| DB_HOST  | `127.0.0.1` (or `localhost`) |
+| DB_PORT  | `5432`                       |
+| DB_NAME  | `dev_wiki_local`             |
+| USERNAME | `postgres`                   |
+| PASSWORD | `postgres`                   |
 
 ## Notes
 

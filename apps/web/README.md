@@ -36,17 +36,20 @@ The **Web App** is the primary frontend application for Dev Wiki, built with Nex
 ### Development Setup
 
 1. **From monorepo root, install dependencies:**
+
    ```bash
    pnpm install
    ```
 
 2. **Configure environment:**
+
    ```bash
    cd apps/web
    cp .env.example .env.local
    ```
 
 3. **Start development server:**
+
    ```bash
    # From monorepo root
    pnpm dev --filter=web
@@ -111,6 +114,7 @@ apps/web/
 ### Authentication Flow
 
 1. **Login Process:**
+
    ```
    User Login → API Authentication → JWT Token → localStorage
                                   → Role Cookie → Frontend Middleware
@@ -122,16 +126,17 @@ apps/web/
    - **Admin**: Full system administration
 
 3. **Implementation:**
+
    ```typescript
    // middleware.ts - Route protection
    export function middleware(request: NextRequest) {
-     const role = request.cookies.get('role')?.value
-     
-     if (request.nextUrl.pathname.startsWith('/admin') && role !== 'admin') {
-       return NextResponse.redirect(new URL('/login', request.url))
+     const role = request.cookies.get("role")?.value;
+
+     if (request.nextUrl.pathname.startsWith("/admin") && role !== "admin") {
+       return NextResponse.redirect(new URL("/login", request.url));
      }
    }
-   
+
    // useCurrentUser.ts - User state management
    export function useCurrentUser() {
      return useQuery<Account>({
@@ -179,11 +184,11 @@ module.exports = {
         // Custom color palette
       },
       fontFamily: {
-        sans: ['Geist', 'system-ui'],
+        sans: ["Geist", "system-ui"],
       },
     },
   },
-}
+};
 ```
 
 ### Responsive Design
@@ -199,20 +204,23 @@ module.exports = {
 
 ```typescript
 // app/layout.tsx - Query client configuration
-const [queryClient] = useState(() => new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
-    },
-  },
-}));
+const [queryClient] = useState(
+  () =>
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          cacheTime: 10 * 60 * 1000, // 10 minutes
+        },
+      },
+    }),
+);
 ```
 
 ### API Integration
 
 ```typescript
-// utils/api/video.ts - Type-safe API calls
+// utils/api/videos.ts - Type-safe API calls
 export async function createVideo(data: CreateVideoRequest): Promise<Video> {
   return fetcher<Video>("/videos", {
     method: "POST",
@@ -223,7 +231,7 @@ export async function createVideo(data: CreateVideoRequest): Promise<Video> {
 // hooks/useVideos.ts - React Query hooks
 export function useVideos() {
   return useQuery({
-    queryKey: ['videos'],
+    queryKey: ["videos"],
     queryFn: getAllVideos,
   });
 }
@@ -262,18 +270,18 @@ app/
 ```typescript
 // middleware.ts - RBAC enforcement
 const protectedRoutes = {
-  '/mod': ['mod', 'admin'],
-  '/admin': ['admin'],
-}
+  "/mod": ["mod", "admin"],
+  "/admin": ["admin"],
+};
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const userRole = request.cookies.get('role')?.value
-  
+  const { pathname } = request.nextUrl;
+  const userRole = request.cookies.get("role")?.value;
+
   // Check access permissions
   for (const [route, allowedRoles] of Object.entries(protectedRoutes)) {
     if (pathname.startsWith(route) && !allowedRoles.includes(userRole)) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 }
@@ -284,13 +292,11 @@ export function middleware(request: NextRequest) {
 ### Zod Schemas
 
 ```typescript
-// validations/post-video-schema.ts
+// validations/post-videos-schema.ts
 export const postVideoSchema = z.object({
-  youtubeUrl: z
-    .string()
-    .regex(YOUTUBE_URL_REGEX, {
-      message: "Invalid YouTube URL format"
-    }),
+  youtubeUrl: z.string().regex(YOUTUBE_URL_REGEX, {
+    message: "Invalid YouTube URL format",
+  }),
 });
 ```
 
@@ -308,7 +314,7 @@ export function PostVideoForm() {
       await createVideo(data);
       toast.success("Video added successfully!");
     } catch (error) {
-      toast.error("Failed to add video");
+      toast.error("Failed to add videos");
     }
   };
 
@@ -357,8 +363,8 @@ pnpm type-check       # TypeScript validation
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,    // 5 minutes
-      cacheTime: 10 * 60 * 1000,   // 10 minutes
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
@@ -392,7 +398,7 @@ pnpm test:coverage
 import { render, screen } from '@testing-library/react';
 import { VideoForm } from './VideoForm';
 
-test('renders video form', () => {
+test('renders videos form', () => {
   render(<VideoForm />);
   expect(screen.getByLabelText(/youtube url/i)).toBeInTheDocument();
 });
@@ -403,6 +409,7 @@ test('renders video form', () => {
 ### Common Issues
 
 **Authentication not working:**
+
 ```bash
 # Check API connection
 curl http://localhost:8000/health
@@ -412,6 +419,7 @@ cat .env.local
 ```
 
 **Styles not loading:**
+
 ```bash
 # Rebuild Tailwind CSS
 pnpm build:css
@@ -421,6 +429,7 @@ npx tailwindcss --init
 ```
 
 **TypeScript errors:**
+
 ```bash
 # Check type definitions
 pnpm type-check
@@ -430,6 +439,7 @@ pnpm build --filter=@repo/ui
 ```
 
 **Build failures:**
+
 ```bash
 # Clean Next.js cache
 rm -rf .next

@@ -1,4 +1,4 @@
-// apps/web/src/validations/post-video-schema.ts
+// apps/web/src/validations/post-videos-schema.ts
 import { YOUTUBE_URL_REGEX } from "@/app/(dashboard)/mod/youtube/constant";
 import { z } from "zod";
 
