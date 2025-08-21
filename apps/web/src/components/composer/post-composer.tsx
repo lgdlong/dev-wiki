@@ -88,7 +88,12 @@ export default function PostComposer() {
       setTitle('');
       setContent('');
       setTags([]);
-
+    } catch (e: unknown) {
+      let msg = 'Publish failed';
+      if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
+        msg = (e as { message: string }).message;
+      }
+      alert(`Lỗi: ${msg}`);
       // Điều hướng sang trang quản trị/chi tiết bài
       router.push(`/mod`); // hoặc `/tutorials/${created.id}` nếu có route chi tiết
     } catch (e: any) {
