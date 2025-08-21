@@ -57,7 +57,9 @@ export class ProductsController {
   }
 
   @Get('creator/:creatorId')
-  findByCreator(@Param('creatorId', ParseIntPipe) creatorId: number): Promise<Product[]> {
+  findByCreator(
+    @Param('creatorId', ParseIntPipe) creatorId: number,
+  ): Promise<Product[]> {
     return this.productsService.findByCreator(creatorId);
   }
 }
