@@ -36,6 +36,12 @@ const data = {
   },
   navMain: [
     {
+      title: "Dashboard",
+      url: "/mod",
+      icon: Command,
+      isActive: true,
+    },
+    {
       title: "Youtube",
       url: "#",
       icon: SquareTerminal,
