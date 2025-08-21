@@ -11,19 +11,19 @@ export class TutorialService {
   constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) { }
 
   async create(dto: CreateTutorialDto) {
-    const post = this.repo.create({
-      title: dto.title.trim(),
-      content: dto.content.trim(),
-      authorId: Number((dto as any).author_id), // map snake -> camel
-      views: 0,
-    });
-    return this.repo.save(post);
+    try {
+      const post = this.repo.create({
+        title: dto.title.trim(),
+        content: dto.content.trim(),
+        authorId: Number((dto as any).author_id), // map snake -> camel
+        views: 0,
+      });
+      return this.repo.save(post);
+    } catch (e) {
+      console.error('TutorialService.create error:', e);
+      throw e;
+    }
   }
-  catch(e) {
-    console.error('TutorialService.create error:', e);
-    throw e;
-  }
-
 
   async findAll() {
     return this.repo.find({ order: { createdAt: 'DESC' } });
