@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { toEntity } from './mappers/product.mapper';
 
 @Injectable()
 export class ProductsService {
@@ -12,8 +13,11 @@ export class ProductsService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = this.productRepository.create(createProductDto);
+  async create(
+    createProductDto: CreateProductDto,
+    creatorId: number,
+  ): Promise<Product> {
+    const product: Product = toEntity(createProductDto, creatorId);
     return await this.productRepository.save(product);
   }
 

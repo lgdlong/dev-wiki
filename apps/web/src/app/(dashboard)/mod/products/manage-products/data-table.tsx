@@ -24,15 +24,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  /** Optional initial sorting, e.g. [{ id: "createdAt", desc: true }] */
+  /** Optional initial sorting, e.g. [{ id: "id", desc: false }] */
   defaultSorting?: SortingState;
 }
 
 export function DataTable<TData, TValue>({
-  columns,
-  data,
-  defaultSorting = [],
-}: DataTableProps<TData, TValue>) {
+                                           columns,
+                                           data,
+                                           defaultSorting = [],
+                                         }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting);
 
   const table = useReactTable({
@@ -41,11 +41,11 @@ export function DataTable<TData, TValue>({
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(), // always client-sort
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 10, // setup số lượng hàng trên mỗi trang của pagination
+        pageSize: 15, // setup số lượng hàng trên mỗi trang của pagination
       },
     },
   });
@@ -54,9 +54,9 @@ export function DataTable<TData, TValue>({
     <div className="overflow-hidden rounded-md border">
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
+          {table.getHeaderGroups().map((hg) => (
+            <TableRow key={hg.id}>
+              {hg.headers.map((header) => (
                 <TableHead key={header.id} style={{ width: header.getSize() }}>
                   {header.isPlaceholder ? null : (
                     <div
@@ -67,13 +67,10 @@ export function DataTable<TData, TValue>({
                       }
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                       {{ asc: " ↑", desc: " ↓" }[
                         header.column.getIsSorted() as string
-                      ] ?? null}
+                        ] ?? null}
                     </div>
                   )}
                 </TableHead>
@@ -108,8 +105,7 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between p-3">
         <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} /{" "}
-          {table.getPageCount() || 1}
+          Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
         </div>
         <div className="flex items-center gap-2">
           <Button
