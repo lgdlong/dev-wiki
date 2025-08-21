@@ -52,7 +52,7 @@ export function makeProductColumns({
           <a
             href={url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {url}
@@ -71,7 +71,7 @@ export function makeProductColumns({
           <a
             href={url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {url}
