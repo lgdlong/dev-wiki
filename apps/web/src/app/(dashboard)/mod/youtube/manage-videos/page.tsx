@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "./data-table";
 import { makeVideoColumns } from "./columns";
 import type { Video } from "@/types/video";
-import { getAllVideos, deleteVideo } from "@/utils/api/video";
+import { getAllVideos, deleteVideo } from "@/utils/api/videoApi";
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
