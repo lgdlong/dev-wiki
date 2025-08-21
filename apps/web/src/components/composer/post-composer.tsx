@@ -41,7 +41,11 @@ export default function PostComposer() {
   }, [tagQuery, tags]);
 
   const canPost = useMemo(
-    () => tab === 'text' && Boolean(title.trim()) && Boolean(content.trim()),
+    () =>
+      tab === 'text' &&
+      Boolean(title.trim()) &&
+      title.trim().length <= TITLE_MAX &&
+      Boolean(content.trim()),
     [tab, title, content]
   );
 
