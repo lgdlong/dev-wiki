@@ -40,7 +40,10 @@ export default function PostComposer() {
     return q ? base.filter(t => t.includes(q)) : base;
   }, [tagQuery, tags]);
 
-  const canPost = useMemo(() => tab === 'text' && title.trim() && content.trim(), [tab, title, content]);
+  const canPost = useMemo(
+    () => tab === 'text' && Boolean(title.trim()) && Boolean(content.trim()),
+    [tab, title, content]
+  );
 
   const addTag = (t: string) => {
     const v = t.trim();
