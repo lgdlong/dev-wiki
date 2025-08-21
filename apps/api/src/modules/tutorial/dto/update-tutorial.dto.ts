@@ -2,7 +2,6 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateTutorialDto } from './create-tutorial.dto';
 import { IsInt, IsOptional } from 'class-validator';
 
-import { IsInt, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTutorialDto } from './create-tutorial.dto';
 
