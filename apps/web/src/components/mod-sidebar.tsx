@@ -3,7 +3,7 @@
 import * as React from "react";
 import {
   BookOpen,
-  Bot,
+  Bot, ChartNoAxesGantt,
   Command,
   Frame,
   LifeBuoy,
@@ -11,7 +11,7 @@ import {
   PieChart,
   Send,
   Settings2,
-  SquareTerminal,
+  SquareTerminal
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -55,10 +55,30 @@ const data = {
           title: "Manage videos",
           url: "/mod/youtube/manage-videos",
         },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
+      ],
+    },
+    {
+      title: "Product",
+      url: "#",
+      icon: ChartNoAxesGantt,
+      isActive: true,
+      items: [
         {
-          title: "Settings",
-          url: "#",
+          title: "New Product",
+          url: "/mod/products/new",
         },
+        {
+          title: "Manage Products",
+          url: "/mod/products/manage-products",
+        },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
       ],
     },
     // {
