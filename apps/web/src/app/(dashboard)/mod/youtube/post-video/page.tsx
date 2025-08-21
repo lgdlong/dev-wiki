@@ -1,5 +1,3 @@
-import { Input } from "@/components/ui/input";
-import React from "react";
 import { PostVideoForm } from "./PostVideoForm";
 
 export default function PostVideoPage() {

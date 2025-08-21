@@ -2,16 +2,11 @@
 
 import * as React from "react";
 import {
-  BookOpen,
-  Bot, ChartNoAxesGantt,
+  ChartNoAxesGantt,
   Command,
-  Frame,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
-  Settings2,
-  SquareTerminal
+  Youtube
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -44,7 +39,7 @@ const data = {
     {
       title: "Youtube",
       url: "#",
-      icon: SquareTerminal,
+      icon: Youtube,
       isActive: true,
       items: [
         {

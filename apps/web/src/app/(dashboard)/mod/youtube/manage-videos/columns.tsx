@@ -18,7 +18,7 @@ export function makeVideoColumns({
   return [
     {
       accessorKey: "thumbnailUrl",
-      header: "",
+      header: "Thumbnail",
       cell: ({ row }) => {
         const v = row.original;
         const thumb =
@@ -115,7 +115,6 @@ export function makeVideoColumns({
           </div>
         );
       },
-      size: 100,
       enableSorting: false,
     },
   ];
