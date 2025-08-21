@@ -4,15 +4,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 import { createProduct } from "@/utils/api/productApi";
 import type { CreateProductDTO, Product } from "@/types/product";
@@ -41,9 +39,8 @@ const postProductSchema = z.object({
 type PostProductFormValues = z.infer<typeof postProductSchema>;
 
 export default function NewProductPage() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: currentUser } = useCurrentUser();
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentUser();
 
   const form = useForm<PostProductFormValues>({
     resolver: zodResolver(postProductSchema) as any,
@@ -60,6 +57,11 @@ export default function NewProductPage() {
 
   async function onSubmit(values: PostProductFormValues) {
     try {
+      // Check if user is signed in
+      if (isUserLoading || !currentUser?.id) {
+        toast.error("You must be signed in to create a product.");
+        return;
+      }
       setIsSubmitting(true);
       // Map form values -> DTO (same keys here)
       const payload: CreateProductDTO = {
@@ -70,20 +72,15 @@ export default function NewProductPage() {
         description: values.description ?? null,
         pros: values.pros ?? null,
         cons: values.cons ?? null,
-        createdBy: currentUser?.id ?? 0, // Use current user's ID
       };
 
-      console.log("[DEBUG] Payload:", payload);
-
+      // Call API to create product
       const created: Product = await createProduct(payload);
 
-      console.log("[DEBUG] Created product:", created);
-
+      // Show the success message
       toast.success("Product created", {
         description: created?.name ?? "",
       });
-
-      // router.push("/mod/products");
     } catch (e: any) {
       toast.error("Failed to create product", {
         description: e?.message ?? "Unexpected error",

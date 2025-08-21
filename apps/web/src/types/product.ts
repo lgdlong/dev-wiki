@@ -34,7 +34,6 @@ export interface CreateProductDTO {
   githubUrl?: string | null;
   pros?: string | null;
   cons?: string | null;
-  createdBy: number; // This should be set by the server based on auth context
 }
 
 // Client → Server: partial update (PATCH)

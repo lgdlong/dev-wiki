@@ -1,14 +1,20 @@
 import { fetcher } from "@/lib/fetcher";
 import type { Product, CreateProductDTO, UpdateProductDTO } from "@/types/product";
+import { getAccessToken } from "@/utils/auth";
 
 /**
  * Create a new product
  * POST /products
  */
 export async function createProduct(data: CreateProductDTO): Promise<Product> {
+  const token = getAccessToken();
   return fetcher<Product>("/products", {
     method: "POST",
     body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 
