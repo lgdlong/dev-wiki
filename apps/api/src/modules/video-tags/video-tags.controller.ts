@@ -16,16 +16,9 @@ import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { VideoTagsService } from './video-tags.service';
 import { CreateVideoTagDto } from './dto/create-video-tag.dto';
 import { UpsertVideoTagsDto } from './dto/upsert-video-tag.dto';
-import { Video } from '../videos/entities/video.entity';
 import { Tag } from '../tags/entities/tag.entity';
+import { AuthenticatedRequest } from '../../shared/types/authenticated-request.interface';
 
-interface AuthenticatedRequest extends Request {
-  user: {
-    id: number;
-    email: string;
-    role: string;
-  };
-}
 
 @Controller()
 @UseGuards(JwtAuthGuard)
