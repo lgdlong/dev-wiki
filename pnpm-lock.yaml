@@ -234,18 +234,15 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.83.0
         version: 5.83.0(@tanstack/react-query@5.83.0(react@19.1.0))(react@19.1.0)
-<<<<<<< HEAD
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@toast-ui/editor':
         specifier: ^3.2.2
         version: 3.2.2
       '@toast-ui/react-editor':
         specifier: ^3.2.3
         version: 3.2.3(react@19.1.0)
-=======
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
->>>>>>> dev
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

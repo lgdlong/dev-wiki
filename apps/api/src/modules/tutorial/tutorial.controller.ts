@@ -11,10 +11,10 @@ import { TutorialService } from './tutorial.service';
 import { CreateTutorialDto } from './dto/create-tutorial.dto';
 import { UpdateTutorialDto } from './dto/update-tutorial.dto';
 
-@Controller('tutorial')
+@Controller('tutorials')
 export class TutorialController {
   constructor(private readonly tutorialService: TutorialService) {}
-
+  // FE nhấn Post -> POST /api/tutorials
   @Post()
   create(@Body() createTutorialDto: CreateTutorialDto) {
     return this.tutorialService.create(createTutorialDto);

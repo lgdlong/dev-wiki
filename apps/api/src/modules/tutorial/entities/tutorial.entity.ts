@@ -18,7 +18,7 @@ export class Tutorial {
   @Column({ type: 'text', nullable: false })
   title: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: false }) //markdown từ Toast UI
   content: string;
 
   @Column({ name: 'author_id', nullable: false })

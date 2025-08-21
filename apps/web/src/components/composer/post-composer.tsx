@@ -2,22 +2,26 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ToastEditor from '@/components/composer/post-markdown';
+import { CreateTutorialRequest } from '@/types/tutorial';
+import { createTutorial } from '@/utils/api/tutorial';
+import { useRouter } from "next/navigation";
 
 type TabKey = 'text' | 'media' | 'link' | 'poll' | 'ama';
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'text',  label: 'Text' },
+  { key: 'text', label: 'Text' },
   { key: 'media', label: 'Images & Video' },
-  { key: 'link',  label: 'Link' },
-  { key: 'poll',  label: 'Poll' },
-  { key: 'ama',   label: 'AMA' },
+  { key: 'link', label: 'Link' },
+  { key: 'poll', label: 'Poll' },
+  { key: 'ama', label: 'AMA' },
 ];
 
 const TITLE_MAX = 300;
 const TAG_SUGGESTIONS = [
-  'announcement','tips','qa','release','bug','feature','guide','howto','performance','security','design',
+  'announcement', 'tips', 'qa', 'release', 'bug', 'feature', 'guide', 'howto', 'performance', 'security', 'design',
 ];
 
 export default function PostComposer() {
+  const router = useRouter();
   const [tab, setTab] = useState<TabKey>('text');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState(''); // Markdown từ ToastEditor
@@ -54,8 +58,34 @@ export default function PostComposer() {
     return () => document.removeEventListener('mousedown', onDocClick);
   }, [pickerOpen]);
 
+  // Viết chức năng của nút bấm (handle button)
   const onSaveDraft = () => alert('Draft saved (mock)');
-  const onPost = () => alert('Posted (mock)');
+  const onPost = async () => {
+    if (!canPost) return;
+
+    try {
+      const payload: CreateTutorialRequest = {
+        title: title.trim(),
+        content: content.trim(), // markdown từ ToastEditor
+        author_id: 25,             // TODO: khi có JWT thì bỏ & lấy từ token BE
+        tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
+      };
+
+       
+
+      const created = await createTutorial(payload); // POST /tutorials
+      console.log(created)
+      // UX tuỳ bạn: reset hoặc điều hướng
+      setTitle('');
+      setContent('');
+      setTags([]);
+
+      // Điều hướng sang trang quản trị/chi tiết bài
+      router.push(`/mod`); // hoặc `/tutorials/${created.id}` nếu có route chi tiết
+    } catch (e: any) {
+      alert(`Lỗi: ${e?.message ?? 'Publish failed'}`);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -184,16 +214,16 @@ export default function PostComposer() {
 
         {/* TOAST UI Editor (Markdown core) */}
         {tab === 'text' ? (
-           <div className="w-full">
-           <ToastEditor
-             value={content}
-             onChange={setContent}
-             height="400px"
-           />
-         </div>
+          <div className="w-full">
+            <ToastEditor
+              value={content}
+              onChange={setContent}
+              height="400px"
+            />
+          </div>
         ) : (
           <div className="rounded-xl border border-white/10 p-6 text-white/60">
-            {`"${TABS.find(x=>x.key===tab)?.label}"`} editor coming soon…
+            {`"${TABS.find(x => x.key === tab)?.label}"`} editor coming soon…
           </div>
         )}
       </div>
@@ -217,3 +247,7 @@ export default function PostComposer() {
     </div>
   );
 }
+function setAuthorId(arg0: number) {
+  throw new Error('Function not implemented.');
+}
+

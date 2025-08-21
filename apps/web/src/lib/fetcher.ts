@@ -45,6 +45,22 @@ export async function fetcher<T>(
   }
 
   if (!res.ok) {
+    // Log chi tiết lỗi để dễ debug
+    console.error("API ERROR", {
+      url,
+      status: res.status,
+      statusText: res.statusText,
+      payload: data,
+    });
+
+
+    // Nếu BE trả { message: [...], error, statusCode }
+    if (data && typeof data === "object" && Array.isArray((data as any).message)) {
+      const msg = (data as any).message
+        .map((x: any) => (typeof x === "string" ? x : x?.message || JSON.stringify(x)))
+        .join(", ");
+      throw new Error(`${res.status} ${res.statusText} — ${msg}`);
+    }
     // Trường hợp có trả về lỗi dạng JSON với message
     const hasMessage = (obj: unknown): obj is { message: string } =>
       typeof obj === "object" &&

@@ -20,7 +20,11 @@ describe('TutorialService', () => {
 
   describe('create', () => {
     it('should return a creation message', () => {
-      const createTutorialDto: CreateTutorialDto = {};
+      const createTutorialDto: CreateTutorialDto = {
+        title: '',
+        content: '',
+        author_id: 0
+      };
       const result = service.create(createTutorialDto);
       expect(result).toBe('This action adds a new tutorial');
     });
