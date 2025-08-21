@@ -8,8 +8,6 @@ import { getAccessToken } from "@/utils/auth";
  * POST /tutorials
  */
 export async function createTutorial(data: CreateTutorialRequest): Promise<Tutorial> {
-
-    // map camelCase -> snake_case nếu BE yêu cầu
     const body = {
         title: data.title,
         content: data.content,
