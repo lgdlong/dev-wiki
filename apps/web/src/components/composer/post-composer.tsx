@@ -254,7 +254,5 @@ export default function PostComposer() {
     </div>
   );
 }
-function setAuthorId(arg0: number) {
-  throw new Error('Function not implemented.');
-}
+
 
