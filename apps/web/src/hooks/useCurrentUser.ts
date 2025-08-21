@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { meApi } from "@/utils/api/auth";
-import type { Account } from "@/types/account"; // giả sử bạn để type vào src/types/accountApi.ts
+import type { Account } from "@/types/account";
 
 export function useCurrentUser() {
   return useQuery<Account>({

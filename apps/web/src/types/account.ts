@@ -1,4 +1,4 @@
-// apps/web/src/types/accountApi.ts
+// apps/web/src/types/account.ts
 export interface Account {
   id: number;
   email: string;
