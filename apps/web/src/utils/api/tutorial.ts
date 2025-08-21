@@ -8,18 +8,19 @@ import { getAccessToken } from "@/utils/auth";
  * POST /tutorials
  */
 export async function createTutorial(data: CreateTutorialRequest): Promise<Tutorial> {
-
-    // map camelCase -> snake_case nếu BE yêu cầu
     const body = {
         title: data.title,
         content: data.content,
-        author_id: Number(data.author_id), 
+        author_id: Number(data.author_id),
         tags: data.tags,
     };
 
     return fetcher<Tutorial>("/tutorials", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json",
+        },
     });
 }
 
