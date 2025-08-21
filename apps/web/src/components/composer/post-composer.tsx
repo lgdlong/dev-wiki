@@ -26,6 +26,7 @@ export default function PostComposer() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState(''); // Markdown từ ToastEditor
   const [tags, setTags] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   // Tag picker
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -61,7 +62,8 @@ export default function PostComposer() {
   // Viết chức năng của nút bấm (handle button)
   const onSaveDraft = () => alert('Draft saved (mock)');
   const onPost = async () => {
-    if (!canPost) return;
+    if (!canPost || submitting) return;
+    setSubmitting(true);
 
     try {
       const payload: CreateTutorialRequest = {
@@ -71,7 +73,7 @@ export default function PostComposer() {
         tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
       };
 
-       
+
 
       const created = await createTutorial(payload); // POST /tutorials
       console.log(created)
@@ -84,6 +86,8 @@ export default function PostComposer() {
       router.push(`/mod`); // hoặc `/tutorials/${created.id}` nếu có route chi tiết
     } catch (e: any) {
       alert(`Lỗi: ${e?.message ?? 'Publish failed'}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 

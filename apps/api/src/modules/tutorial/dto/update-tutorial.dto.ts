@@ -3,7 +3,6 @@ import { CreateTutorialDto } from './create-tutorial.dto';
 import { IsInt, IsOptional } from 'class-validator';
 
 export class UpdateTutorialDto extends PartialType(CreateTutorialDto) {
-    @IsOptional()
-    @IsInt()
-    author_id?: number;
+  // Do not allow changing author via update to prevent ownership tampering
+  // author_id is intentionally omitted here
 }
