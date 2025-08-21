@@ -106,6 +106,7 @@ export default function NewProductPage() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
                 {/* Name */}
                 <FormField
                   control={form.control}
@@ -122,62 +123,6 @@ export default function NewProductPage() {
                     </FormItem>
                   )}
                 />
-
-                {/* URLs */}
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="logoUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Logo URL</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://.../logo.png" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="homepageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Homepage URL</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="githubUrl"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>GitHub URL</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://github.com/org/repo" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Quick logo preview */}
-                <div className="flex items-center gap-3">
-                  <div className="text-sm text-muted-foreground">Preview:</div>
-                  <div className="h-10 w-10 overflow-hidden rounded border bg-muted">
-                    {logoPreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={logoPreview} alt="logo preview" className="h-full w-full object-contain" />
-                    ) : null}
-                  </div>
-                </div>
 
                 {/* Description (big) */}
                 <FormField
@@ -197,6 +142,69 @@ export default function NewProductPage() {
                     </FormItem>
                   )}
                 />
+
+
+                {/* URLs */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Home page url */}
+                  <FormField
+                    control={form.control}
+                    name="homepageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Homepage URL</FormLabel>
+                        <FormControl>
+                          <Input type="url" placeholder="https://example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* GitHub url */}
+                  <FormField
+                    control={form.control}
+                    name="githubUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub URL</FormLabel>
+                        <FormControl>
+                          <Input type="url" placeholder="https://github.com/org/repo" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-4 items-end">
+                  {/* Logo url */}
+                  <FormField
+                    control={form.control}
+                    name="logoUrl"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-3">
+                        <FormLabel>Logo URL</FormLabel>
+                        <FormControl>
+                          <Input type="url" placeholder="https://.../logo.png" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Quick logo preview */}
+                  <div className="flex items-center gap-1 md:border-l md:pl-4">
+                    <div className="text-sm text-muted-foreground">Preview:</div>
+                    <div className="h-10 w-10 overflow-hidden rounded border bg-muted">
+                      {logoPreview ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={logoPreview} alt="logo preview" className="h-full w-full object-contain" />
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
 
                 {/* Pros (big) */}
                 <FormField
