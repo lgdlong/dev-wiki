@@ -71,19 +71,17 @@ export default function PostComposer() {
   const onPost = async () => {
     if (!canPost || submitting) return;
     setSubmitting(true);
-
+  
     try {
       const payload: CreateTutorialRequest = {
         title: title.trim(),
         content: content.trim(), // markdown từ ToastEditor
-        author_id: 25,             // TODO: khi có JWT thì bỏ & lấy từ token BE
+        author_id: 25,           // TODO: khi có JWT thì bỏ & lấy từ token BE
         tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
       };
-
-
-
+  
       const created = await createTutorial(payload); // POST /tutorials
-      console.log(created)
+      console.log(created);
       // UX tuỳ bạn: reset hoặc điều hướng
       setTitle('');
       setContent('');
@@ -92,16 +90,17 @@ export default function PostComposer() {
       let msg = 'Publish failed';
       if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
         msg = (e as { message: string }).message;
+      } else if (e instanceof Error) {
+        msg = e.message;
       }
       alert(`Lỗi: ${msg}`);
       // Điều hướng sang trang quản trị/chi tiết bài
-      router.push(`/mod`); // hoặc `/tutorials/${created.id}` nếu có route chi tiết
-    } catch (e: any) {
-      alert(`Lỗi: ${e?.message ?? 'Publish failed'}`);
+      router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
     } finally {
       setSubmitting(false);
     }
   };
+  
 
   return (
     <div className="space-y-4">
