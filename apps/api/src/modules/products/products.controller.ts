@@ -19,11 +19,11 @@ import { AuthenticatedRequest } from '../../shared/types/authenticated-request.i
 import { Product } from './entities/product.entity';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(
     @Body() createProductDto: CreateProductDto,
     @Request() req: AuthenticatedRequest,
