@@ -6,23 +6,21 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { DataTable } from "./data-table";
-import { makeVideoColumns } from "./columns";
-import type { Video } from "@/types/video";
-import { getAllVideos, deleteVideo } from "@/utils/api/videoApi";
+import type { Product } from "@/types/product";
+import { getAllProducts, deleteProduct } from "@/utils/api/productApi";
 import { Plus, RefreshCw } from "lucide-react";
-import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 
-const DEFAULT_SORT: SortingState = [{ id: "createdAt", desc: true }];
+// new imports
+import { DataTable } from "./data-table";
+import { makeProductColumns } from "./columns";
 
-export default function ManageVideoPage() {
+export default function ManageProductPage() {
   const router = useRouter();
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
-  // state cho dialog
   const [openDelete, setOpenDelete] = useState(false);
   const [pendingId, setPendingId] = useState<number | null>(null);
 
@@ -30,10 +28,10 @@ export default function ManageVideoPage() {
     try {
       setLoading(true);
       setErr(null);
-      const data = await getAllVideos(); // fetch once, sort client-side
-      setVideos(data ?? []);
+      const data = await getAllProducts();
+      setProducts(data ?? []);
     } catch (e: any) {
-      setErr(e?.message ?? "Failed to load videos");
+      setErr(e?.message ?? "Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -44,54 +42,42 @@ export default function ManageVideoPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!q) return videos;
+    if (!q) return products;
     const k = q.toLowerCase();
-    return videos.filter((v) =>
-      [v.title, v.channelTitle, v.youtubeId]
-        .filter(Boolean)
-        .some((s) => String(s).toLowerCase().includes(k)),
+    return products.filter((p) =>
+      [p.name, p.homepageUrl, p.githubUrl].filter(Boolean).some((s) => String(s).toLowerCase().includes(k)),
     );
-  }, [videos, q]);
+  }, [products, q]);
 
-  const columns: ColumnDef<Video>[] = useMemo(
-    () =>
-      makeVideoColumns({
-        onEdit: (id: number) =>
-          router.push(`/mod/youtube/manage-videos/${id}/edit`),
-        onRequestDelete: (id: number) => {
-          setPendingId(id);
-          setOpenDelete(true);
-        },
-      }),
-    [router],
-  );
-
-  // Hàm xoá thực sự (gọi từ dialog)
   async function confirmDelete() {
     if (pendingId == null) return;
-    await deleteVideo(pendingId);
-    setVideos((prev) => prev.filter((x) => x.id !== pendingId));
+    await deleteProduct(pendingId);
+    setProducts((prev) => prev.filter((x) => x.id !== pendingId));
     setPendingId(null);
   }
+
+  const columns = makeProductColumns({
+    onEdit: (id) => router.push(`/mod/products/${id}/edit`),
+    onRequestDelete: (id) => {
+      setPendingId(id);
+      setOpenDelete(true);
+    },
+  });
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Manage YouTube Videos
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            View, edit and delete videos (Moderator).
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">Manage Products</h1>
+          <p className="text-sm text-muted-foreground">View, edit and delete products (Moderator).</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="gap-2" onClick={() => load()}>
             <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
           <Button asChild className="gap-2">
-            <Link href="/mod/youtube/post-video">
-              <Plus className="h-4 w-4" /> Add Video
+            <Link href="/mod/products/new">
+              <Plus className="h-4 w-4" /> Add Product
             </Link>
           </Button>
         </div>
@@ -100,13 +86,13 @@ export default function ManageVideoPage() {
       <Card>
         <CardContent className="flex items-center justify-between gap-3 pt-6">
           <Input
-            placeholder="Search by title, channel or YouTube ID…"
+            placeholder="Search by name, homepage or GitHub…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="max-w-sm"
           />
           <div className="text-sm text-muted-foreground">
-            Total <span className="font-medium">{filtered.length}</span> videos
+            Total <span className="font-medium">{filtered.length}</span> products
           </div>
         </CardContent>
       </Card>
@@ -119,26 +105,19 @@ export default function ManageVideoPage() {
         <DataTable
           columns={columns}
           data={filtered}
-          defaultSorting={DEFAULT_SORT}
+          defaultSorting={[{ id: "id", desc: false }]}
         />
       )}
 
-      <p className="text-xs text-muted-foreground">
-        Tip: if you use <code>next/image</code> for YouTube thumbnails,
-        whitelist <code>i.ytimg.com</code> in <code>next.config.js</code> (
-        <code>images.remotePatterns</code>) or set <code>unoptimized</code>.
-      </p>
-
-      {/* Dialog xác nhận xoá (mobile-friendly) */}
       <DeleteConfirmDialog
         open={openDelete}
         onOpenChange={(v: boolean) => {
           setOpenDelete(v);
           if (!v) setPendingId(null);
         }}
-        title="Delete this video?"
-        description="This action cannot be undone. The video will be permanently removed."
-        confirmText="Delete video"
+        title="Delete this product?"
+        description="This action cannot be undone. The product will be permanently removed."
+        confirmText="Delete product"
         onConfirm={confirmDelete}
       />
     </div>

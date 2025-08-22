@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getVideoById, getVideoTags, upsertVideoTags } from "@/utils/api/video";
+import { getVideoById, getVideoTags, upsertVideoTags } from "@/utils/api/videoApi";
 import { createTag, getAllTags } from "@/utils/api/tag";
 import type { Video } from "@/types/video";
 import type { Tag } from "@/components/tags/TagBadgeList";

@@ -7,27 +7,39 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
+  Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '../../shared/types/authenticated-request.interface';
+import { Product } from './entities/product.entity';
 
 @Controller('products')
+@UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<Product> {
+    const userId: number = Number(req.user?.id);
+    if (!userId) throw new UnauthorizedException('Invalid token payload');
+    return this.productsService.create(createProductDto, userId);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productsService.findOne(id);
   }
 
@@ -35,17 +47,19 @@ export class ProductsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
-  ) {
+  ): Promise<Product> {
     return this.productsService.update(id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.productsService.remove(id);
   }
 
   @Get('creator/:creatorId')
-  findByCreator(@Param('creatorId', ParseIntPipe) creatorId: number) {
+  findByCreator(
+    @Param('creatorId', ParseIntPipe) creatorId: number,
+  ): Promise<Product[]> {
     return this.productsService.findByCreator(creatorId);
   }
 }

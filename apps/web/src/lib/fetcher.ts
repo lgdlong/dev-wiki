@@ -1,83 +1,123 @@
 // apps/web/src/lib/fetcher.ts
 import { API_URL } from "@/config/api";
 
+export class ApiError extends Error {
+  status: number;
+  // payload gốc từ server (nếu có), để debug/hiển thị chi tiết hơn khi cần
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(message: string, status: number, data?: any) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
+type JsonLike =
+  | { message?: string | string[]; error?: string; statusCode?: number }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | Record<string, any>;
+
 /**
- * Hàm fetcher dùng cho mọi API, hỗ trợ generic type, trả về dữ liệu đúng type.
- * @param path - endpoint (bắt đầu bằng dấu /)
- * @param options - RequestInit (method, body, headers, ...)
+ * Fetch helper cho toàn bộ API (generic).
+ * - Tự parse JSON hoặc text.
+ * - Ném ApiError khi !res.ok, message gộp mượt.
  */
 export async function fetcher<T>(
   path: string,
-  options?: RequestInit,
+  options: RequestInit = {},
 ): Promise<T> {
   const url = `${API_URL}${path}`;
-  let res: Response;
 
+  // Chỉ set Content-Type khi có body JSON
+  const hasBody = typeof options.body !== "undefined";
+  const headers: HeadersInit = {
+    ...(hasBody ? { "Content-Type": "application/json" } : {}),
+    ...(options.headers || {}),
+  };
+
+  let res: Response;
   try {
-    res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
-    });
+    res = await fetch(url, { ...options, headers });
   } catch (err) {
-    console.error("Fetch error:", err);
-    throw new Error("Could not connect to server. Please try again later.");
+    console.error("Network error:", err);
+    throw new ApiError(
+      "Could not connect to server. Please try again later.",
+      0,
+    );
   }
 
-  let data: unknown = null;
-  const contentType = res.headers.get("content-type") || "";
+  // Thử parse JSON trước, nếu fail thì lấy text
+  let json: JsonLike | undefined;
+  let text: string | undefined;
 
-  // Nếu backend trả về JSON thì parse, còn không thì trả về text hoặc null
-  if (contentType.includes("application/json")) {
+  const tryParseJson = async () => {
     try {
-      data = await res.json();
+      json = await res.clone().json();
     } catch {
-      data = null;
+      json = undefined;
     }
-  } else {
+  };
+  const tryParseText = async () => {
     try {
-      data = await res.text();
+      text = await res.clone().text();
     } catch {
-      data = null;
+      text = undefined;
     }
+  };
+
+  await tryParseJson();
+  if (json === undefined) {
+    await tryParseText();
   }
 
   if (!res.ok) {
-    // Log chi tiết lỗi để dễ debug
-    console.error("API ERROR", {
-      url,
-      status: res.status,
-      statusText: res.statusText,
-      payload: data,
-    });
+    // Ưu tiên message từ JSON
+    let message = `HTTP ${res.status} ${res.statusText || "Error"}`;
 
+    if (json) {
+      const maybeMsg = (json as JsonLike).message;
+      const maybeErr = (json as JsonLike).error;
 
-    // Nếu BE trả { message: [...], error, statusCode }
-    if (data && typeof data === "object" && Array.isArray((data as any).message)) {
-      const msg = (data as any).message
-        .map((x: any) => (typeof x === "string" ? x : x?.message || JSON.stringify(x)))
-        .join(", ");
-      throw new Error(`${res.status} ${res.statusText} — ${msg}`);
+      if (Array.isArray(maybeMsg)) {
+        message = maybeMsg.join(", ");
+      } else if (typeof maybeMsg === "string" && maybeMsg.trim()) {
+        message = maybeMsg;
+      } else if (typeof maybeErr === "string" && maybeErr.trim()) {
+        message = maybeErr;
+      } else {
+        // fallback: stringify ngắn gọn
+        try {
+          message = JSON.stringify(json);
+        } catch {
+          /* ignore */
+        }
+      }
+    } else if (text && text.trim()) {
+      message = text;
     }
-    // Trường hợp có trả về lỗi dạng JSON với message
-    const hasMessage = (obj: unknown): obj is { message: string } =>
-      typeof obj === "object" &&
-      obj !== null &&
-      "message" in obj &&
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      typeof (obj as any).message === "string";
 
-    if (hasMessage(data)) {
-      throw new Error(data.message);
-    }
-    if (typeof data === "string" && data.length > 0) {
-      throw new Error(data);
-    }
-    throw new Error(res.statusText || "API error");
+    throw new ApiError(message, res.status, json ?? text);
   }
 
-  // Trả về đúng kiểu dữ liệu
-  return data as T;
+  // 204 No Content → trả undefined
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
+  // Ưu tiên trả JSON nếu có
+  if (json !== undefined) {
+    return json as T;
+  }
+
+  // Nếu API trả text mà generic của bạn expecting string
+  if (typeof text === "string") {
+    return text as unknown as T;
+  }
+
+  // Không có gì để trả
+  return undefined as T;
 }

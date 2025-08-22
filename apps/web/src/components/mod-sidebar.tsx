@@ -2,16 +2,11 @@
 
 import * as React from "react";
 import {
-  BookOpen,
-  Bot,
+  ChartNoAxesGantt,
   Command,
-  Frame,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
-  Settings2,
-  SquareTerminal,
+  Youtube
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -44,7 +39,7 @@ const data = {
     {
       title: "Youtube",
       url: "#",
-      icon: SquareTerminal,
+      icon: Youtube,
       isActive: true,
       items: [
         {
@@ -55,10 +50,30 @@ const data = {
           title: "Manage videos",
           url: "/mod/youtube/manage-videos",
         },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
+      ],
+    },
+    {
+      title: "Product",
+      url: "#",
+      icon: ChartNoAxesGantt,
+      isActive: true,
+      items: [
         {
-          title: "Settings",
-          url: "#",
+          title: "New Product",
+          url: "/mod/products/new",
         },
+        {
+          title: "Manage Products",
+          url: "/mod/products/manage-products",
+        },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
       ],
     },
     // {

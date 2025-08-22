@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { createVideo } from "@/utils/api/video";
+import { createVideo } from "@/utils/api/videoApi";
 import {
   Form,
   FormControl,
