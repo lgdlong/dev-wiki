@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import ToastEditor from '@/components/tutorials/tutorial-markdown';
+import dynamic from 'next/dynamic';
 import { CreateTutorialRequest } from '@/types/tutorial';
 import { createTutorial } from '@/utils/api/tutorial';
 import { useRouter } from "next/navigation";
 import { Toast } from '../ui/announce-success-toast';
+
+// Dynamic import with no SSR to prevent Element undefined error
+const ToastEditor = dynamic(() => import('@/components/tutorials/tutorial-markdown'), {
+  ssr: false,
+  loading: () => <div className="h-[400px] rounded-xl border border-white/10 bg-white/5 animate-pulse" />
+});
 
 type TabKey = 'text' | 'media' | 'link' | 'poll' | 'ama';
 const TABS: { key: TabKey; label: string }[] = [
@@ -293,5 +299,3 @@ export default function PostComposer() {
     </div>
   );
 }
-
-
