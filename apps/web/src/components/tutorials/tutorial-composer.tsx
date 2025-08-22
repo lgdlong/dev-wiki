@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import ToastEditor from '@/components/composer/post-markdown';
+import ToastEditor from '@/components/tutorials/tutorial-markdown';
 import { CreateTutorialRequest } from '@/types/tutorial';
 import { createTutorial } from '@/utils/api/tutorial';
 import { useRouter } from "next/navigation";
+import { Toast } from '../ui/announce-success-toast';
 
 type TabKey = 'text' | 'media' | 'link' | 'poll' | 'ama';
 const TABS: { key: TabKey; label: string }[] = [
@@ -33,6 +34,10 @@ export default function PostComposer() {
   const [tagQuery, setTagQuery] = useState('');
   const pickerRef = useRef<HTMLDivElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
+
+  // Toast state
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
 
   const filteredSuggestions = useMemo(() => {
     const q = tagQuery.trim().toLowerCase();
@@ -71,7 +76,7 @@ export default function PostComposer() {
   const onPost = async () => {
     if (!canPost || submitting) return;
     setSubmitting(true);
-  
+
     try {
       const payload: CreateTutorialRequest = {
         title: title.trim(),
@@ -79,28 +84,46 @@ export default function PostComposer() {
         author_id: 25,           // TODO: khi có JWT thì bỏ & lấy từ token BE
         tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
       };
-  
+
       const created = await createTutorial(payload); // POST /tutorials
       console.log(created);
+
+
       // UX tuỳ bạn: reset hoặc điều hướng
       setTitle('');
       setContent('');
       setTags([]);
-    } catch (e: unknown) {
-      let msg = 'Publish failed';
-      if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
-        msg = (e as { message: string }).message;
-      } else if (e instanceof Error) {
-        msg = e.message;
-      }
-      alert(`Lỗi: ${msg}`);
+      
+
+      // Hiện toast thành công
+      setToastMsg('Đăng bài thành công!');
+      setToastOpen(true);
+
+      
       // Điều hướng sang trang quản trị/chi tiết bài
       router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
+
+    } catch (e: unknown) {
+
+      // let msg = 'Publish failed';
+      // if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
+
+      //   msg = (e as { message: string }).message;
+      // } else if (e instanceof Error) {
+      //   msg = e.message;
+      // }
+      //alert(`Lỗi: ${msg}`);
+
+      // Có thể show banner đỏ (phần 2) hoặc toast error luôn
+      setToastMsg('Có lỗi xảy ra');
+      setToastOpen(true);
+
+
     } finally {
       setSubmitting(false);
     }
   };
-  
+
 
   return (
     <div className="space-y-4">
@@ -252,13 +275,21 @@ export default function PostComposer() {
           Save Draft
         </button>
         <button
-          disabled={!canPost}
+          disabled={!canPost || submitting}        // <-- KHOÁ KHI SUBMITTING
           onClick={onPost}
           className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Post
+          {submitting ? 'Posting…' : 'Post'}        {/* <-- UX nhỏ */}
         </button>
       </div>
+        {/* RENDER TOAST  */}
+
+        <Toast
+        open={toastOpen}
+        message={toastMsg}
+        kind={toastMsg.includes('thành công') ? 'success' : 'error'}
+        onClose={() => setToastOpen(false)}
+      />
     </div>
   );
 }

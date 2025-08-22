@@ -1,4 +1,4 @@
-import PostComposer from '@/components/composer/post-composer';
+import PostComposer from '@/components/tutorials/tutorial-composer';
 
 export const metadata = { title: 'New Post' };
 
