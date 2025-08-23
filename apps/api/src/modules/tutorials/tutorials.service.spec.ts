@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TutorialService } from './tutorial.service';
-import { CreateTutorialDto } from './dto/create-tutorial.dto';
-import { UpdateTutorialDto } from './dto/update-tutorial.dto';
+import { TutorialService } from './tutorials.service';
+import { CreateTutorialDto } from './dto/create-tutorials.dto';
+import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 
 describe('TutorialService', () => {
   let service: TutorialService;
@@ -24,7 +24,6 @@ describe('TutorialService', () => {
       const createTutorialDto: CreateTutorialDto = {
         title: 'Intro to TUI',
         content: 'Markdown content',
-        author_id: 1,
       };
       const result = await service.create(createTutorialDto);
       expect(result).toMatchObject({ id: 1, ...createTutorialDto });

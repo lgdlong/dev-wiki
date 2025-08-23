@@ -12,6 +12,5 @@ export class CreateTutorialDto {
     content: string;
 
     // nếu dùng JWT để lấy author_id từ token thì field này không cần trong body
-    @IsInt()
-    author_id: number;
+    // ahthour_id đã bị xóa
 }

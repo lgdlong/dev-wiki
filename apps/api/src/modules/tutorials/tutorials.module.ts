@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TutorialService } from './tutorial.service';
-import { TutorialController } from './tutorial.controller';
+import { TutorialService } from './tutorials.service';
+import { TutorialController } from './tutorials.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Tutorial } from './entities/tutorial.entity';
+import { Tutorial } from './entities/tutorials.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tutorial])],

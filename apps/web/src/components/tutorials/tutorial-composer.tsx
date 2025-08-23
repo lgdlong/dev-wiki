@@ -27,7 +27,7 @@ const TAG_SUGGESTIONS = [
   'announcement', 'tips', 'qa', 'release', 'bug', 'feature', 'guide', 'howto', 'performance', 'security', 'design',
 ];
 
-export default function PostComposer() {
+export default function TutorialComposer() {
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>('text');
   const [title, setTitle] = useState('');
@@ -87,7 +87,7 @@ export default function PostComposer() {
       const payload: CreateTutorialRequest = {
         title: title.trim(),
         content: content.trim(), // markdown từ ToastEditor
-        author_id: session?.user?.id, // Lấy từ session (NextAuth)
+        author_id: 25, 
         tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
       };
 
@@ -107,7 +107,7 @@ export default function PostComposer() {
 
       
       // Điều hướng sang trang quản trị/chi tiết bài
-      router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
+      //router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
 
     } catch (e: unknown) {
 
@@ -258,11 +258,11 @@ export default function PostComposer() {
 
         {/* TOAST UI Editor (Markdown core) */}
         {tab === 'text' ? (
-          <div className="w-full">
+          <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
             <ToastEditor
               value={content}
               onChange={setContent}
-              height="400px"
+              height="100%"
             />
           </div>
         ) : (
@@ -288,12 +288,12 @@ export default function PostComposer() {
           {submitting ? 'Posting…' : 'Post'}        {/* <-- UX nhỏ */}
         </button>
       </div>
-        {/* RENDER TOAST  */}
 
+        {/* RENDER TOAST  */}
         <Toast
         open={toastOpen}
         message={toastMsg}
-        kind={toastMsg.includes('thành công') ? 'success' : 'error'}
+        kind={toastMsg.includes('success') ? 'success' : 'error'}
         onClose={() => setToastOpen(false)}
       />
     </div>

@@ -7,8 +7,8 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
-import { TutorialTagsService } from './tutorial-tags.service';
-import { CreateTutorialTagDto } from './dto/create-tutorial-tag.dto';
+import { TutorialTagsService } from './tutorials-tags.service';
+import { CreateTutorialTagDto } from './dto/create-tutorials-tag.dto';
 
 @Controller('tutorial-tags')
 export class TutorialTagsController {

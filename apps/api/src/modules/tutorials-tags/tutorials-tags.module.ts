@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TutorialTagsService } from './tutorial-tags.service';
-import { TutorialTagsController } from './tutorial-tags.controller';
-import { TutorialTag } from './entities/tutorial-tag.entity';
+import { TutorialTagsService } from './tutorials-tags.service';
+import { TutorialTagsController } from './tutorials-tags.controller';
+import { TutorialTag } from './entities/tutorials-tag.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TutorialTag])],

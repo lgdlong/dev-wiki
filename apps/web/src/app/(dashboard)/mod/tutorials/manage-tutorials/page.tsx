@@ -1,1 +1,1 @@
-export function ABC(){}
+export default function manageTutorials() {}

@@ -3,6 +3,13 @@ import { Tutorial, CreateTutorialRequest, UpdateTutorialRequest } from "@/types/
 import { Tag } from "@/types/tag";
 import { getAccessToken } from "@/utils/auth";
 
+//function hàm authHeader
+function authHeaders(): Record<string, string> {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+
 /**
  * Create a new tutorial
  * POST /tutorials
@@ -11,7 +18,10 @@ export async function createTutorial(data: CreateTutorialRequest): Promise<Tutor
     const body = {
         title: data.title,
         content: data.content,
-        author_id: Number(data.author_id),
+        // only include author_id if present; avoid NaN
+        ...(data.author_id !== undefined && data.author_id !== null
+            ? { author_id: Number(data.author_id) }
+            : {}),
         tags: data.tags,
     };
 
@@ -19,14 +29,8 @@ export async function createTutorial(data: CreateTutorialRequest): Promise<Tutor
         method: "POST",
         body: JSON.stringify(body),
         headers: {
-
-    const token = getAccessToken();
-    return fetcher<Tutorial>("/tutorials", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(),
         },
     });
 }
@@ -62,14 +66,10 @@ export async function getTutorialsByAuthor(authorId: number): Promise<Tutorial[]
 export async function updateTutorial(id: number, data: UpdateTutorialRequest): Promise<Tutorial> {
     return fetcher<Tutorial>(`/tutorials/${id}`, {
         method: "PATCH",
-export async function updateTutorial(id: number, data: UpdateTutorialRequest): Promise<Tutorial> {
-    const token = getAccessToken();
-    return fetcher<Tutorial>(`/tutorials/${id}`, {
-        method: "PATCH",
         body: JSON.stringify(data),
         headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(),
         },
     });
 }
@@ -83,7 +83,7 @@ export async function deleteTutorial(id: number): Promise<void> {
     return fetcher<void>(`/tutorials/${id}`, {
         method: "DELETE",
         headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(),
         },
     });
 }
@@ -102,7 +102,7 @@ export async function upsertTutorialTags(
         body: JSON.stringify({ tagIds }),
         headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(),
         },
     });
 }
@@ -117,7 +117,7 @@ export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(),
         },
     });
 }

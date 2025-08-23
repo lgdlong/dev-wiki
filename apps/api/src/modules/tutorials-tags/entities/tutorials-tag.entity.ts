@@ -6,7 +6,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { Tutorial } from '../../tutorial/entities/tutorial.entity';
+import { Tutorial } from '../../tutorials/entities/tutorials.entity';
 import { Tag } from '../../tags/entities/tag.entity';
 
 @Entity({ name: 'tutorial_tags' })

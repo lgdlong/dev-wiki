@@ -21,7 +21,7 @@ export default function ToastEditor({ value, onChange, height = '420px' }: Props
   }, [value]);
 
   return (
-    <Editor
+    <Editor 
       ref={ref}
       theme="dark"
       initialEditType="markdown"
