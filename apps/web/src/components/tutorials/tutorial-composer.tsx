@@ -102,7 +102,7 @@ export default function PostComposer() {
       
 
       // Hiện toast thành công
-      setToastMsg('Đăng bài thành công!');
+      setToastMsg('Tutorial published successfully!');
       setToastOpen(true);
 
       
