@@ -79,7 +79,13 @@ export async function updateTutorial(id: number, data: UpdateTutorialRequest): P
  * DELETE /tutorials/:id
  */
 export async function deleteTutorial(id: number): Promise<void> {
-    return fetcher<void>(`/tutorials/${id}`, { method: "DELETE" });
+    const token = getAccessToken();
+    return fetcher<void>(`/tutorials/${id}`, {
+        method: "DELETE",
+        headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+    });
 }
 
 /**
