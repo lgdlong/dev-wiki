@@ -89,7 +89,7 @@ const data = {
         },
         {
           title: "Manage Tutorials",
-          url: "/mod/tutorial/manage-tutorials",
+          url: "/mod/tutorials/manage-tutorials",
         },
         // {
         //   title: "Settings",
