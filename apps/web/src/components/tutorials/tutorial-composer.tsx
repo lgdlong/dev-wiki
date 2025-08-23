@@ -87,7 +87,7 @@ export default function PostComposer() {
       const payload: CreateTutorialRequest = {
         title: title.trim(),
         content: content.trim(), // markdown từ ToastEditor
-        author_id: 25,           // TODO: khi có JWT thì bỏ & lấy từ token BE
+        author_id: session?.user?.id, // Lấy từ session (NextAuth)
         tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
       };
 
