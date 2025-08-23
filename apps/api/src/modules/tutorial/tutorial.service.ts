@@ -15,7 +15,13 @@ export class TutorialService {
       const post = this.repo.create({
         title: dto.title.trim(),
         content: dto.content.trim(),
-        authorId: Number((dto as any).author_id), // map snake -> camel
+      // Define a local type for DTOs that may have author_id
+      type CreateTutorialDtoWithAuthorId = CreateTutorialDto & { author_id?: number | string };
+      const { author_id } = dto as CreateTutorialDtoWithAuthorId;
+      const post = this.repo.create({
+        title: dto.title.trim(),
+        content: dto.content.trim(),
+        authorId: author_id !== undefined ? Number(author_id) : undefined, // map snake -> camel
         views: 0,
       });
       return this.repo.save(post);
