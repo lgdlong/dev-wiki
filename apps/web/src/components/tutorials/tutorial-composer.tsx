@@ -121,7 +121,7 @@ export default function PostComposer() {
       //alert(`Lỗi: ${msg}`);
 
       // Có thể show banner đỏ (phần 2) hoặc toast error luôn
-      setToastMsg('Có lỗi xảy ra');
+      setToastMsg('An error occurred');
       setToastOpen(true);
 
 
