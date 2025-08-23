@@ -43,7 +43,24 @@ export class TutorialService {
 
   async update(id: number, dto: UpdateTutorialDto) {
     const existing = await this.findOne(id);
-    Object.assign(existing, dto);
+    const { author_id, title, content, ...rest } = dto as any;
+
+    if (typeof title === 'string') {
+      existing.title = title.trim();
+    }
+    if (typeof content === 'string') {
+      existing.content = content.trim();
+    }
+    Object.assign(existing, rest);
+
+    if (author_id !== undefined) {
+      const aid = Number(author_id);
+      if (Number.isNaN(aid)) {
+        throw new BadRequestException('author_id must be a number');
+      }
+      (existing as any).authorId = aid;
+    }
+
     return this.repo.save(existing);
   }
 
