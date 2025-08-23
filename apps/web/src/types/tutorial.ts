@@ -3,7 +3,7 @@
 export interface Tutorial {
     id: number;
     title: string;
-    content: string;        // markdown hoặc text
+    content: string;        // markdown or text
     authorId: number;       // khóa ngoại tới User
     views: number;          // mặc định = 0
     tags?: string[];        // hoặc mảng Tag nếu backend có entity riêng
