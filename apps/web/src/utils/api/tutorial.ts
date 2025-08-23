@@ -62,7 +62,15 @@ export async function getTutorialsByAuthor(authorId: number): Promise<Tutorial[]
 export async function updateTutorial(id: number, data: UpdateTutorialRequest): Promise<Tutorial> {
     return fetcher<Tutorial>(`/tutorials/${id}`, {
         method: "PATCH",
+export async function updateTutorial(id: number, data: UpdateTutorialRequest): Promise<Tutorial> {
+    const token = getAccessToken();
+    return fetcher<Tutorial>(`/tutorials/${id}`, {
+        method: "PATCH",
         body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
     });
 }
 
