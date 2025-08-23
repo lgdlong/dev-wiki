@@ -19,7 +19,14 @@ export async function createTutorial(data: CreateTutorialRequest): Promise<Tutor
         method: "POST",
         body: JSON.stringify(body),
         headers: {
+
+    const token = getAccessToken();
+    return fetcher<Tutorial>("/tutorials", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
     });
 }
