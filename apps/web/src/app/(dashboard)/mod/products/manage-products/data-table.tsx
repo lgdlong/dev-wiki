@@ -29,10 +29,10 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           defaultSorting = [],
-                                         }: DataTableProps<TData, TValue>) {
+  columns,
+  data,
+  defaultSorting = [],
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting);
 
   const table = useReactTable({
@@ -67,10 +67,13 @@ export function DataTable<TData, TValue>({
                       }
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                       {{ asc: " ↑", desc: " ↓" }[
                         header.column.getIsSorted() as string
-                        ] ?? null}
+                      ] ?? null}
                     </div>
                   )}
                 </TableHead>
@@ -105,7 +108,8 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between p-3">
         <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
+          Page {table.getState().pagination.pageIndex + 1} /{" "}
+          {table.getPageCount() || 1}
         </div>
         <div className="flex items-center gap-2">
           <Button

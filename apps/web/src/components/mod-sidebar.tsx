@@ -6,7 +6,8 @@ import {
   Command,
   LifeBuoy,
   Send,
-  Youtube
+  Youtube,
+  BookText,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -69,6 +70,26 @@ const data = {
         {
           title: "Manage Products",
           url: "/mod/products/manage-products",
+        },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
+      ],
+    },
+    {
+      title: "Tutorial",
+      url: "#",
+      icon: BookText,
+      isActive: true,
+      items: [
+        {
+          title: "New Tutorial",
+          url: "/mod/tutorials/new",
+        },
+        {
+          title: "Manage Tutorials",
+          url: "/mod/tutorials/manage-tutorials",
         },
         // {
         //   title: "Settings",

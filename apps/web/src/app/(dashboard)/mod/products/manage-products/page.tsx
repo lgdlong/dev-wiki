@@ -45,7 +45,9 @@ export default function ManageProductPage() {
     if (!q) return products;
     const k = q.toLowerCase();
     return products.filter((p) =>
-      [p.name, p.homepageUrl, p.githubUrl].filter(Boolean).some((s) => String(s).toLowerCase().includes(k)),
+      [p.name, p.homepageUrl, p.githubUrl]
+        .filter(Boolean)
+        .some((s) => String(s).toLowerCase().includes(k)),
     );
   }, [products, q]);
 
@@ -68,8 +70,12 @@ export default function ManageProductPage() {
     <div className="space-y-6 p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Manage Products</h1>
-          <p className="text-sm text-muted-foreground">View, edit and delete products (Moderator).</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Manage Products
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            View, edit and delete products (Moderator).
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="gap-2" onClick={() => load()}>
@@ -92,7 +98,8 @@ export default function ManageProductPage() {
             className="max-w-sm"
           />
           <div className="text-sm text-muted-foreground">
-            Total <span className="font-medium">{filtered.length}</span> products
+            Total <span className="font-medium">{filtered.length}</span>{" "}
+            products
           </div>
         </CardContent>
       </Card>

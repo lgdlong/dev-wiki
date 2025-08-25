@@ -7,10 +7,23 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 import { createProduct } from "@/utils/api/productApi";
 import type { CreateProductDTO, Product } from "@/types/product";
@@ -102,8 +115,10 @@ export default function NewProductPage() {
 
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Name */}
                 <FormField
                   control={form.control}
@@ -114,7 +129,10 @@ export default function NewProductPage() {
                         Name <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Bun, Vite, Prisma" {...field} />
+                        <Input
+                          placeholder="e.g. Bun, Vite, Prisma"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,7 +158,6 @@ export default function NewProductPage() {
                   )}
                 />
 
-
                 {/* URLs */}
                 <div className="grid gap-4 md:grid-cols-2">
                   {/* Home page url */}
@@ -151,7 +168,11 @@ export default function NewProductPage() {
                       <FormItem>
                         <FormLabel>Homepage URL</FormLabel>
                         <FormControl>
-                          <Input type="url" placeholder="https://example.com" {...field} />
+                          <Input
+                            type="url"
+                            placeholder="https://example.com"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -166,7 +187,11 @@ export default function NewProductPage() {
                       <FormItem>
                         <FormLabel>GitHub URL</FormLabel>
                         <FormControl>
-                          <Input type="url" placeholder="https://github.com/org/repo" {...field} />
+                          <Input
+                            type="url"
+                            placeholder="https://github.com/org/repo"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -183,7 +208,11 @@ export default function NewProductPage() {
                       <FormItem className="md:col-span-3">
                         <FormLabel>Logo URL</FormLabel>
                         <FormControl>
-                          <Input type="url" placeholder="https://.../logo.png" {...field} />
+                          <Input
+                            type="url"
+                            placeholder="https://.../logo.png"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -192,16 +221,21 @@ export default function NewProductPage() {
 
                   {/* Quick logo preview */}
                   <div className="flex items-center gap-1 md:border-l md:pl-4">
-                    <div className="text-sm text-muted-foreground">Preview:</div>
+                    <div className="text-sm text-muted-foreground">
+                      Preview:
+                    </div>
                     <div className="h-10 w-10 overflow-hidden rounded border bg-muted">
                       {logoPreview ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={logoPreview} alt="logo preview" className="h-full w-full object-contain" />
+                        <img
+                          src={logoPreview}
+                          alt="logo preview"
+                          className="h-full w-full object-contain"
+                        />
                       ) : null}
                     </div>
                   </div>
                 </div>
-
 
                 {/* Pros (big) */}
                 <FormField
@@ -242,7 +276,12 @@ export default function NewProductPage() {
                 />
 
                 <div className="flex items-center justify-end gap-2">
-                  <Button type="reset" variant="outline" disabled={isSubmitting} onClick={() => form.reset()}>
+                  <Button
+                    type="reset"
+                    variant="outline"
+                    disabled={isSubmitting}
+                    onClick={() => form.reset()}
+                  >
                     Reset
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>

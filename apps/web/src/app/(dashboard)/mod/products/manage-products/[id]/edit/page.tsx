@@ -1,5 +1,3 @@
 export default function EditProductPage() {
-  return (
-    <div>Hello</div>
-  );
+  return <div>Hello</div>;
 }

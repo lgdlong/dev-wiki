@@ -200,7 +200,7 @@ export default async function ModPage() {
       {/* Quick Actions */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/posts/new">
+          <Link href="/mod/tutorials/new">
             <FileText className="h-4 w-4" /> Bài viết mới
           </Link>
         </Button>

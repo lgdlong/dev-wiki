@@ -8,9 +8,9 @@ import { Edit, Trash2 } from "lucide-react";
 import type { Product } from "@/types/product";
 
 export function makeProductColumns({
-                                     onEdit,
-                                     onRequestDelete,
-                                   }: {
+  onEdit,
+  onRequestDelete,
+}: {
   onEdit: (id: number) => void;
   onRequestDelete: (id: number) => void;
 }): ColumnDef<Product>[] {
@@ -41,7 +41,9 @@ export function makeProductColumns({
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.name}</span>
+      ),
     },
     {
       accessorKey: "homepageUrl",

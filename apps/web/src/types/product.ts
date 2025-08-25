@@ -60,7 +60,13 @@ export function toProduct(dto: {
 }): Product {
   return {
     ...dto,
-    createdAt: dto.createdAt instanceof Date ? dto.createdAt.toISOString() : dto.createdAt,
-    updatedAt: dto.updatedAt instanceof Date ? dto.updatedAt.toISOString() : dto.updatedAt,
+    createdAt:
+      dto.createdAt instanceof Date
+        ? dto.createdAt.toISOString()
+        : dto.createdAt,
+    updatedAt:
+      dto.updatedAt instanceof Date
+        ? dto.updatedAt.toISOString()
+        : dto.updatedAt,
   };
 }

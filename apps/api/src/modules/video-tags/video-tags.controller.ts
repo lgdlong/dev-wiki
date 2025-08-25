@@ -19,7 +19,6 @@ import { UpsertVideoTagsDto } from './dto/upsert-video-tag.dto';
 import { Tag } from '../tags/entities/tag.entity';
 import { AuthenticatedRequest } from '../../shared/types/authenticated-request.interface';
 
-
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class VideoTagsController {

@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TutorialTag } from './entities/tutorial-tag.entity';
-import { CreateTutorialTagDto } from './dto/create-tutorial-tag.dto';
+import { TutorialTag } from './entities/tutorials-tag.entity';
+import { CreateTutorialTagDto } from './dto/create-tutorials-tag.dto';
 
 @Injectable()
 export class TutorialTagsService {

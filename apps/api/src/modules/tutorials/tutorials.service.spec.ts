@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TutorialService } from './tutorial.service';
-import { CreateTutorialDto } from './dto/create-tutorial.dto';
-import { UpdateTutorialDto } from './dto/update-tutorial.dto';
+import { TutorialService } from './tutorials.service';
+import { CreateTutorialDto } from './dto/create-tutorials.dto';
+import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 
 describe('TutorialService', () => {
   let service: TutorialService;
@@ -20,9 +20,14 @@ describe('TutorialService', () => {
 
   describe('create', () => {
     it('should return a creation message', () => {
-      const createTutorialDto: CreateTutorialDto = {};
-      const result = service.create(createTutorialDto);
-      expect(result).toBe('This action adds a new tutorial');
+      it('create: should persist and return the tutorial', async () => {
+        const createTutorialDto: CreateTutorialDto = {
+          title: 'Intro to TUI',
+          content: 'Markdown content',
+        };
+        const result = await service.create(createTutorialDto);
+        expect(result).toMatchObject({ id: 1, ...createTutorialDto });
+      });
     });
   });
 
