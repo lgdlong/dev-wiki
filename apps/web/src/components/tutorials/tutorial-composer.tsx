@@ -130,7 +130,6 @@ export default function TutorialComposer() {
     }
   };
 
-
   return (
     <div className="space-y-4">
       {/* Tabs (đen/trắng) */}
@@ -156,8 +155,8 @@ export default function TutorialComposer() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
-            placeholder="Title*"
-            className="w-full rounded-xl border border-white/15 bg-black p-4 text-lg text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/15"
+            placeholder="Title"
+            className="w-full h-8 rounded-xl border border-white/15 bg-black p-4 text-lg text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/15"
           />
           <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-white/50">
             {title.length}/{TITLE_MAX}
