@@ -1,110 +1,124 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { createTutorial } from '@/utils/api/tutorial';
+import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { createTutorial } from "@/utils/api/tutorial";
 import { useRouter } from "next/navigation";
-import { Toast } from '../ui/announce-success-toast';
+import { Toast } from "../ui/announce-success-toast";
 
 // Dynamic import with no SSR to prevent Element undefined error
-const ToastEditor = dynamic(() => import('@/components/tutorials/tutorial-markdown'), {
-  ssr: false,
-  loading: () => <div className="h-[400px] rounded-xl border border-white/10 bg-white/5 animate-pulse" />
-});
+const ToastEditor = dynamic(
+  () => import("@/components/tutorials/tutorial-markdown"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] rounded-xl border border-white/10 bg-white/5 animate-pulse" />
+    ),
+  },
+);
 
-type TabKey = 'text' | 'media' | 'link' | 'poll' | 'ama';
+type TabKey = "text" | "media" | "link" | "poll" | "ama";
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'text', label: 'Text' },
-  { key: 'media', label: 'Images & Video' },
-  { key: 'link', label: 'Link' },
-  { key: 'poll', label: 'Poll' },
-  { key: 'ama', label: 'AMA' },
+  { key: "text", label: "Text" },
+  { key: "media", label: "Images & Video" },
+  { key: "link", label: "Link" },
+  { key: "poll", label: "Poll" },
+  { key: "ama", label: "AMA" },
 ];
 
 const TITLE_MAX = 100;
 const TAG_SUGGESTIONS = [
-  'announcement', 'tips', 'qa', 'release', 'bug', 'feature', 'guide', 'howto', 'performance', 'security', 'design',
+  "announcement",
+  "tips",
+  "qa",
+  "release",
+  "bug",
+  "feature",
+  "guide",
+  "howto",
+  "performance",
+  "security",
+  "design",
 ];
 
 export default function TutorialComposer() {
   const router = useRouter();
-  const [tab, setTab] = useState<TabKey>('text');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState(''); // Markdown từ ToastEditor
+  const [tab, setTab] = useState<TabKey>("text");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState(""); // Markdown từ ToastEditor
   const [tags, setTags] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   // Tag picker
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [tagQuery, setTagQuery] = useState('');
+  const [tagQuery, setTagQuery] = useState("");
   const pickerRef = useRef<HTMLDivElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
+  const [toastMsg, setToastMsg] = useState("");
 
   const filteredSuggestions = useMemo(() => {
     const q = tagQuery.trim().toLowerCase();
-    const base = TAG_SUGGESTIONS.filter(t => !tags.includes(t));
-    return q ? base.filter(t => t.includes(q)) : base;
+    const base = TAG_SUGGESTIONS.filter((t) => !tags.includes(t));
+    return q ? base.filter((t) => t.includes(q)) : base;
   }, [tagQuery, tags]);
 
   const canPost = useMemo(
     () =>
-      tab === 'text' &&
+      tab === "text" &&
       Boolean(title.trim()) &&
       title.trim().length <= TITLE_MAX &&
       Boolean(content.trim()),
-    [tab, title, content]
+    [tab, title, content],
   );
 
   const addTag = (t: string) => {
     const v = t.trim();
     if (!v || tags.includes(v)) return;
-    setTags(prev => [...prev, v]);
-    setTagQuery('');
+    setTags((prev) => [...prev, v]);
+    setTagQuery("");
   };
-  const removeTag = (t: string) => setTags(prev => prev.filter(x => x !== t));
+  const removeTag = (t: string) =>
+    setTags((prev) => prev.filter((x) => x !== t));
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!pickerOpen) return;
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) setPickerOpen(false);
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node))
+        setPickerOpen(false);
     }
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
   }, [pickerOpen]);
 
   // Viết chức năng của nút bấm (handle button)
-  const onSaveDraft = () => alert('Draft saved (mock)');
+  const onSaveDraft = () => alert("Draft saved (mock)");
   const onPost = async () => {
     if (!canPost || submitting) return;
     setSubmitting(true);
 
     try {
-      const created = await createTutorial({ // POST /tutorials (chủ yếu lọc)
+      const created = await createTutorial({
+        // POST /tutorials (chủ yếu lọc)
         title: title.trim(),
         content: content.trim(),
         tags,
-      }); 
+      });
       console.log(created);
 
-
       // UX tuỳ bạn: reset hoặc điều hướng
-      setTitle('');
-      setContent('');
+      setTitle("");
+      setContent("");
       setTags([]);
-      
 
       // Hiện toast thành công
-      setToastMsg('Tutorial published successfully!');
+      setToastMsg("Tutorial published successfully!");
       setToastOpen(true);
 
-      
       // Điều hướng sang trang quản trị/chi tiết bài
       //router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
-
     } catch (e: unknown) {
       //**********************DEBUG HERE********************** */
       // let msg = 'Publish failed';
@@ -116,12 +130,10 @@ export default function TutorialComposer() {
       // }
       //alert(`Lỗi: ${msg}`);
       //**************************************************************************** */
-      
+
       // Có thể show banner đỏ (phần 2) hoặc toast error luôn
-      setToastMsg('An error occurred');
+      setToastMsg("An error occurred");
       setToastOpen(true);
-
-
     } finally {
       setSubmitting(false);
     }
@@ -132,12 +144,12 @@ export default function TutorialComposer() {
       {/* Tabs (đen/trắng) */}
       <div className="border-b border-white/10">
         <div className="flex gap-4">
-          {TABS.map(t => (
+          {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition
-                ${tab === t.key ? 'border-white text-white' : 'border-transparent text-white/60 hover:text-white'}`}
+                ${tab === t.key ? "border-white text-white" : "border-transparent text-white/60 hover:text-white"}`}
             >
               {t.label}
             </button>
@@ -166,7 +178,7 @@ export default function TutorialComposer() {
             <button
               type="button"
               onClick={() => {
-                setPickerOpen(v => !v);
+                setPickerOpen((v) => !v);
                 setTimeout(() => tagInputRef.current?.focus(), 0);
               }}
               className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
@@ -182,8 +194,11 @@ export default function TutorialComposer() {
                     value={tagQuery}
                     onChange={(e) => setTagQuery(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') { e.preventDefault(); if (tagQuery.trim()) addTag(tagQuery); }
-                      if (e.key === 'Escape') setPickerOpen(false);
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (tagQuery.trim()) addTag(tagQuery);
+                      }
+                      if (e.key === "Escape") setPickerOpen(false);
                     }}
                     placeholder="Search or add a tag…"
                     className="w-full rounded-lg border border-white/10 bg-black p-2 text-sm text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/10"
@@ -208,7 +223,9 @@ export default function TutorialComposer() {
                     </ul>
                   ) : (
                     <div className="p-3 text-sm text-white/60">
-                      No suggestions. Press <kbd className="rounded bg-white/10 px-1">Enter</kbd> to add “{tagQuery.trim()}”.
+                      No suggestions. Press{" "}
+                      <kbd className="rounded bg-white/10 px-1">Enter</kbd> to
+                      add “{tagQuery.trim()}”.
                     </div>
                   )}
                 </div>
@@ -223,7 +240,10 @@ export default function TutorialComposer() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { if (tagQuery.trim()) addTag(tagQuery); setPickerOpen(false); }}
+                    onClick={() => {
+                      if (tagQuery.trim()) addTag(tagQuery);
+                      setPickerOpen(false);
+                    }}
                     className="rounded-xl bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
                   >
                     Add tag
@@ -235,8 +255,11 @@ export default function TutorialComposer() {
 
           {!!tags.length && (
             <div className="mt-3 flex flex-wrap gap-2">
-              {tags.map(t => (
-                <span key={t} className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm">
+              {tags.map((t) => (
+                <span
+                  key={t}
+                  className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
+                >
                   #{t}
                   <button
                     type="button"
@@ -253,17 +276,13 @@ export default function TutorialComposer() {
         </div>
 
         {/* TOAST UI Editor (Markdown core) */}
-        {tab === 'text' ? (
+        {tab === "text" ? (
           <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
-            <ToastEditor
-              value={content}
-              onChange={setContent}
-              height="100%"
-            />
+            <ToastEditor value={content} onChange={setContent} height="100%" />
           </div>
         ) : (
           <div className="rounded-xl border border-white/10 p-6 text-white/60">
-            {`"${TABS.find(x => x.key === tab)?.label}"`} editor coming soon…
+            {`"${TABS.find((x) => x.key === tab)?.label}"`} editor coming soon…
           </div>
         )}
       </div>
@@ -277,19 +296,19 @@ export default function TutorialComposer() {
           Save Draft
         </button>
         <button
-          disabled={!canPost || submitting}        // <-- KHOÁ KHI SUBMITTING
+          disabled={!canPost || submitting} // <-- KHOÁ KHI SUBMITTING
           onClick={onPost}
           className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {submitting ? 'Posting…' : 'Post'}        {/* <-- UX nhỏ */}
+          {submitting ? "Posting…" : "Post"} {/* <-- UX nhỏ */}
         </button>
       </div>
 
-        {/* RENDER TOAST  */}
-        <Toast
+      {/* RENDER TOAST  */}
+      <Toast
         open={toastOpen}
         message={toastMsg}
-        kind={toastMsg.includes('success') ? 'success' : 'error'}
+        kind={toastMsg.includes("success") ? "success" : "error"}
         onClose={() => setToastOpen(false)}
       />
     </div>

@@ -1,5 +1,9 @@
 import { fetcher } from "@/lib/fetcher";
-import type { Product, CreateProductDTO, UpdateProductDTO } from "@/types/product";
+import type {
+  Product,
+  CreateProductDTO,
+  UpdateProductDTO,
+} from "@/types/product";
 import { getAccessToken } from "@/utils/auth";
 
 /**
@@ -42,7 +46,9 @@ export async function getProductById(id: number): Promise<Product> {
  * Get products by creator
  * GET /products/creator/:creatorId
  */
-export async function getProductsByCreator(creatorId: number): Promise<Product[]> {
+export async function getProductsByCreator(
+  creatorId: number,
+): Promise<Product[]> {
   return fetcher<Product[]>(`/products/creator/${creatorId}`, {
     method: "GET",
   });
@@ -52,7 +58,10 @@ export async function getProductsByCreator(creatorId: number): Promise<Product[]
  * Update a product
  * PATCH /products/:id
  */
-export async function updateProduct(id: number, data: UpdateProductDTO): Promise<Product> {
+export async function updateProduct(
+  id: number,
+  data: UpdateProductDTO,
+): Promise<Product> {
   return fetcher<Product>(`/products/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),

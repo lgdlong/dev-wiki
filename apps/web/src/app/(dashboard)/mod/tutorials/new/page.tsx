@@ -1,6 +1,6 @@
 "use client";
 
-import TutorialComposer from '@/components/tutorials/tutorial-composer';
+import TutorialComposer from "@/components/tutorials/tutorial-composer";
 
 // export const metadata = { title: 'New Post' };
 
