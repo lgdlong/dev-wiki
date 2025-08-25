@@ -15,7 +15,7 @@ export interface Tutorial {
   export interface CreateTutorialRequest {
     title: string;
     content: string;
-    author_id: number;
+    author_id?: number; //FE ko cần truyền id đâu có thể xóa luôn nếu cần
     tags?: string[];
   }
   

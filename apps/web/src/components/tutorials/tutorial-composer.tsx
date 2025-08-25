@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { CreateTutorialRequest } from '@/types/tutorial';
 import { createTutorial } from '@/utils/api/tutorial';
 import { useRouter } from "next/navigation";
 import { Toast } from '../ui/announce-success-toast';
@@ -22,7 +21,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'ama', label: 'AMA' },
 ];
 
-const TITLE_MAX = 300;
+const TITLE_MAX = 100;
 const TAG_SUGGESTIONS = [
   'announcement', 'tips', 'qa', 'release', 'bug', 'feature', 'guide', 'howto', 'performance', 'security', 'design',
 ];
@@ -84,14 +83,11 @@ export default function TutorialComposer() {
     setSubmitting(true);
 
     try {
-      const payload: CreateTutorialRequest = {
+      const created = await createTutorial({ // POST /tutorials (chủ yếu lọc)
         title: title.trim(),
-        content: content.trim(), // markdown từ ToastEditor
-        author_id: 25, 
-        tags,                    // BE hỗ trợ string[] → dùng luôn  "tags": ["guide","howto"]
-      };
-
-      const created = await createTutorial(payload); // POST /tutorials
+        content: content.trim(),
+        tags,
+      }); 
       console.log(created);
 
 
@@ -110,7 +106,7 @@ export default function TutorialComposer() {
       //router.push(`/mod`); // hoặc `/tutorials/${(e as any)?.id ?? ''}` nếu có route chi tiết
 
     } catch (e: unknown) {
-
+      //**********************DEBUG HERE********************** */
       // let msg = 'Publish failed';
       // if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
 
@@ -119,7 +115,8 @@ export default function TutorialComposer() {
       //   msg = e.message;
       // }
       //alert(`Lỗi: ${msg}`);
-
+      //**************************************************************************** */
+      
       // Có thể show banner đỏ (phần 2) hoặc toast error luôn
       setToastMsg('An error occurred');
       setToastOpen(true);
