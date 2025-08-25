@@ -14,23 +14,23 @@ import { CreateTutorialDto } from './dto/create-tutorials.dto';
 import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
 import { GetUser } from 'src/core/decorators/get-user.decorator';
-import { Account } from '../account/entities/account.entity';
+import { GetUserId } from 'src/core/decorators/get-user-id.decorator';
 
-  @Controller('tutorials')
-  export class TutorialController {
-  constructor(private readonly tutorialService: TutorialService) {}
+@Controller('tutorials')
+export class TutorialController {
+  constructor(private readonly tutorialService: TutorialService) { }
 
   // ====== CREATE (yêu cầu đăng nhập) ======
   @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Body() dto: CreateTutorialDto,
-    @GetUser() user: Account,             // lấy full user
+    @GetUserId() authorId: number,
   ) {
-    const authorId = Number(user?.id);
     if (!Number.isFinite(authorId)) throw new UnauthorizedException('Invalid user');
     return this.tutorialService.create(dto, authorId);
   }
+
 
   // ====== PUBLIC GETS ======
   @Get()
