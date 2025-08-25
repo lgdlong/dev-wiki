@@ -16,7 +16,16 @@ export function makeProductColumns({
 }): ColumnDef<Product>[] {
   return [
     {
-      id: "logo",
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">{row.original.id}</span>
+      ),
+      size: 40,
+      enableSorting: true,
+    },
+    {
+      accessorKey: "logoUrl",
       header: "Logo",
       cell: ({ row }) => {
         const p = row.original;
