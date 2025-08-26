@@ -14,7 +14,11 @@ import {
 } from "@/utils/api/categories";
 import { CategoryTable } from "./_components/category-table";
 import { CategoryDialog } from "./_components/category-dialog";
-import { generateSlug, isValidSlugFormat, slugIfNameChanged } from "@/utils/category";
+import {
+  generateSlug,
+  isValidSlugFormat,
+  slugIfNameChanged,
+} from "@/utils/category";
 
 export default function ManageCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -52,9 +56,7 @@ export default function ManageCategoriesPage() {
       }
 
       // Check if category with same slug already exists (client-side validation)
-      const existingCategory = categories.find(
-        (cat) => cat.slug === slug
-      );
+      const existingCategory = categories.find((cat) => cat.slug === slug);
 
       if (existingCategory) {
         toast.error(`Category with slug "${slug}" already exists`);
@@ -74,8 +76,13 @@ export default function ManageCategoriesPage() {
       console.error("Failed to create category:", error);
 
       // Handle specific error types
-      if (error?.response?.status === 409 || error?.message?.includes("already exists")) {
-        toast.error(`Category with slug "${generateSlug(data.name)}" already exists`);
+      if (
+        error?.response?.status === 409 ||
+        error?.message?.includes("already exists")
+      ) {
+        toast.error(
+          `Category with slug "${generateSlug(data.name)}" already exists`,
+        );
       } else if (error?.response?.status === 400) {
         toast.error("Invalid category data. Please check your input.");
       } else {
@@ -101,7 +108,7 @@ export default function ManageCategoriesPage() {
       // Check if category with same slug already exists (excluding current category)
       if (slug) {
         const existingCategory = categories.find(
-          (cat) => cat.slug === slug && cat.id !== editingCategory.id
+          (cat) => cat.slug === slug && cat.id !== editingCategory.id,
         );
 
         if (existingCategory) {
@@ -124,9 +131,17 @@ export default function ManageCategoriesPage() {
       console.error("Failed to update category:", error);
 
       // Handle specific error types
-      if (error?.response?.status === 409 || error?.message?.includes('already exists')) {
-        const attemptedSlug = slugIfNameChanged(data.name, editingCategory.name);
-        toast.error(`Category with slug "${attemptedSlug || editingCategory.slug}" already exists`);
+      if (
+        error?.response?.status === 409 ||
+        error?.message?.includes("already exists")
+      ) {
+        const attemptedSlug = slugIfNameChanged(
+          data.name,
+          editingCategory.name,
+        );
+        toast.error(
+          `Category with slug "${attemptedSlug || editingCategory.slug}" already exists`,
+        );
       } else if (error?.response?.status === 400) {
         toast.error("Invalid category data. Please check your input.");
       } else {

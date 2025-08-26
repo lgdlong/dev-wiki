@@ -11,7 +11,14 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Edit, Trash2, Search, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  ArrowUpDown,
+  Edit,
+  Trash2,
+  Search,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,7 +117,7 @@ export function CategoryTable({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -128,7 +135,7 @@ export function CategoryTable({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -159,7 +166,7 @@ export function CategoryTable({
           {Math.min(
             (table.getState().pagination.pageIndex + 1) *
               table.getState().pagination.pageSize,
-            table.getFilteredRowModel().rows.length
+            table.getFilteredRowModel().rows.length,
           )}{" "}
           of {table.getFilteredRowModel().rows.length} categories
         </div>

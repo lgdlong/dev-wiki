@@ -30,7 +30,11 @@ import {
   editProductSchema,
   editCategorySchema,
 } from "@/validations/edit-product-category-schema";
-import { assignCategoriesToProduct, updateProduct, getProductCategories } from "@/utils/api/productApi";
+import {
+  assignCategoriesToProduct,
+  updateProduct,
+  getProductCategories,
+} from "@/utils/api/productApi";
 import { getAllCategories } from "@/utils/api/categories";
 import { ProductCategory } from "@/types/product-categories";
 
@@ -38,7 +42,9 @@ interface EditProductCategoryFormProps {
   product: Product;
 }
 
-export default function EditProductCategoryForm({ product }: EditProductCategoryFormProps) {
+export default function EditProductCategoryForm({
+  product,
+}: EditProductCategoryFormProps) {
   const router = useRouter();
   const [isProductLoading, setIsProductLoading] = useState(false);
   const [isCategoryLoading, setIsCategoryLoading] = useState(false);
@@ -70,14 +76,20 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
 
   // Filter categories based on search query, excluding already selected ones
   const filteredCategories = useMemo(() => {
-    const selectedIds = selectedCategories.map(cat => cat.id);
-    const availableCategories = allCategories.filter(cat => !selectedIds.includes(cat.id));
+    const selectedIds = selectedCategories.map((cat) => cat.id);
+    const availableCategories = allCategories.filter(
+      (cat) => !selectedIds.includes(cat.id),
+    );
 
     if (!searchQuery.trim()) return availableCategories;
 
-    return availableCategories.filter(category =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.description && category.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    return availableCategories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (category.description &&
+          category.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())),
     );
   }, [allCategories, selectedCategories, searchQuery]);
 
@@ -106,11 +118,16 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
 
     // Normalize API response: it could be ProductCategory[] (with .category)
     // or Category[] depending on backend/relations. We extract Category[] safely.
-    const extractCategories = (rows: (ProductCategory | Category)[]): Category[] => {
-    if (!Array.isArray(rows)) return [];
+    const extractCategories = (
+      rows: (ProductCategory | Category)[],
+    ): Category[] => {
+      if (!Array.isArray(rows)) return [];
       return rows
         .map((row: any) => (row?.category ? row.category : row))
-        .filter((c: any): c is Category => c && typeof c.id === "number" && typeof c.name === "string");
+        .filter(
+          (c: any): c is Category =>
+            c && typeof c.id === "number" && typeof c.name === "string",
+        );
     };
 
     const loadProductCategories = async () => {
@@ -121,7 +138,7 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
         setSelectedCategories(categories);
 
         // Initialize the form with existing category IDs
-        const categoryIds = categories.map(cat => cat.id);
+        const categoryIds = categories.map((cat) => cat.id);
         categoryForm.reset({
           categoryIds: categoryIds,
         });
@@ -141,13 +158,15 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
 
   // Update categoryIds in form when selectedCategories changes
   useEffect(() => {
-    const categoryIds = selectedCategories.map(cat => cat.id);
-    categoryForm.setValue("categoryIds", categoryIds, { shouldDirty: categoryIds.length > 0 });
+    const categoryIds = selectedCategories.map((cat) => cat.id);
+    categoryForm.setValue("categoryIds", categoryIds, {
+      shouldDirty: categoryIds.length > 0,
+    });
   }, [selectedCategories, categoryForm]);
 
   const handleCategoryAdd = useCallback((category: Category) => {
-    setSelectedCategories(prev => {
-      if (prev.find(cat => cat.id === category.id)) return prev;
+    setSelectedCategories((prev) => {
+      if (prev.find((cat) => cat.id === category.id)) return prev;
       return [...prev, category];
     });
     setSearchQuery("");
@@ -155,7 +174,9 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
   }, []);
 
   const handleCategoryRemove = useCallback((categoryId: number) => {
-    setSelectedCategories(prev => prev.filter(cat => cat.id !== categoryId));
+    setSelectedCategories((prev) =>
+      prev.filter((cat) => cat.id !== categoryId),
+    );
   }, []);
 
   const onProductSubmit = async (data: EditProductFormValues) => {
@@ -169,11 +190,15 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
       };
 
       const changedFields: Partial<EditProductFormValues> = {};
-      (Object.keys(data) as Array<keyof EditProductFormValues>).forEach((key) => {
-        if (data[key] !== originalValues[key as keyof typeof originalValues]) {
-          (changedFields as any)[key] = data[key];
-        }
-      });
+      (Object.keys(data) as Array<keyof EditProductFormValues>).forEach(
+        (key) => {
+          if (
+            data[key] !== originalValues[key as keyof typeof originalValues]
+          ) {
+            (changedFields as any)[key] = data[key];
+          }
+        },
+      );
 
       if (Object.keys(changedFields).length === 0) {
         toast.info("No changes to save");
@@ -193,12 +218,15 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
   const onCategorySubmit = async (data: EditCategoryFormValues) => {
     setIsCategoryLoading(true);
     try {
-      const result = await assignCategoriesToProduct(product.id, data.categoryIds);
+      const result = await assignCategoriesToProduct(
+        product.id,
+        data.categoryIds,
+      );
 
       // Provide detailed feedback to the user
       if (result.assigned > 0 && result.skipped > 0) {
         toast.success(
-          `Successfully assigned ${result.assigned} categories. ${result.skipped} were already assigned.`
+          `Successfully assigned ${result.assigned} categories. ${result.skipped} were already assigned.`,
         );
       } else if (result.assigned > 0) {
         toast.success(`Successfully assigned ${result.assigned} categories!`);
@@ -206,7 +234,7 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
         toast.info(`All ${result.skipped} categories were already assigned.`);
       }
 
-      console.log('Category assignment result:', result);
+      console.log("Category assignment result:", result);
     } catch (error) {
       console.error("Failed to update categories:", error);
       toast.error("Failed to update categories. Please try again.");
@@ -234,7 +262,9 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Edit Product</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Edit Product
+            </h1>
             <p className="text-sm text-muted-foreground">
               Edit product details and assign categories for {product.name}
             </p>
@@ -254,7 +284,10 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
           </CardHeader>
           <CardContent>
             <Form {...productForm}>
-              <form onSubmit={productForm.handleSubmit(onProductSubmit)} className="space-y-4">
+              <form
+                onSubmit={productForm.handleSubmit(onProductSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={productForm.control}
                   name="name"
@@ -276,7 +309,11 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enter product description" rows={3} {...field} />
+                        <Textarea
+                          placeholder="Enter product description"
+                          rows={3}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -290,7 +327,11 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
                     <FormItem>
                       <FormLabel>Homepage URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com" {...field} value={field.value || ""} />
+                        <Input
+                          placeholder="https://example.com"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -356,12 +397,17 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
             {/* Current Categories */}
             <section className="space-y-2">
               <div className="text-sm text-muted-foreground">
-                Categories assigned to this product ({selectedCategories.length})
+                Categories assigned to this product ({selectedCategories.length}
+                )
               </div>
               {selectedCategories.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {selectedCategories.map((category) => (
-                    <Badge key={category.id} variant="secondary" className="px-2 py-1 gap-1">
+                    <Badge
+                      key={category.id}
+                      variant="secondary"
+                      className="px-2 py-1 gap-1"
+                    >
                       {category.name}
                       <button
                         aria-label={`Remove ${category.name}`}
@@ -397,7 +443,9 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                    onBlur={() =>
+                      setTimeout(() => setIsSearchFocused(false), 200)
+                    }
                     className="pl-10"
                   />
                 </div>
@@ -434,9 +482,16 @@ export default function EditProductCategoryForm({ product }: EditProductCategory
 
             {/* Save Categories Button */}
             <Form {...categoryForm}>
-              <form onSubmit={categoryForm.handleSubmit(onCategorySubmit)} className="pt-4">
+              <form
+                onSubmit={categoryForm.handleSubmit(onCategorySubmit)}
+                className="pt-4"
+              >
                 <div className="flex items-center justify-end gap-2">
-                  <Button type="submit" disabled={!canSaveCategory} className="cursor-pointer">
+                  <Button
+                    type="submit"
+                    disabled={!canSaveCategory}
+                    className="cursor-pointer"
+                  >
                     {isCategoryLoading ? (
                       "Saving..."
                     ) : (

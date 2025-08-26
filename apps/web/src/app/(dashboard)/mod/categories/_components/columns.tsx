@@ -8,7 +8,7 @@ import { Category } from "@/types/category";
 
 export function getCategoryColumns(
   onEdit: (category: Category) => void,
-  onDelete: (category: Category) => void
+  onDelete: (category: Category) => void,
 ): ColumnDef<Category>[] {
   return [
     {

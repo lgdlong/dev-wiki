@@ -62,4 +62,6 @@ export const editProductCategorySchema = editProductSchema.extend({
 // Kiểu dữ liệu TypeScript suy ra từ schema
 export type EditProductFormValues = z.infer<typeof editProductSchema>;
 export type EditCategoryFormValues = z.infer<typeof editCategorySchema>;
-export type EditProductCategoryFormValues = z.infer<typeof editProductCategorySchema>;
+export type EditProductCategoryFormValues = z.infer<
+  typeof editProductCategorySchema
+>;

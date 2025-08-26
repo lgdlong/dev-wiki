@@ -50,7 +50,7 @@ export async function getProductById(id: number): Promise<Product> {
  * GET /products/creator/:creatorId
  */
 export async function getProductsByCreator(
-  creatorId: number
+  creatorId: number,
 ): Promise<Product[]> {
   return fetcher<Product[]>(`/products/creator/${creatorId}`, {
     method: "GET",
@@ -63,7 +63,7 @@ export async function getProductsByCreator(
  */
 export async function updateProduct(
   id: number,
-  data: UpdateProductDTO
+  data: UpdateProductDTO,
 ): Promise<Product> {
   return fetcher<Product>(`/products/${id}`, {
     method: "PATCH",
@@ -91,7 +91,7 @@ export async function deleteProduct(id: number): Promise<void> {
  */
 export async function assignCategoriesToProduct(
   productId: number,
-  categoryIds: number[]
+  categoryIds: number[],
 ): Promise<AssignCategoriesResponse> {
   const requestData: AssignCategoriesRequest = { productId, categoryIds };
 
@@ -101,7 +101,7 @@ export async function assignCategoriesToProduct(
       method: "PUT",
       headers: getAuthHeaders(),
       body: JSON.stringify(requestData),
-    }
+    },
   );
 }
 
@@ -113,7 +113,7 @@ export async function assignCategoriesToProduct(
  */
 export async function linkProductCategory(
   productId: number,
-  categoryId: number
+  categoryId: number,
 ): Promise<void> {
   const requestData: CreateProductCategoryRequest = { productId, categoryId };
 
@@ -130,9 +130,12 @@ export async function linkProductCategory(
  * @param productId - The ID of the product
  */
 export async function getProductCategories(
-  productId: number
+  productId: number,
 ): Promise<ProductCategory[]> {
-  return fetcher<ProductCategory[]>(`/product-categories/product/${productId}/categories`, {
-    method: "GET",
-  });
+  return fetcher<ProductCategory[]>(
+    `/product-categories/product/${productId}/categories`,
+    {
+      method: "GET",
+    },
+  );
 }
