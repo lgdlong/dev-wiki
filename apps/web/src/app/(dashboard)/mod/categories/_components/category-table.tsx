@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/table";
 
 import { Category } from "@/types/category";
-import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { getCategoryColumns } from "./columns";
 
 interface CategoryTableProps {
@@ -43,15 +42,8 @@ export function CategoryTable({
 }: CategoryTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const handleRequestDelete = (category: Category) => {
-    setDeleteTarget(category);
-    setIsDeleteOpen(true);
-  };
-
-  const columns = getCategoryColumns(onEdit, handleRequestDelete);
+  const columns = getCategoryColumns(onEdit, onDelete);
 
   const table = useReactTable({
     data,
@@ -190,25 +182,6 @@ export function CategoryTable({
           </Button>
         </div>
       </div>
-      {/* Delete confirm dialog */}
-      <DeleteConfirmDialog
-        open={isDeleteOpen}
-        onOpenChange={(v) => setIsDeleteOpen(v)}
-        title={
-          deleteTarget ? `Delete ${deleteTarget.name}?` : "Delete category?"
-        }
-        description={
-          deleteTarget
-            ? `Are you sure you want to delete the category "${deleteTarget.name}"? This action cannot be undone.`
-            : "This action cannot be undone."
-        }
-        onConfirm={async () => {
-          if (!deleteTarget) return;
-          await onDelete(deleteTarget);
-          setIsDeleteOpen(false);
-          setDeleteTarget(null);
-        }}
-      />
     </div>
   );
 }

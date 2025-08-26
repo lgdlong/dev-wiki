@@ -8,7 +8,7 @@ import { Category } from "@/types/category";
 
 export function getCategoryColumns(
   onEdit: (category: Category) => void,
-  onRequestDelete: (category: Category) => void
+  onDelete: (category: Category) => void
 ): ColumnDef<Category>[] {
   return [
     {
@@ -48,7 +48,9 @@ export function getCategoryColumns(
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
         return (
-          <span className="text-muted-foreground">{description || "—"}</span>
+          <span className="text-muted-foreground">
+            {description || <em>No description</em>}
+          </span>
         );
       },
     },
@@ -92,7 +94,7 @@ export function getCategoryColumns(
               size="sm"
               variant="destructive"
               aria-label="Delete category"
-              onClick={() => onRequestDelete(category)}
+              onClick={() => onDelete(category)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

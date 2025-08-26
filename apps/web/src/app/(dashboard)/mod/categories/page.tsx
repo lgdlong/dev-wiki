@@ -6,19 +6,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Category } from "@/types/category";
-import { CategoryTable } from "./_components/category-table";
-import { CategoryDialog } from "./_components/category-dialog";
 import {
   getAllCategories,
   createCategory,
   updateCategory,
   deleteCategory,
 } from "@/utils/api/categories";
-import {
-  generateSlug,
-  isValidSlugFormat,
-  slugIfNameChanged,
-} from "@/utils/category";
+import { CategoryTable } from "./_components/category-table";
+import { CategoryDialog } from "./_components/category-dialog";
+import { generateSlug, isValidSlugFormat, slugIfNameChanged } from "@/utils/category";
 
 export default function ManageCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
