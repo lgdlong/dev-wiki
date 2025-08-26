@@ -12,8 +12,8 @@ import { Plus, RefreshCw } from "lucide-react";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 
 // new imports
-import { DataTable } from "./data-table";
-import { makeProductColumns } from "./columns";
+import { DataTable } from "./_components/data-table";
+import { makeProductColumns } from "./_components/columns";
 
 export default function ManageProductPage() {
   const router = useRouter();
