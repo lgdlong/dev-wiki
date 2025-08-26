@@ -1,21 +1,11 @@
 import { fetcher } from "@/lib/fetcher";
 import { Category, CategoryCreate, CategoryUpdate } from "@/types/category";
-import { getAccessToken } from "@/utils/auth";
-
-// Helper function to get auth headers
-function getAuthHeaders() {
-  const token = getAccessToken();
-  return {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-}
+import { getAccessToken, getAuthHeaders } from "@/utils/auth";
 
 // Get all categories
 export async function getAllCategories(): Promise<Category[]> {
   return fetcher("/categories", {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 }
 
@@ -23,7 +13,6 @@ export async function getAllCategories(): Promise<Category[]> {
 export async function getCategoryById(id: number): Promise<Category> {
   return fetcher(`/categories/${id}`, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 }
 
@@ -31,7 +20,6 @@ export async function getCategoryById(id: number): Promise<Category> {
 export async function getCategoryByName(name: string): Promise<Category> {
   return fetcher(`/categories/name/${name}`, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 }
 
