@@ -4,6 +4,12 @@ import type {
   CreateProductDTO,
   UpdateProductDTO,
 } from "@/types/product";
+import type {
+  AssignCategoriesRequest,
+  AssignCategoriesResponse,
+  CreateProductCategoryRequest,
+  ProductCategory,
+} from "@/types/product-categories";
 import { getAccessToken, getAuthHeaders } from "@/utils/auth";
 
 /**
@@ -78,27 +84,55 @@ export async function deleteProduct(id: number): Promise<void> {
 }
 
 /**
- * TODO: connect real API
- * Update a product's category assignment
- * @param productId - The ID of the product to update
- * @param categoryId - The ID of the category to assign (null to remove category)
+ * Assign multiple categories to a product in one request
+ * PUT /product-categories/assign-multiple
+ * @param productId - The ID of the product
+ * @param categoryIds - Array of category IDs to assign
  */
-export async function updateProductCategory(
+export async function assignCategoriesToProduct(
   productId: number,
-  categoryId: number | null
-): Promise<void> {
-  // TODO: implement API call
-  // Example implementation:
-  // return fetcher<void>(`/products/${productId}/category`, {
-  //   method: "PATCH",
-  //   body: JSON.stringify({ categoryId }),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${getAccessToken()}`,
-  //   },
-  // });
+  categoryIds: number[]
+): Promise<AssignCategoriesResponse> {
+  const requestData: AssignCategoriesRequest = { productId, categoryIds };
 
-  // Placeholder for now
-  console.log(`TODO: Update product ${productId} category to ${categoryId}`);
-  return Promise.resolve();
+  return fetcher<AssignCategoriesResponse>(
+    "/product-categories/assign-multiple",
+    {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(requestData),
+    }
+  );
+}
+
+/**
+ * Link a single product to a category (legacy - use assignCategoriesToProduct instead)
+ * POST /product-categories/link
+ * @param productId - The ID of the product
+ * @param categoryId - Single category ID to link
+ */
+export async function linkProductCategory(
+  productId: number,
+  categoryId: number
+): Promise<void> {
+  const requestData: CreateProductCategoryRequest = { productId, categoryId };
+
+  return fetcher<void>("/product-categories/link", {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(requestData),
+  });
+}
+
+/**
+ * Get categories assigned to a product
+ * GET /product-categories/product/:productId/categories
+ * @param productId - The ID of the product
+ */
+export async function getProductCategories(
+  productId: number
+): Promise<ProductCategory[]> {
+  return fetcher<ProductCategory[]>(`/product-categories/product/${productId}/categories`, {
+    method: "GET",
+  });
 }
