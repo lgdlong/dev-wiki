@@ -4,7 +4,7 @@ import type {
   CreateProductDTO,
   UpdateProductDTO,
 } from "@/types/product";
-import { getAccessToken } from "@/utils/auth";
+import { getAccessToken, getAuthHeaders } from "@/utils/auth";
 
 /**
  * Create a new product
@@ -14,11 +14,8 @@ export async function createProduct(data: CreateProductDTO): Promise<Product> {
   const token = getAccessToken();
   return fetcher<Product>("/products", {
     method: "POST",
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
   });
 }
 
@@ -47,7 +44,7 @@ export async function getProductById(id: number): Promise<Product> {
  * GET /products/creator/:creatorId
  */
 export async function getProductsByCreator(
-  creatorId: number,
+  creatorId: number
 ): Promise<Product[]> {
   return fetcher<Product[]>(`/products/creator/${creatorId}`, {
     method: "GET",
@@ -60,10 +57,11 @@ export async function getProductsByCreator(
  */
 export async function updateProduct(
   id: number,
-  data: UpdateProductDTO,
+  data: UpdateProductDTO
 ): Promise<Product> {
   return fetcher<Product>(`/products/${id}`, {
     method: "PATCH",
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 }
@@ -75,5 +73,32 @@ export async function updateProduct(
 export async function deleteProduct(id: number): Promise<void> {
   return fetcher<void>(`/products/${id}`, {
     method: "DELETE",
+    headers: getAuthHeaders(),
   });
+}
+
+/**
+ * TODO: connect real API
+ * Update a product's category assignment
+ * @param productId - The ID of the product to update
+ * @param categoryId - The ID of the category to assign (null to remove category)
+ */
+export async function updateProductCategory(
+  productId: number,
+  categoryId: number | null
+): Promise<void> {
+  // TODO: implement API call
+  // Example implementation:
+  // return fetcher<void>(`/products/${productId}/category`, {
+  //   method: "PATCH",
+  //   body: JSON.stringify({ categoryId }),
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${getAccessToken()}`,
+  //   },
+  // });
+
+  // Placeholder for now
+  console.log(`TODO: Update product ${productId} category to ${categoryId}`);
+  return Promise.resolve();
 }

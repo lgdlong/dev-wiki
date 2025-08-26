@@ -6,3 +6,11 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
+
+export function getAuthHeaders() {
+  const token = getAccessToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+}
