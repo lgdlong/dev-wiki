@@ -16,17 +16,13 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from 'src/core/decorators/roles.decorator';
 import { AccountRole } from 'src/shared/enums/account-role.enum';
 import { RolesGuard } from '../../core/guards/roles.guard';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 
-@UseGuards(RolesGuard)
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Post()
-  @Roles(AccountRole.MOD)
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
-  }
+  // ========= Public (no auth) =========
 
   @Get()
   findAll() {
@@ -43,7 +39,17 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
+  // ========= Protected (Role) =========
+
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.create(createCategoryDto);
+  }
+
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AccountRole.MOD)
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -53,7 +59,8 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  @Roles(AccountRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.categoriesService.remove(id);
   }
