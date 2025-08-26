@@ -27,9 +27,6 @@ export async function getCategoryByName(name: string): Promise<Category> {
 export async function createCategory(
   categoryData: CategoryCreate,
 ): Promise<Category> {
-  const token = getAccessToken();
-  if (!token) throw new Error("Authentication required to create category!");
-
   return fetcher("/categories", {
     method: "POST",
     headers: getAuthHeaders(),
@@ -42,9 +39,6 @@ export async function updateCategory(
   id: number,
   categoryData: CategoryUpdate,
 ): Promise<Category> {
-  const token = getAccessToken();
-  if (!token) throw new Error("Authentication required to update category!");
-
   return fetcher(`/categories/${id}`, {
     method: "PATCH",
     headers: getAuthHeaders(),
@@ -54,9 +48,6 @@ export async function updateCategory(
 
 // Delete category
 export async function deleteCategory(id: number): Promise<void> {
-  const token = getAccessToken();
-  if (!token) throw new Error("Authentication required to delete category!");
-
   return fetcher(`/categories/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),

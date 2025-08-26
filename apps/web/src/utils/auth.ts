@@ -9,6 +9,9 @@ export function getAccessToken(): string | null {
 
 export function getAuthHeaders() {
   const token = getAccessToken();
+  if (!token) {
+    throw new Error("Authentication using token required!");
+  }
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
