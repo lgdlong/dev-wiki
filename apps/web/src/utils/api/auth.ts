@@ -77,7 +77,7 @@ export async function meApi(): Promise<MeApiResponse> {
   // If backend returns access_token, store it in localStorage
   if (res && res.access_token) {
     localStorage.setItem("access_token", res.access_token);
-    return res.user || (res as any as Account);
+    return res.user as Account;
   }
 
   // If no user or token, throw error
