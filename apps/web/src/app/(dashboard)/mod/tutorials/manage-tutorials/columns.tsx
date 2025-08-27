@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import type { Tutorial } from "@/types/tutorial";
 
 // --- Helpers ---
@@ -42,9 +42,11 @@ function renderTags(tags?: string[]) {
 export function makeTutorialColumns({
   onEdit,
   onRequestDelete,
+  deletingIds,
 }: {
   onEdit: (id: number) => void;
   onRequestDelete: (id: number) => void;
+  deletingIds: Set<number>;
 }): ColumnDef<Tutorial>[] {
   return [
     {
@@ -109,13 +111,16 @@ export function makeTutorialColumns({
       header: "",
       cell: ({ row }) => {
         const t = row.original;
+        const id = t.id as number;
+        const isDeleting = deletingIds.has(id);
         return (
           <div className="flex justify-end gap-2">
             <Button
               size="icon"
               variant="outline"
               aria-label="Edit tutorial"
-              onClick={() => onEdit(t.id as unknown as number)}
+              onClick={() => onEdit(id)}
+              disabled={isDeleting}
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -123,9 +128,14 @@ export function makeTutorialColumns({
               size="icon"
               variant="destructive"
               aria-label="Delete tutorial"
-              onClick={() => onRequestDelete(t.id as unknown as number)}
+              onClick={() =>  onRequestDelete(id)}
+              disabled={isDeleting}
             >
-              <Trash2 className="h-4 w-4" />
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </Button>
           </div>
         );

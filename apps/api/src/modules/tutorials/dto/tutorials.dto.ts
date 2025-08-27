@@ -3,7 +3,7 @@ export class TutorialListItemDto {
     title!: string; 
     createdAt!: Date;
     updatedAt!: Date; 
-    authorName!: string; // read-only
+    authorName!: string;
 }
 
 export class TutorialDetailDto extends TutorialListItemDto {

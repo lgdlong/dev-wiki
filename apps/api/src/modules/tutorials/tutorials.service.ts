@@ -49,68 +49,24 @@ export class TutorialService {
     }
   }
 
-  // async findAll() {
-  //   return this.repo.find({
-  //     order: { createdAt: 'DESC' },
-  //     relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
-  //   });
-  // }
-  // async findOne(id: number) {
-  //   const row = await this.repo.findOne({ where: { id } });
-  //   if (!row) throw new NotFoundException(`Post #${id} not found`);
-  //   return row;
-  // }
 
 
-  // ======= GET ================
-  async findAll(): Promise<TutorialListItemDto[]> {
-    const rows = await this.repo
-      .createQueryBuilder('t')
-      .leftJoin('t.author', 'a')
-      .select([
-        't.id',
-        't.title',
-        't.createdAt',
-        't.updatedAt',
-        'a.name',
-      ])
-      .orderBy('t.createdAt', 'DESC')
-      .getRawMany();
-
-    return rows.map(r => ({
-      id: r.t_id,
-      title: r.t_title,
-      createdAt: r.t_createdAt,
-      updatedAt: r.t_updatedAt,
-      authorName: r.a_name ?? '—',
-    }));
+  // ===================== GET ======================
+  async findAll() {
+    return this.repo.find({
+      order: { createdAt: 'DESC' },
+      relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
+    });
   }
-  async findOne(id: number): Promise<TutorialDetailDto> {
-    const row = await this.repo
-      .createQueryBuilder('t')
-      .leftJoin('t.author', 'a')
-      .where('t.id = :id', { id })
-      .select([
-        't.id',
-        't.title',
-        't.content',
-        't.createdAt',
-        't.updatedAt',
-        'a.name',
-      ])
-      .getRawOne();
-
-    if (!row) throw new NotFoundException('Tutorial not found');
-
-    return {
-      id: row.t_id,
-      title: row.t_title,
-      content: row.t_content,
-      createdAt: row.t_createdAt,
-      updatedAt: row.t_updatedAt,
-      authorName: row.a_name ?? '—',
-    };
+  async findOne(id: number) {
+    const row = await this.repo.findOne({ where: { id } });
+    if (!row) throw new NotFoundException(`Post #${id} not found`);
+    return row;
   }
+
+
+
+
 
   // ===== helper: check quyền sở hữu (nếu có userId) =====
   private assertOwnership(row: Tutorial, userId?: number) {
@@ -134,21 +90,30 @@ export class TutorialService {
     this.assertOwnership(row, userId);
 
     // Không cho sửa authorId qua body
-    const { author_id, authorId, ...rest } = dto as any;
+    const { author_id, authorId, views, createdAt, updatedAt, id: _id, ...rest } = dto as any;
 
-    if (typeof (rest as any).title === 'string') {
-      const t = (rest as any).title.trim();
-      if (!t) throw new BadRequestException('title cannot be empty');
-      row.title = t;
+    // Nếu client gửi title/content nhưng là chuỗi rỗng → chặn
+    if ('title' in rest && typeof rest.title === 'string' && rest.title.trim() === '') {
+      throw new BadRequestException('title cannot be empty');
     }
-    if (typeof (rest as any).content === 'string') {
-      const c = (rest as any).content.trim();
-      if (!c) throw new BadRequestException('content cannot be empty');
-      row.content = c;
+    if ('content' in rest && typeof rest.content === 'string' && rest.content.trim() === '') {
+      throw new BadRequestException('content cannot be empty');
+    }
+
+
+    // Chỉ merge các field được phép & có giá trị defined
+    const allowed: (keyof UpdateTutorialDto)[] = ['title', 'content']; // mở rộng: 'status', 'tags'...
+    for (const key of allowed) {
+      const v = rest[key];
+      if (typeof v !== 'undefined') {
+        // đã trim ở DTO; nếu muốn đảm bảo:
+        if (typeof v === 'string') (row as any)[key] = v.trim();
+        else (row as any)[key] = v;
+      }
     }
 
     // gán các field khác (vd: tags, status…)
-    Object.assign(row, rest);
+    //Object.assign(row, rest); lấy toàn bộ object copy tất cả thuộc tính từ object này sang object khác trong khi ở trên có whitelist -> có thể xóa
 
     return this.repo.save(row);
   }

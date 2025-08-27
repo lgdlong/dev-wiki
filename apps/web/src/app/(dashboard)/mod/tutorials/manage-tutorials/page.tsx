@@ -1,4 +1,3 @@
-// app/mod/tutorials/manage-tutorials/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "./data-table";
 import { makeTutorialColumns } from "./columns";
 import type { Tutorial } from "@/types/tutorial";
-import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorialApi"; // <-- đổi sang tutorial API
+import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorialApi";
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
@@ -25,12 +24,14 @@ export default function ManageTutorialPage() {
   const [q, setQ] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [pendingId, setPendingId] = useState<number | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
 
   async function load() {
     try {
       setLoading(true);
       setErr(null);
       const data = await getAllTutorials(); // fetch once, sort client-side
+      console.log(data)
       setTutorials(data ?? []);
     } catch (e: any) {
       setErr(e?.message ?? "Failed to load tutorials");
@@ -42,6 +43,8 @@ export default function ManageTutorialPage() {
   useEffect(() => {
     void load();
   }, []);
+
+
 
   // search theo title, content, tags và authorId
   const filtered = useMemo(() => {
@@ -68,15 +71,29 @@ export default function ManageTutorialPage() {
           setPendingId(id);
           setOpenDelete(true);
         },
+        deletingIds, // ⬅️ truyền xuống để biết dòng nào đang xoá
       }),
-    [router],
+    [router, deletingIds],
   );
 
   async function confirmDelete() {
     if (pendingId == null) return;
-    await deleteTutorial(pendingId);
-    setTutorials((prev) => prev.filter((x) => x.id !== pendingId));
-    setPendingId(null);
+    setDeletingIds(prev => new Set(prev).add(pendingId));
+
+    try {
+      await deleteTutorial(pendingId);
+      setTutorials(prev => prev.filter(x => x.id !== pendingId));
+    } catch (e) {
+      console.error("Delete failed", e);
+      // TODO: toast lỗi nếu cần
+    } finally {
+      setDeletingIds(prev => {
+        const next = new Set(prev);
+        next.delete(pendingId!);
+        return next;
+      });
+      setPendingId(null);
+    }
   }
 
   return (
@@ -137,3 +154,4 @@ export default function ManageTutorialPage() {
     </div>
   );
 }
+

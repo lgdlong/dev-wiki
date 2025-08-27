@@ -19,7 +19,7 @@ import { GetUserId } from 'src/core/decorators/get-user-id.decorator';
 
 @Controller('tutorials')
 export class TutorialController {
-  constructor(private readonly tutorialService: TutorialService) {}
+  constructor(private readonly tutorialService: TutorialService) { }
 
   // ====== CREATE (yêu cầu đăng nhập) ======
   @UseGuards(JwtAuthGuard)
@@ -33,6 +33,7 @@ export class TutorialController {
   // ====== PUBLIC GETS ======
   @Get()
   findAll() {
+    console.log("[BE] GET /tutorials called");
     return this.tutorialService.findAll();   // trả về TutorialListItemDto[]
   }
 
@@ -47,7 +48,7 @@ export class TutorialController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTutorialDto,
-    @GetUser('id') userId: number, // chỉ lấy id nếu muốn
+    @GetUserId() userId: number, // chỉ lấy id nếu muốn
   ) {
     if (!Number.isFinite(userId))
       throw new UnauthorizedException('Invalid user');
@@ -57,7 +58,9 @@ export class TutorialController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @GetUser('id') userId: number) {
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUserId() userId: number) {
     if (!Number.isFinite(userId))
       throw new UnauthorizedException('Invalid user');
     return this.tutorialService.remove(+id, userId);
