@@ -3,11 +3,13 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DEFAULT_FRONTEND_URL, DEFAULT_PORT } from './shared/constants';
+import cookieParser from 'cookie-parser';
 // import { DocumentBuilder } from '@nestjs/swagger';
 // import { SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
 
   // Cấu hình Swagger

@@ -12,14 +12,13 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { MeResponseDto } from './dto/me-response.dto';
 import { GoogleOAuthGuard } from '../../core/guards/google-oauth.guard';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { GetUser } from '../../core/decorators/get-user.decorator';
 import { Account } from '../account/entities/account.entity';
 import { AppService } from '../../app.service';
-import { ConfigService } from '@nestjs/config';
-import { DEFAULT_FRONTEND_URL } from '../../shared/constants';
+import { AuthCookiesService } from '../../shared/http/cookies/auth-cookies.service';
+import { buildGoogleRedirectUrl } from './auth.helpers';
 import { Response, Request } from 'express';
 import { AuthAccountResponse } from './interfaces/auth-account-response.interface';
 
@@ -28,7 +27,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly appService: AppService,
-    private readonly configService: ConfigService,
+    private readonly cookies: AuthCookiesService,
   ) {}
 
   // Đăng ký tài khoản
@@ -48,25 +47,42 @@ export class AuthController {
     const email = dto.email.toLowerCase();
     const password = dto.password.trim();
     const data = await this.authService.validateUser(email, password);
-    // Set cookie 'role' for normal login
-    res.cookie('role', data.account.role, {
-      path: '/',
-      httpOnly: false,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-    });
+
+    // DRY: use service to set cookies
+    this.cookies.applyLoginCookies(res, data);
+
     return res.json(data);
   }
 
   // Lấy thông tin người dùng hiện tại
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getCurrentUser(@GetUser() user: Account): MeResponseDto {
+  getCurrentUser(@GetUser() user: Account, @Req() req: Request) {
     // Loại bỏ password khỏi response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+
+    // Try to extract JWT from Authorization header or cookie
+    let accessToken: string | undefined = undefined;
+    const authHeader = req.headers['authorization'];
+    if (
+      authHeader &&
+      typeof authHeader === 'string' &&
+      authHeader.startsWith('Bearer ')
+    ) {
+      accessToken = authHeader.slice(7);
+    } else {
+      // Safe cookie access
+      const cookies = req.cookies as Record<string, string> | undefined;
+      if (cookies && typeof cookies.token === 'string') {
+        accessToken = cookies.token;
+      }
+    }
+
+    return {
+      user: userWithoutPassword,
+      access_token: accessToken,
+    };
   }
 
   // Bắt đầu Google OAuth
@@ -85,10 +101,9 @@ export class AuthController {
       const result = this.appService.googleLogin(req);
 
       if (!('user' in result)) {
-        const frontendUrl =
-          this.configService.get<string>('FRONTEND_URL') ||
-          DEFAULT_FRONTEND_URL;
-        return res.redirect(`${frontendUrl}?error=google_auth_failed`);
+        return res.redirect(
+          `${this.cookies.getFrontendUrl()}?error=google_auth_failed`,
+        );
       }
 
       // The strategy now returns the login result with access_token and account
@@ -99,47 +114,33 @@ export class AuthController {
 
       // Validate login result
       if (!loginResult.access_token || !loginResult.account) {
-        const frontendUrl =
-          this.configService.get<string>('FRONTEND_URL') ||
-          DEFAULT_FRONTEND_URL;
-        return res.redirect(`${frontendUrl}?error=incomplete_login_data`);
+        return res.redirect(
+          `${this.cookies.getFrontendUrl()}?error=incomplete_login_data`,
+        );
       }
 
-      // Trước khi redirect về FE, set cookie "role"
-      res.cookie('role', loginResult.account.role, {
-        path: '/',
-        httpOnly: false, // middleware đọc được, client-side cũng đọc được nếu muốn
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7, // 1 tuần
-      });
+      // DRY: set cookies via service
+      this.cookies.applyLoginCookies(res, loginResult);
 
-      // Redirect to frontend with token in URL params
-      const FE_CALLBACK =
-        (this.configService.get<string>('FRONTEND_URL') ||
-          DEFAULT_FRONTEND_URL) + '/google-callback';
-
-      // Encode the token and user data for URL
-      const redirectUrl = `${FE_CALLBACK}?token=${encodeURIComponent(loginResult.access_token)}&provider=google&name=${encodeURIComponent(loginResult.account.name || '')}&email=${encodeURIComponent(loginResult.account.email)}&role=${encodeURIComponent(loginResult.account.role)}`;
+      // DRY: build redirect URL
+      const redirectUrl = buildGoogleRedirectUrl(
+        this.cookies.getFrontendUrl(),
+        loginResult.account,
+      );
 
       return res.redirect(redirectUrl);
     } catch (err) {
       console.error('Google login redirect error:', err);
-      const frontendUrl =
-        this.configService.get<string>('FRONTEND_URL') || DEFAULT_FRONTEND_URL;
-      return res.redirect(`${frontendUrl}?error=internal_error`);
+      return res.redirect(
+        `${this.cookies.getFrontendUrl()}?error=internal_error`,
+      );
     }
   }
 
-  // Logout: remove the 'role' cookie
+  // Logout: remove both JWT token and role cookies
   @Post('logout')
   logout(@Res() res: Response) {
-    res.clearCookie('role', {
-      path: '/',
-      httpOnly: false,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    this.cookies.clearAuthCookies(res);
     return res.json({ message: 'Logged out successfully' });
   }
 }
