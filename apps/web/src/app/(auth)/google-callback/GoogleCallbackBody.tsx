@@ -30,7 +30,8 @@ export function GoogleCallbackBody() {
           localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
         }
       } catch (err) {
-        // Optionally handle error
+        console.error("Failed to fetch and store access token:", err);
+        router.replace(`/login?error=${encodeURIComponent("Google login failed. Please try again.")}`);
       }
     }
 
