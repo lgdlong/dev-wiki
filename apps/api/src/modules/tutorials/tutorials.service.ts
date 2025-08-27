@@ -14,7 +14,7 @@ import { TutorialDetailDto, TutorialListItemDto } from './dto/tutorials.dto';
 
 @Injectable()
 export class TutorialService {
-  constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) { }
+  constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) {}
 
   // ✅ Overload signatures
   create(dto: CreateTutorialDto): Promise<Tutorial>;
@@ -49,16 +49,14 @@ export class TutorialService {
     }
   }
 
-
-
   // ===================== GET ======================
   async findAll(): Promise<TutorialListItemDto[]> {
     const tutorials = await this.repo.find({
       order: { createdAt: 'DESC' },
-      relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
+      relations: ['author'], //DEBUG: check entity để fix name (này cũng join Account)
     });
     console.log('[DEBUG] Tutorials in findAll:', tutorials);
-    return tutorials.map(tutorial => ({
+    return tutorials.map((tutorial) => ({
       id: tutorial.id,
       title: tutorial.title,
       createdAt: tutorial.createdAt,
@@ -67,9 +65,12 @@ export class TutorialService {
     }));
   }
   async findOne(id: number): Promise<TutorialDetailDto> {
-    const row = await this.repo.findOne({ where: { id }, relations: ["author"] });
+    const row = await this.repo.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
-    
+
     console.log('[DEBUG] Tutorial in findOne:', row);
     return {
       id: row.id,
@@ -80,10 +81,6 @@ export class TutorialService {
       authorName: row.author?.name || 'Unknown',
     };
   }
-
-
-
-
 
   // ===== helper: check quyền sở hữu (nếu có userId) =====
   private assertOwnership(row: Tutorial, userId?: number) {
@@ -107,16 +104,31 @@ export class TutorialService {
     this.assertOwnership(row, userId);
 
     // Không cho sửa authorId qua body
-    const { author_id, authorId, views, createdAt, updatedAt, id: _id, ...rest } = dto as any;
+    const {
+      author_id,
+      authorId,
+      views,
+      createdAt,
+      updatedAt,
+      id: _id,
+      ...rest
+    } = dto as any;
 
     // Nếu client gửi title/content nhưng là chuỗi rỗng → chặn
-    if ('title' in rest && typeof rest.title === 'string' && rest.title.trim() === '') {
+    if (
+      'title' in rest &&
+      typeof rest.title === 'string' &&
+      rest.title.trim() === ''
+    ) {
       throw new BadRequestException('title cannot be empty');
     }
-    if ('content' in rest && typeof rest.content === 'string' && rest.content.trim() === '') {
+    if (
+      'content' in rest &&
+      typeof rest.content === 'string' &&
+      rest.content.trim() === ''
+    ) {
       throw new BadRequestException('content cannot be empty');
     }
-
 
     // Chỉ merge các field được phép & có giá trị defined
     const allowed: (keyof UpdateTutorialDto)[] = ['title', 'content']; // mở rộng: 'status', 'tags'...

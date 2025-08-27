@@ -43,7 +43,7 @@ export class JWTValidator {
       }
 
       // Validate role is one of the expected values
-      if (!VALID_ROLES.includes(payload.role as typeof VALID_ROLES[number])) {
+      if (!VALID_ROLES.includes(payload.role as (typeof VALID_ROLES)[number])) {
         return null;
       }
 

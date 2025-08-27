@@ -31,7 +31,9 @@ export function GoogleCallbackBody() {
         }
       } catch (err) {
         console.error("Failed to fetch and store access token:", err);
-        router.replace(`/login?error=${encodeURIComponent("Google login failed. Please try again.")}`);
+        router.replace(
+          `/login?error=${encodeURIComponent("Google login failed. Please try again.")}`,
+        );
       }
     }
 

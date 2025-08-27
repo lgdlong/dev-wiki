@@ -18,5 +18,4 @@ export class UpdateTutorialDto extends PartialType(CreateTutorialDto) {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @MinLength(1, { message: 'content cannot be empty' })
   content?: string;
-  
 }

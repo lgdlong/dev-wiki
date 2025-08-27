@@ -31,7 +31,11 @@ export default function ManageTutorialPage() {
   const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
 
   // ⬇️ NEW: state cho Toast tự viết
-  const [toast, setToast] = useState<{ open: boolean; kind: ToastKind; message: string }>({
+  const [toast, setToast] = useState<{
+    open: boolean;
+    kind: ToastKind;
+    message: string;
+  }>({
     open: false,
     kind: "success",
     message: "",
@@ -59,7 +63,12 @@ export default function ManageTutorialPage() {
     if (!q) return tutorials;
     const k = q.toLowerCase();
     return tutorials.filter((t) => {
-      const haystack = [t.title, t.content, String(t.authorId), ...(t.tags ?? [])]
+      const haystack = [
+        t.title,
+        t.content,
+        String(t.authorId),
+        ...(t.tags ?? []),
+      ]
         .filter(Boolean)
         .map((x) => String(x).toLowerCase());
       return haystack.some((s) => s.includes(k));
@@ -89,7 +98,11 @@ export default function ManageTutorialPage() {
       await deleteTutorial(pendingId);
       setTutorials((prev) => prev.filter((x) => x.id !== pendingId));
       // ✅ success toast
-      setToast({ open: true, kind: "success", message: `Deleted tutorial #${pendingId}` });
+      setToast({
+        open: true,
+        kind: "success",
+        message: `Deleted tutorial #${pendingId}`,
+      });
     } catch (e: any) {
       console.error("Delete failed", e);
       // ❌ error toast
@@ -122,8 +135,12 @@ export default function ManageTutorialPage() {
       {/* header + search giữ nguyên */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Manage Tutorials</h1>
-          <p className="text-sm text-muted-foreground">View, search, edit and delete tutorials (Moderator).</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Manage Tutorials
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            View, search, edit and delete tutorials (Moderator).
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="gap-2" onClick={() => load()}>
@@ -146,7 +163,8 @@ export default function ManageTutorialPage() {
             className="max-w-sm"
           />
           <div className="text-sm text-muted-foreground">
-            Total <span className="font-medium">{filtered.length}</span> tutorials
+            Total <span className="font-medium">{filtered.length}</span>{" "}
+            tutorials
           </div>
         </CardContent>
       </Card>
@@ -156,7 +174,11 @@ export default function ManageTutorialPage() {
       ) : err ? (
         <div className="rounded-md border p-3 text-red-600">{err}</div>
       ) : (
-        <DataTable columns={columns} data={filtered} defaultSorting={DEFAULT_SORT} />
+        <DataTable
+          columns={columns}
+          data={filtered}
+          defaultSorting={DEFAULT_SORT}
+        />
       )}
 
       {/* Confirm dialog giữ nguyên */}

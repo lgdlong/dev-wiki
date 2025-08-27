@@ -22,7 +22,8 @@ function formatDate(input?: string | number | Date) {
 }
 
 function renderTags(tags?: string[]) {
-  if (!tags || tags.length === 0) return <span className="text-sm text-muted-foreground">—</span>;
+  if (!tags || tags.length === 0)
+    return <span className="text-sm text-muted-foreground">—</span>;
   const shown = tags.slice(0, 3);
   const rest = tags.length - shown.length;
   return (
@@ -33,7 +34,9 @@ function renderTags(tags?: string[]) {
         </Badge>
       ))}
       {rest > 0 && (
-        <Badge variant="outline" className="px-2 py-0.5">+{rest}</Badge>
+        <Badge variant="outline" className="px-2 py-0.5">
+          +{rest}
+        </Badge>
       )}
     </div>
   );

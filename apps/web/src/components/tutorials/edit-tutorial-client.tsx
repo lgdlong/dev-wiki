@@ -1,50 +1,63 @@
 // apps/web/src/components/tutorials/edit-tutorial-client.tsx
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { Toast } from '@/components/ui/announce-success-toast';
+import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { Toast } from "@/components/ui/announce-success-toast";
 import { getTutorialById, updateTutorial } from "@/utils/api/tutorialApi";
 
-const ToastEditor = dynamic(() => import('@/components/tutorials/tutorial-markdown'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] rounded-2xl border border-white/10 bg-white/5 animate-pulse" />
-  ),
-});
+const ToastEditor = dynamic(
+  () => import("@/components/tutorials/tutorial-markdown"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] rounded-2xl border border-white/10 bg-white/5 animate-pulse" />
+    ),
+  },
+);
 
 // ===== Constants / Tabs (match Create) =====
 const TITLE_MAX = 300;
 
-type TabKey = 'text' | 'media' | 'link' | 'poll' | 'ama';
+type TabKey = "text" | "media" | "link" | "poll" | "ama";
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'text', label: 'Text' },
-  { key: 'media', label: 'Images & Video' },
-  { key: 'link', label: 'Link' },
-  { key: 'poll', label: 'Poll' },
-  { key: 'ama', label: 'AMA' },
+  { key: "text", label: "Text" },
+  { key: "media", label: "Images & Video" },
+  { key: "link", label: "Link" },
+  { key: "poll", label: "Poll" },
+  { key: "ama", label: "AMA" },
 ];
 
 const TAG_SUGGESTIONS = [
-  'announcement', 'tips', 'qa', 'release', 'bug', 'feature', 'guide', 'howto', 'performance', 'security', 'design',
+  "announcement",
+  "tips",
+  "qa",
+  "release",
+  "bug",
+  "feature",
+  "guide",
+  "howto",
+  "performance",
+  "security",
+  "design",
 ];
 
 export default function EditTutorialClient({ id }: { id: number }) {
   // ===== UI State =====
-  const [tab, setTab] = useState<TabKey>('text');
+  const [tab, setTab] = useState<TabKey>("text");
   const [loading, setLoading] = useState(true); // skeleton-first; will be turned off on mount
   const [saving, setSaving] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
+  const [toastMsg, setToastMsg] = useState("");
 
   // Form state
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
   // Tag picker state/refs
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [tagQuery, setTagQuery] = useState('');
+  const [tagQuery, setTagQuery] = useState("");
   const pickerRef = useRef<HTMLDivElement | null>(null);
   const tagInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -83,7 +96,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
     const v = t.trim().toLowerCase();
     if (!v) return;
     if (!tags.includes(v)) setTags((s) => [...s, v]);
-    setTagQuery('');
+    setTagQuery("");
   }
   function removeTag(t: string) {
     setTags((s) => s.filter((x) => x !== t));
@@ -96,15 +109,16 @@ export default function EditTutorialClient({ id }: { id: number }) {
       const target = e.target as Node;
       if (!pickerRef.current.contains(target)) setPickerOpen(false);
     }
-    if (pickerOpen) document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
+    if (pickerOpen) document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
   }, [pickerOpen]);
 
   // ===== Actions (skeleton only, no API) =====
-  const canUpdate = title.trim().length > 0 && content.trim().length > 0 && !saving;
+  const canUpdate =
+    title.trim().length > 0 && content.trim().length > 0 && !saving;
 
   const onSaveDraft = () => {
-    setToastMsg('Saved draft (skeleton).');
+    setToastMsg("Saved draft (skeleton).");
     setToastOpen(true);
   };
 
@@ -119,7 +133,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
       });
       setToastMsg("Update success");
       setToastOpen(true);
-      
+
       // điều hướng tuỳ bạn:
       // router.push(`/mod/tutorials/${id}`);
     } catch (e) {
@@ -141,8 +155,8 @@ export default function EditTutorialClient({ id }: { id: number }) {
               onClick={() => setTab(t.key)}
               className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${
                 tab === t.key
-                  ? 'border-white text-white'
-                  : 'border-transparent text-white/60 hover:text-white'
+                  ? "border-white text-white"
+                  : "border-transparent text-white/60 hover:text-white"
               }`}
             >
               {t.label}
@@ -194,11 +208,11 @@ export default function EditTutorialClient({ id }: { id: number }) {
                     value={tagQuery}
                     onChange={(e) => setTagQuery(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         if (tagQuery.trim()) addTag(tagQuery);
                       }
-                      if (e.key === 'Escape') setPickerOpen(false);
+                      if (e.key === "Escape") setPickerOpen(false);
                     }}
                     placeholder="Search or add a tag…"
                     className="w-full rounded-lg border border-white/10 bg-black p-2 text-sm text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/10"
@@ -223,7 +237,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
                     </ul>
                   ) : (
                     <div className="p-3 text-sm text-white/60">
-                      No suggestions. Press <kbd className="rounded bg-white/10 px-1">Enter</kbd> to add “{tagQuery.trim()}”.
+                      No suggestions. Press{" "}
+                      <kbd className="rounded bg-white/10 px-1">Enter</kbd> to
+                      add “{tagQuery.trim()}”.
                     </div>
                   )}
                 </div>
@@ -274,12 +290,16 @@ export default function EditTutorialClient({ id }: { id: number }) {
         </div>
 
         {/* Editor */}
-        {tab === 'text' ? (
+        {tab === "text" ? (
           loading ? (
             <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] w-full rounded-2xl bg-white/5 animate-pulse" />
           ) : (
             <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
-              <ToastEditor value={content} onChange={setContent} height="100%" />
+              <ToastEditor
+                value={content}
+                onChange={setContent}
+                height="100%"
+              />
             </div>
           )
         ) : (
@@ -291,13 +311,12 @@ export default function EditTutorialClient({ id }: { id: number }) {
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-3">
-       
         <button
           disabled={!canUpdate || saving}
           onClick={onUpdate}
           className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {saving ? 'Updating…' : 'Update'}
+          {saving ? "Updating…" : "Update"}
         </button>
       </div>
 
@@ -305,7 +324,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
       <Toast
         open={toastOpen}
         message={toastMsg}
-        kind={toastMsg.includes('success') ? 'success' : 'info'}
+        kind={toastMsg.includes("success") ? "success" : "info"}
         onClose={() => setToastOpen(false)}
       />
     </div>

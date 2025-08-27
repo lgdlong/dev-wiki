@@ -19,7 +19,7 @@ import { GetUserId } from 'src/core/decorators/get-user-id.decorator';
 
 @Controller('tutorials')
 export class TutorialController {
-  constructor(private readonly tutorialService: TutorialService) { }
+  constructor(private readonly tutorialService: TutorialService) {}
 
   // ====== CREATE (yêu cầu đăng nhập) ======
   @UseGuards(JwtAuthGuard)
@@ -33,13 +33,13 @@ export class TutorialController {
   // ====== PUBLIC GETS ======
   @Get()
   findAll() {
-    console.log("[BE] GET /tutorials called");
-    return this.tutorialService.findAll();   // trả về TutorialListItemDto[]
+    console.log('[BE] GET /tutorials called');
+    return this.tutorialService.findAll(); // trả về TutorialListItemDto[]
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.tutorialService.findOne(+id);     // trả về TutorialDetailDto
+    return this.tutorialService.findOne(+id); // trả về TutorialDetailDto
   }
 
   // ====== UPDATE / DELETE (nên yêu cầu đăng nhập) ======
@@ -58,22 +58,12 @@ export class TutorialController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUserId() userId: number) {
+  remove(@Param('id', ParseIntPipe) id: number, @GetUserId() userId: number) {
     if (!Number.isFinite(userId))
       throw new UnauthorizedException('Invalid user');
     return this.tutorialService.remove(+id, userId);
   }
 }
-
-
-
-
-
-
-
-
 
 // // FE nhấn Post -> POST /api/tutorials
 // @Post()
