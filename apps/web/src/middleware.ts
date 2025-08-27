@@ -1,6 +1,7 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { JWTValidator, type JwtPayload } from "./lib/jwt";
 
 type Role = "admin" | "mod" | "user" | "guest";
 
@@ -11,51 +12,103 @@ const GUEST: Role = "guest";
 const ADMIN_PATH = "/admin";
 const MOD_PATH = "/mod";
 const ROOT_PATH = "/";
+const LOGIN_PATH = "/login";
 
 const isAdmin = (role: Role) => role === ADMIN;
-const isMod = (role: Role) => role === MOD;
+const isMod = (role: Role) => role === MOD || role === ADMIN; // Admin can access mod routes
+const isAuthenticated = (role: Role) => role !== GUEST;
 
 const toURL = (path: string, req: NextRequest) => new URL(path, req.url);
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const raw = request.cookies.get("role")?.value ?? GUEST;
-  const role = (
-    ["admin", "mod", "user", "guest"].includes(raw) ? raw : GUEST
-  ) as Role;
+/**
+ * Extracts JWT token from request and validates it
+ * Returns the user's role or 'guest' if invalid/missing
+ */
+async function getUserRoleFromJWT(request: NextRequest): Promise<Role> {
+  try {
+    // Extract token from Authorization header or cookies
+    const authHeader = request.headers.get("authorization");
+    let token: string | null = null;
 
-  // 1) /admin/** → chỉ admin
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.slice(7);
+    } else {
+      // Fallback: try to get token from cookies
+      token = request.cookies.get("token")?.value || null;
+    }
+
+    if (!token) {
+      return GUEST;
+    }
+
+    // Validate the JWT token
+    const payload = await JWTValidator.validateToken(token);
+    if (!payload || !payload.role) {
+      return GUEST;
+    }
+
+    // Ensure the role is valid
+    const validRoles: Role[] = ["admin", "mod", "user", "guest"];
+    if (validRoles.includes(payload.role as Role)) {
+      return payload.role as Role;
+    }
+
+    return GUEST;
+  } catch (error) {
+    console.warn("Error validating JWT in middleware:", error);
+    return GUEST;
+  }
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Get user role from JWT token (secure validation)
+  const role = await getUserRoleFromJWT(request);
+
+  // 1) /admin/** → only admin
   if (pathname.startsWith(ADMIN_PATH)) {
     if (!isAdmin(role)) {
-      const target = toURL(ROOT_PATH, request);
+      // Redirect unauthenticated users to login, others to root
+      const target =
+        role === GUEST ? toURL(LOGIN_PATH, request) : toURL(ROOT_PATH, request);
       if (target.href !== request.url) return NextResponse.redirect(target);
       return NextResponse.next();
     }
     return NextResponse.next();
   }
 
-  // 2) /mod/** → chỉ mod
+  // 2) /mod/** → mod or admin
   if (pathname.startsWith(MOD_PATH)) {
     if (!isMod(role)) {
-      const target = toURL(ROOT_PATH, request);
+      // Redirect unauthenticated users to login, others to root
+      const target =
+        role === GUEST ? toURL(LOGIN_PATH, request) : toURL(ROOT_PATH, request);
       if (target.href !== request.url) return NextResponse.redirect(target);
       return NextResponse.next();
     }
     return NextResponse.next();
   }
 
-  // 3) Các path khác (vùng user/client)
-  //    Nếu admin/mod cố vào → đẩy về dashboard đúng role
-  if (isAdmin(role) || isMod(role)) {
-    const dashboard = isAdmin(role) ? ADMIN_PATH : MOD_PATH;
-    // Tránh redirect loop nếu đã ở đúng dashboard
-    if (!pathname.startsWith(dashboard)) {
+  // 3) Auto-redirect authenticated users to their appropriate dashboard
+  if (
+    isAuthenticated(role) &&
+    (pathname === ROOT_PATH || pathname === LOGIN_PATH)
+  ) {
+    const dashboard = isAdmin(role)
+      ? ADMIN_PATH
+      : isMod(role)
+        ? MOD_PATH
+        : ROOT_PATH;
+
+    // Only redirect if not already on the correct dashboard
+    if (dashboard !== ROOT_PATH && !pathname.startsWith(dashboard)) {
       const target = toURL(dashboard, request);
       if (target.href !== request.url) return NextResponse.redirect(target);
     }
   }
 
-  // 4) Mặc định cho qua
+  // 4) Default: allow through
   return NextResponse.next();
 }
 
@@ -66,7 +119,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/mod/:path*",
-    // “global user/client area” – nhưng loại trừ _next, favicon, api
+    // "global user/client area" – nhưng loại trừ _next, favicon, api
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

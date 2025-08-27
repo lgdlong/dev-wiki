@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { AppService } from '../../app.service';
+import { AuthCookiesService } from '../../shared/http/cookies/auth-cookies.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AppService } from '../../app.service';
     JwtStrategy,
     GoogleStrategy,
     AppService,
+    AuthCookiesService,
   ],
 })
 export class AuthModule {}

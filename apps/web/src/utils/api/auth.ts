@@ -4,6 +4,13 @@ import { Account } from "@/types/account";
 import { LoginResponse } from "@/types/auth";
 import { isJwtExpired } from "@/utils/jwt";
 
+// Define the response type for /me
+export type MeApiResponse = {
+  user?: Account;
+  access_token?: string;
+  [key: string]: any;
+};
+
 // Đăng nhập
 export async function loginApi({
   email,
@@ -37,28 +44,44 @@ export async function signupApi({
 }
 
 // Lấy thông tin user hiện tại (đã đăng nhập)
-export async function meApi(): Promise<Account> {
+export async function meApi(): Promise<MeApiResponse> {
   // Lấy token từ localStorage
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-  if (!token) throw new Error("Chưa đăng nhập hoặc không tìm thấy token!");
-  if (isJwtExpired(token)) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+  // If token exists in localStorage, use it as before
+  if (token) {
+    if (isJwtExpired(token)) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+      throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
     }
-    throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+    return fetcher("/me", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
-  return fetcher("/me", {
+  // If no token in localStorage, try cookie-based auth
+  const res = await fetcher<MeApiResponse>("/me", {
     method: "GET",
-    credentials: "include", // Nếu backend vẫn dùng cookie song song, có thể giữ lại; còn không thì bỏ dòng này
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   });
+
+  // If backend returns access_token, store it in localStorage
+  if (res && res.access_token) {
+    localStorage.setItem("access_token", res.access_token);
+    return res.user as Account;
+  }
+
+  // If no user or token, throw error
+  throw new Error("Chưa đăng nhập hoặc không tìm thấy token!");
 }
 
 // Logout API: calls backend to clear the role cookie

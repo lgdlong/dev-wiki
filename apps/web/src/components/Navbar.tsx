@@ -43,7 +43,7 @@ const videoComponents: { title: string; href: string; description: string }[] =
   ];
 
 export function Navbar() {
-  const account: UseQueryResult<Account, Error> = useCurrentUser();
+  const account = useCurrentUser();
 
   // Hàm xử lý logout
   async function handleLogout() {
