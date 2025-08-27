@@ -48,7 +48,7 @@ export class TutorialController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTutorialDto,
-    @GetUserId() userId: number, // chỉ lấy id nếu muốn
+    @GetUserId() userId: number, // chỉ lấy id nếu muốn (lỗi nếu @GetUser('id'))
   ) {
     if (!Number.isFinite(userId))
       throw new UnauthorizedException('Invalid user');

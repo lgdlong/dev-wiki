@@ -52,16 +52,31 @@ export class TutorialService {
 
 
   // ===================== GET ======================
-  async findAll() {
-    return this.repo.find({
+  async findAll(): Promise<TutorialListItemDto[]> {
+    const tutorials = await this.repo.find({
       order: { createdAt: 'DESC' },
-      relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
+      relations: ["author"],
     });
+    return tutorials.map(tutorial => ({
+      id: tutorial.id,
+      title: tutorial.title,
+      createdAt: tutorial.createdAt,
+      updatedAt: tutorial.updatedAt,
+      authorName: tutorial.author?.name || 'Unknown',
+    }));
   }
-  async findOne(id: number) {
-    const row = await this.repo.findOne({ where: { id } });
+  async findOne(id: number): Promise<TutorialDetailDto> {
+    const row = await this.repo.findOne({ where: { id }, relations: ["author"] });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
-    return row;
+    
+    return {
+      id: row.id,
+      title: row.title,
+      content: row.content,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      authorName: row.author?.name || 'Unknown',
+    };
   }
 
 

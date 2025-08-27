@@ -1,3 +1,4 @@
+// 1) IMPORTS
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -13,11 +14,14 @@ import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorialApi";
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { Toast, type ToastKind } from "@/components/ui/announce-success-toast";
 
 const DEFAULT_SORT: SortingState = [{ id: "createdAt", desc: true }];
 
 export default function ManageTutorialPage() {
   const router = useRouter();
+
+  // 2) STATE
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -26,12 +30,18 @@ export default function ManageTutorialPage() {
   const [pendingId, setPendingId] = useState<number | null>(null);
   const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
 
+  // ⬇️ NEW: state cho Toast tự viết
+  const [toast, setToast] = useState<{ open: boolean; kind: ToastKind; message: string }>({
+    open: false,
+    kind: "success",
+    message: "",
+  });
+
   async function load() {
     try {
       setLoading(true);
       setErr(null);
-      const data = await getAllTutorials(); // fetch once, sort client-side
-      console.log(data)
+      const data = await getAllTutorials();
       setTutorials(data ?? []);
     } catch (e: any) {
       setErr(e?.message ?? "Failed to load tutorials");
@@ -44,19 +54,12 @@ export default function ManageTutorialPage() {
     void load();
   }, []);
 
-
-
-  // search theo title, content, tags và authorId
+  // search…
   const filtered = useMemo(() => {
     if (!q) return tutorials;
     const k = q.toLowerCase();
     return tutorials.filter((t) => {
-      const haystack = [
-        t.title,
-        t.content,
-        String(t.authorId),
-        ...(t.tags ?? []),
-      ]
+      const haystack = [t.title, t.content, String(t.authorId), ...(t.tags ?? [])]
         .filter(Boolean)
         .map((x) => String(x).toLowerCase());
       return haystack.some((s) => s.includes(k));
@@ -71,23 +74,32 @@ export default function ManageTutorialPage() {
           setPendingId(id);
           setOpenDelete(true);
         },
-        deletingIds, // ⬅️ truyền xuống để biết dòng nào đang xoá
+        deletingIds, // để columns hiển thị skeleton + spinner ở dòng đang xoá
       }),
     [router, deletingIds],
   );
 
+  // 3) CONFIRM DELETE → skeleton + toast
   async function confirmDelete() {
     if (pendingId == null) return;
-    setDeletingIds(prev => new Set(prev).add(pendingId));
+    setDeletingIds((prev) => new Set(prev).add(pendingId));
+    setOpenDelete(false);
 
     try {
       await deleteTutorial(pendingId);
-      setTutorials(prev => prev.filter(x => x.id !== pendingId));
-    } catch (e) {
+      setTutorials((prev) => prev.filter((x) => x.id !== pendingId));
+      // ✅ success toast
+      setToast({ open: true, kind: "success", message: `Deleted tutorial #${pendingId}` });
+    } catch (e: any) {
       console.error("Delete failed", e);
-      // TODO: toast lỗi nếu cần
+      // ❌ error toast
+      setToast({
+        open: true,
+        kind: "error",
+        message: e?.message ?? "Delete failed. Please try again.",
+      });
     } finally {
-      setDeletingIds(prev => {
+      setDeletingIds((prev) => {
         const next = new Set(prev);
         next.delete(pendingId!);
         return next;
@@ -98,12 +110,20 @@ export default function ManageTutorialPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {/* ⬇️ Render Toast của bạn (fixed top-right) */}
+      <Toast
+        open={toast.open}
+        kind={toast.kind}
+        message={toast.message}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+        duration={2500}
+      />
+
+      {/* header + search giữ nguyên */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Manage Tutorials</h1>
-          <p className="text-sm text-muted-foreground">
-            View, search, edit and delete tutorials (Moderator).
-          </p>
+          <p className="text-sm text-muted-foreground">View, search, edit and delete tutorials (Moderator).</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="gap-2" onClick={() => load()}>
@@ -139,7 +159,7 @@ export default function ManageTutorialPage() {
         <DataTable columns={columns} data={filtered} defaultSorting={DEFAULT_SORT} />
       )}
 
-      {/* Dialog xác nhận xoá */}
+      {/* Confirm dialog giữ nguyên */}
       <DeleteConfirmDialog
         open={openDelete}
         onOpenChange={(v: boolean) => {
@@ -154,4 +174,3 @@ export default function ManageTutorialPage() {
     </div>
   );
 }
-
