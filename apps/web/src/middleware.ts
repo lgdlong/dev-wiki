@@ -20,7 +20,9 @@ const toURL = (path: string, req: NextRequest) => new URL(path, req.url);
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const raw = request.cookies.get("role")?.value ?? GUEST;
-  const role = (["admin", "mod", "user", "guest"].includes(raw) ? raw : GUEST) as Role;
+  const role = (
+    ["admin", "mod", "user", "guest"].includes(raw) ? raw : GUEST
+  ) as Role;
 
   // 1) /admin/** → chỉ admin
   if (pathname.startsWith(ADMIN_PATH)) {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // app/mod/tutorials/manage-tutorials/page.tsx
 "use client";
 
@@ -137,3 +138,6 @@ export default function ManageTutorialPage() {
     </div>
   );
 }
+=======
+export default function manageTutorials() {}
+>>>>>>> dev

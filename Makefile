@@ -23,8 +23,8 @@ DUMP_FILE = $(DUMP_DIR)/dump-$(DB_NAME)-$(TIMESTAMP).dump
 # ==================================
 
 up:
-	@echo "Starting PostgreSQL container..."
-	docker compose up -d --build
+	@echo "Starting Postgres container..."
+	docker compose up -d
 
 down:
 	@echo "Stopping and removing container and volumes..."
@@ -33,6 +33,10 @@ down:
 restart:
 	@echo "Full restart (clean volumes and rebuild)..."
 	docker compose down -v
+	docker compose up -d
+
+build:
+	@echo "Building Docker image..."
 	docker compose up --build
 
 # ==================================

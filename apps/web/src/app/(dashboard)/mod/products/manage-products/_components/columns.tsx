@@ -8,15 +8,24 @@ import { Edit, Trash2 } from "lucide-react";
 import type { Product } from "@/types/product";
 
 export function makeProductColumns({
-                                     onEdit,
-                                     onRequestDelete,
-                                   }: {
+  onEdit,
+  onRequestDelete,
+}: {
   onEdit: (id: number) => void;
   onRequestDelete: (id: number) => void;
 }): ColumnDef<Product>[] {
   return [
     {
-      id: "logo",
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">{row.original.id}</span>
+      ),
+      size: 40,
+      enableSorting: true,
+    },
+    {
+      accessorKey: "logoUrl",
       header: "Logo",
       cell: ({ row }) => {
         const p = row.original;
@@ -41,7 +50,9 @@ export function makeProductColumns({
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.name}</span>
+      ),
     },
     {
       accessorKey: "homepageUrl",

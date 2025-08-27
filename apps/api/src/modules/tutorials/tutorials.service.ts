@@ -1,5 +1,10 @@
 // src/posts/posts.service.ts
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tutorial } from './entities/tutorials.entity';
@@ -8,31 +13,31 @@ import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 
 @Injectable()
 export class TutorialService {
-  constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) { }
-
+  constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) {}
 
   // ✅ Overload signatures
   create(dto: CreateTutorialDto): Promise<Tutorial>;
   create(dto: CreateTutorialDto, authorId: number): Promise<Tutorial>;
 
-
   async create(dto: CreateTutorialDto, authorId?: number): Promise<Tutorial> {
     try {
       // (tuỳ chọn) vẫn hỗ trợ body có author_id để quá độ
-      type DtoWithAuthorId = CreateTutorialDto & { author_id?: number | string };
+      type DtoWithAuthorId = CreateTutorialDto & {
+        author_id?: number | string;
+      };
       const fromBody = (dto as DtoWithAuthorId).author_id;
 
       const finalAuthorId =
-        authorId ??
-        (fromBody !== undefined ? Number(fromBody) : undefined);
+        authorId ?? (fromBody !== undefined ? Number(fromBody) : undefined);
 
       // Nếu DB yêu cầu NOT NULL cho authorId, nên kiểm tra:
-      if (finalAuthorId == null) throw new BadRequestException('author_id is required');
+      if (finalAuthorId == null)
+        throw new BadRequestException('author_id is required');
 
       const post = this.repo.create({
         title: dto.title.trim(),
         content: dto.content.trim(),
-        authorId: finalAuthorId,  // map snake_case -> camelCase
+        authorId: finalAuthorId, // map snake_case -> camelCase
         views: 0,
       });
 
@@ -52,8 +57,6 @@ export class TutorialService {
     if (!row) throw new NotFoundException(`Post #${id} not found`);
     return row;
   }
-
-
 
   // ===== helper: check quyền sở hữu (nếu có userId) =====
   private assertOwnership(row: Tutorial, userId?: number) {
@@ -110,18 +113,17 @@ export class TutorialService {
   }
 }
 
-
 // gọn gàn với không valid
-  // async create(dto: CreateTutorialDto, authorId?: number): Promise<Tutorial> {
-  //   try {
-  //     const post = this.repo.create({
-  //       title: dto.title.trim(),
-  //       content: dto.content.trim(),
-  //       authorId: authorId ?? undefined,
-  //       views: 0,
-  //     });
-  //     return this.repo.save(post);
-  //   } catch (error) {
-  //     console.error("error at tutorials.service" + error);
-  //   }
-  // }
+// async create(dto: CreateTutorialDto, authorId?: number): Promise<Tutorial> {
+//   try {
+//     const post = this.repo.create({
+//       title: dto.title.trim(),
+//       content: dto.content.trim(),
+//       authorId: authorId ?? undefined,
+//       views: 0,
+//     });
+//     return this.repo.save(post);
+//   } catch (error) {
+//     console.error("error at tutorials.service" + error);
+//   }
+// }

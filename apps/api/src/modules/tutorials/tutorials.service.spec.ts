@@ -20,14 +20,14 @@ describe('TutorialService', () => {
 
   describe('create', () => {
     it('should return a creation message', () => {
-    it('create: should persist and return the tutorial', async () => {
-      const createTutorialDto: CreateTutorialDto = {
-        title: 'Intro to TUI',
-        content: 'Markdown content',
-      };
-      const result = await service.create(createTutorialDto);
-      expect(result).toMatchObject({ id: 1, ...createTutorialDto });
-    });
+      it('create: should persist and return the tutorial', async () => {
+        const createTutorialDto: CreateTutorialDto = {
+          title: 'Intro to TUI',
+          content: 'Markdown content',
+        };
+        const result = await service.create(createTutorialDto);
+        expect(result).toMatchObject({ id: 1, ...createTutorialDto });
+      });
     });
   });
 

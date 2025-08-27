@@ -1,11 +1,11 @@
-'use client';
-import { useState, useEffect } from 'react';
+"use client";
+import { useState, useEffect } from "react";
 
-type BannerKind = 'error' | 'success' | 'warning' | 'info';
+type BannerKind = "error" | "success" | "warning" | "info";
 
 export default function TopBanner({
   message,
-  kind = 'error',
+  kind = "error",
   open = false,
   autoHideMs,
 }: {
@@ -27,10 +27,10 @@ export default function TopBanner({
   if (!show) return null;
 
   const styles: Record<BannerKind, string> = {
-    error: 'bg-rose-600',
-    success: 'bg-emerald-600',
-    warning: 'bg-amber-500',
-    info: 'bg-sky-600',
+    error: "bg-rose-600",
+    success: "bg-emerald-600",
+    warning: "bg-amber-500",
+    info: "bg-sky-600",
   };
 
   return (
@@ -49,8 +49,7 @@ export default function TopBanner({
   );
 }
 
-
-// TopBanner(hiện chưa xài cho ai cả) 
+// TopBanner(hiện chưa xài cho ai cả)
 
 // Dùng cho thông báo “toàn cục” / nghiêm trọng / cần user chú ý nhiều
 // Error/sự cố lớn → TopBanner (lỗi server, downtime, cần user thao tác).

@@ -29,10 +29,10 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           defaultSorting = [],
-                                         }: DataTableProps<TData, TValue>) {
+  columns,
+  data,
+  defaultSorting = [],
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting);
 
   const table = useReactTable({
@@ -67,10 +67,13 @@ export function DataTable<TData, TValue>({
                       }
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                       {{ asc: " ↑", desc: " ↓" }[
                         header.column.getIsSorted() as string
-                        ] ?? null}
+                      ] ?? null}
                     </div>
                   )}
                 </TableHead>
@@ -79,7 +82,7 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id}>
                 {row.getVisibleCells().map((cell) => (
@@ -91,11 +94,8 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No data.
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
               </TableCell>
             </TableRow>
           )}
@@ -105,7 +105,8 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between p-3">
         <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
+          Page {table.getState().pagination.pageIndex + 1} /{" "}
+          {table.getPageCount() || 1}
         </div>
         <div className="flex items-center gap-2">
           <Button

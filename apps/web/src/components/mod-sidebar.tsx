@@ -7,7 +7,8 @@ import {
   LifeBuoy,
   Send,
   Youtube,
-  BookText
+  BookText,
+  LayoutGrid,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -56,6 +57,11 @@ const data = {
         //   url: "#",
         // },
       ],
+    },
+    {
+      title: "Category",
+      url: "/mod/categories",
+      icon: LayoutGrid,
     },
     {
       title: "Product",

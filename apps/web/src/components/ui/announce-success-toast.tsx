@@ -1,11 +1,11 @@
-'use client';
-import { useEffect } from 'react';
+"use client";
+import { useEffect } from "react";
 
-export type ToastKind = 'success' | 'error' | 'info';
+export type ToastKind = "success" | "error" | "info";
 
 export function Toast({
   open,
-  kind = 'success',
+  kind = "success",
   message,
   onClose,
   duration = 2500,
@@ -25,11 +25,11 @@ export function Toast({
   if (!open) return null;
 
   const color =
-    kind === 'success'
-      ? 'bg-emerald-600'
-      : kind === 'error'
-      ? 'bg-rose-600'
-      : 'bg-slate-700';
+    kind === "success"
+      ? "bg-emerald-600"
+      : kind === "error"
+        ? "bg-rose-600"
+        : "bg-slate-700";
 
   return (
     <div className="fixed right-4 top-4 z-[9999]">

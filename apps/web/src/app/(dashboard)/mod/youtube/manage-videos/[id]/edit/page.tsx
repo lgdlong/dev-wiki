@@ -2,7 +2,11 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getVideoById, getVideoTags, upsertVideoTags } from "@/utils/api/videoApi";
+import {
+  getVideoById,
+  getVideoTags,
+  upsertVideoTags,
+} from "@/utils/api/videoApi";
 import { createTag, getAllTags } from "@/utils/api/tag";
 import type { Video } from "@/types/video";
 import type { Tag } from "@/components/tags/TagBadgeList";
@@ -126,11 +130,7 @@ export default function EditVideoPage() {
 
   return (
     <main className="p-6 space-y-6">
-      <Button
-        variant="outline"
-        onClick={() => router.back()}
-        disabled={saving}
-      >
+      <Button variant="outline" onClick={() => router.back()} disabled={saving}>
         <ChevronLeft />
         Back
       </Button>
