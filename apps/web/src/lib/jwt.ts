@@ -1,5 +1,9 @@
 // JWT utility for server-side validation in middleware
 import { jwtVerify, type JWTPayload } from "jose";
+import { NextRequest } from "next/server";
+
+// Valid roles for RBAC
+export const VALID_ROLES = ["admin", "mod", "user", "guest"] as const;
 
 export interface JwtPayload extends JWTPayload {
   sub: string | undefined;
@@ -39,8 +43,7 @@ export class JWTValidator {
       }
 
       // Validate role is one of the expected values
-      const validRoles = ["admin", "mod", "user", "guest"];
-      if (!validRoles.includes(payload.role as string)) {
+      if (!VALID_ROLES.includes(payload.role as typeof VALID_ROLES[number])) {
         return null;
       }
 
@@ -60,7 +63,7 @@ export class JWTValidator {
    * @param request NextRequest object
    * @returns JWT token string or null
    */
-  static extractToken(request: any): string | null {
+  static extractToken(request: NextRequest): string | null {
     // Try Authorization header first (Bearer token)
     const authHeader = request.headers.get("authorization");
     if (authHeader?.startsWith("Bearer ")) {
