@@ -57,6 +57,7 @@ export class TutorialService {
       order: { createdAt: 'DESC' },
       relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
     });
+    console.log('[DEBUG] Tutorials in findAll:', tutorials);
     return tutorials.map(tutorial => ({
       id: tutorial.id,
       title: tutorial.title,
@@ -69,6 +70,7 @@ export class TutorialService {
     const row = await this.repo.findOne({ where: { id }, relations: ["author"] });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
     
+    console.log('[DEBUG] Tutorial in findOne:', row);
     return {
       id: row.id,
       title: row.title,
