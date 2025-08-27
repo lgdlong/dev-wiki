@@ -55,7 +55,7 @@ export class TutorialService {
   async findAll(): Promise<TutorialListItemDto[]> {
     const tutorials = await this.repo.find({
       order: { createdAt: 'DESC' },
-      relations: ["author"],
+      relations: ["author"], //DEBUG: check entity để fix name (này cũng join Account)
     });
     return tutorials.map(tutorial => ({
       id: tutorial.id,
