@@ -65,16 +65,12 @@ export class AuthController {
     // Try to extract JWT from Authorization header or cookie
     let accessToken: string | undefined = undefined;
     const authHeader = req.headers['authorization'];
-    if (
-      authHeader &&
-      typeof authHeader === 'string' &&
-      authHeader.startsWith('Bearer ')
-    ) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
       accessToken = authHeader.slice(7);
     } else {
       // Safe cookie access
       const cookies = req.cookies as Record<string, string> | undefined;
-      if (cookies && typeof cookies.token === 'string') {
+      if (cookies) {
         accessToken = cookies.token;
       }
     }
