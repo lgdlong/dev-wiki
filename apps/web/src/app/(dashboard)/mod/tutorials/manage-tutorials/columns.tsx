@@ -111,16 +111,20 @@ export function makeTutorialColumns({
       header: "",
       cell: ({ row }) => {
         const t = row.original;
-        const id = t.id as number;
-        const isDeleting = deletingIds.has(id);
+        const id = Number(t.id);
+        const isValidId = Number.isFinite(id) && Number.isInteger(id);
+        const isDeleting = isValidId && deletingIds.has(id);
         return (
           <div className="flex justify-end gap-2">
             <Button
               size="icon"
               variant="outline"
               aria-label="Edit tutorial"
-              onClick={() => onEdit(id)}
-              disabled={isDeleting}
+              onClick={() => {
+                if (!isValidId) return;
+                onEdit(id);
+              }}
+              disabled={isDeleting || !isValidId}
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -128,8 +132,11 @@ export function makeTutorialColumns({
               size="icon"
               variant="destructive"
               aria-label="Delete tutorial"
-              onClick={() =>  onRequestDelete(id)}
-              disabled={isDeleting}
+              onClick={() => {
+                if (!isValidId) return;
+                onRequestDelete(id);
+              }}
+              disabled={isDeleting || !isValidId}
             >
               {isDeleting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -145,5 +152,3 @@ export function makeTutorialColumns({
     },
   ];
 }
-
-
