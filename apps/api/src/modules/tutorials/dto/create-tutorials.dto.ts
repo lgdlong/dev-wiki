@@ -1,10 +1,16 @@
 import { Expose } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  Length,
+  MinLength,
+} from 'class-validator';
 
 export class CreateTutorialDto {
   @IsString()
   @IsNotEmpty()
-  @MinLength(1)
+  @Length(1, 100)
   title: string;
 
   @IsString()

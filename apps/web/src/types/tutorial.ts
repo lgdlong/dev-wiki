@@ -5,6 +5,7 @@ export interface Tutorial {
   title: string;
   content: string; // markdown or text
   authorId: number; // khóa ngoại tới User
+  authorName?: string;
   views: number; // mặc định = 0
   tags?: string[]; // hoặc mảng Tag nếu backend có entity riêng
   createdAt: string; // ISO string (yyyy-mm-ddTHH:mm:ssZ)
@@ -15,7 +16,7 @@ export interface Tutorial {
 export interface CreateTutorialRequest {
   title: string;
   content: string;
-  author_id?: number; //FE ko cần truyền id đâu có thể xóa luôn nếu cần
+  author_id?: number;
   tags?: string[];
 }
 
