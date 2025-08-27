@@ -1,11 +1,10 @@
-// app/mod/tutorials/manage-tutorials/columns.tsx
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Eye } from "lucide-react";
-import type { Tutorial } from "@/types/tutorial"; // <- nếu chưa có type, xem note bên dưới
+import type { Tutorial } from "@/types/tutorial";
 
 // --- Helpers ---
 function formatDate(input?: string | number | Date) {
@@ -58,8 +57,7 @@ export function makeTutorialColumns({
             <div className="font-medium">{t.title || "(Untitled)"}</div>
             {/* subtitle: author / id */}
             <div className="text-xs text-muted-foreground">
-              {t.authorName ? `by ${t.authorName}` : t.authorId ? `author #${t.authorId}` : "—"}
-              {typeof t.id !== "undefined" ? ` • ID: ${t.id}` : ""}
+              {t.authorName ? `by ${t.authorName}` : "Name: Unknown"}
             </div>
           </div>
         );
@@ -138,21 +136,4 @@ export function makeTutorialColumns({
   ];
 }
 
-/**
- * NOTE:
- * Nếu bạn CHƯA có type Tutorial trong "@/types/tutorial", có thể dùng tối thiểu như sau:
- * 
- * export type Tutorial = {
- *   id: number;
- *   title: string;
- *   content?: string;
- *   authorId?: number;
- *   authorName?: string;
- *   tags?: string[];
- *   views?: number;
- *   createdAt?: string | Date;
- *   updatedAt?: string | Date;
- * };
- * 
- * Hoặc mở rộng theo schema BE của bạn.
- */
+

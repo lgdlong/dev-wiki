@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   UnauthorizedException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TutorialService } from './tutorials.service';
 import { CreateTutorialDto } from './dto/create-tutorials.dto';
@@ -32,19 +33,19 @@ export class TutorialController {
   // ====== PUBLIC GETS ======
   @Get()
   findAll() {
-    return this.tutorialService.findAll();
+    return this.tutorialService.findAll();   // trả về TutorialListItemDto[]
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tutorialService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.tutorialService.findOne(+id);     // trả về TutorialDetailDto
   }
 
   // ====== UPDATE / DELETE (nên yêu cầu đăng nhập) ======
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTutorialDto,
     @GetUser('id') userId: number, // chỉ lấy id nếu muốn
   ) {
@@ -56,12 +57,20 @@ export class TutorialController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @GetUser('id') userId: number) {
+  remove(@Param('id', ParseIntPipe) id: number, @GetUser('id') userId: number) {
     if (!Number.isFinite(userId))
       throw new UnauthorizedException('Invalid user');
     return this.tutorialService.remove(+id, userId);
   }
 }
+
+
+
+
+
+
+
+
 
 // // FE nhấn Post -> POST /api/tutorials
 // @Post()

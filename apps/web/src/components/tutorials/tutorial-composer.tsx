@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { createTutorial } from "@/utils/api/tutorial";
+import { createTutorial } from "@/utils/api/tutorialApi";
 import { useRouter } from "next/navigation";
 import { Toast } from "../ui/announce-success-toast";
 
@@ -101,7 +101,7 @@ export default function TutorialComposer() {
 
     try {
       const created = await createTutorial({
-        // POST /tutorials (chủ yếu lọc)
+        // POST /tutorials
         title: title.trim(),
         content: content.trim(),
         tags,

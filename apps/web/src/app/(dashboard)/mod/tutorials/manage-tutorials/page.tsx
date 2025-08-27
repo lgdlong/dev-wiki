@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // app/mod/tutorials/manage-tutorials/page.tsx
 "use client";
 
@@ -11,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "./data-table";
 import { makeTutorialColumns } from "./columns";
 import type { Tutorial } from "@/types/tutorial";
-import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorial"; // <-- đổi sang tutorial API
+import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorialApi"; // <-- đổi sang tutorial API
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
@@ -138,6 +137,3 @@ export default function ManageTutorialPage() {
     </div>
   );
 }
-=======
-export default function manageTutorials() {}
->>>>>>> dev
