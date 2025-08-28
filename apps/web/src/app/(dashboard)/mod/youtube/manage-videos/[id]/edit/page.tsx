@@ -1,13 +1,13 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getVideoById,
   getVideoTags,
   upsertVideoTags,
 } from "@/utils/api/videoApi";
-import { createTag, getAllTags } from "@/utils/api/tag";
+import { createTag, getAllTags } from "@/utils/api/tagApi";
 import type { Video } from "@/types/video";
 import type { Tag } from "@/components/tags/TagBadgeList";
 
@@ -34,6 +34,9 @@ export default function EditVideoPage() {
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // NEW: giữ snapshot ban đầu để so dirty
+  const initialLinkedIdsRef = useRef<number[] | null>(null);
+
   const videoId: number = Number(id);
   if (isNaN(videoId)) {
     router.replace("/404");
@@ -58,8 +61,15 @@ export default function EditVideoPage() {
         ]);
         if (!mounted) return;
 
-        setAllTags(all);
-        setLinkedTags(linkedFromServer);
+        // sort ổn định theo name cho UX
+        const sortByName = (xs: Tag[]) =>
+          [...xs].sort((a, b) => a.name.localeCompare(b.name));
+
+        setAllTags(sortByName(all));
+        setLinkedTags(sortByName(linkedFromServer));
+        initialLinkedIdsRef.current = linkedFromServer
+          .map((t) => t.id)
+          .sort((a, b) => a - b);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -69,10 +79,40 @@ export default function EditVideoPage() {
     };
   }, [videoId, router]);
 
+  // helper: so sánh 2 mảng id đã sort (để check dirty)
+  const idsOf = (tags: Tag[]) => tags.map((t) => t.id).sort((a, b) => a - b);
+  const isSameIds = (a: number[] | null, b: number[]) => {
+    if (!a) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  };
+
+  // NEW: dirty state tính từ snapshot
+  const dirty = useMemo(() => {
+    const current = idsOf(linkedTags);
+    return !isSameIds(initialLinkedIdsRef.current, current);
+  }, [linkedTags]);
+
+  // NEW: cảnh báo rời trang nếu dirty (batch)
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      e.preventDefault();
+      e.returnValue = ""; // Chrome cần chuỗi rỗng
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  // Batch mode: add/remove chỉ cập nhật state local (chưa gọi API)
   const addTag = (tag: Tag) => {
-    setLinkedTags((prev) =>
-      prev.some((t) => t.id === tag.id) ? prev : [...prev, tag],
-    );
+    setLinkedTags((prev) => {
+      if (prev.some((t) => t.id === tag.id)) return prev;
+      const next = [...prev, tag];
+      next.sort((a, b) => a.name.localeCompare(b.name));
+      return next;
+    });
     setTagQuery("");
   };
 
@@ -84,13 +124,20 @@ export default function EditVideoPage() {
     if (!isValidTagName(tagName)) return; // chặn UI level
     setCreating(true);
     try {
-      const exists = allTags.find((t) => t.name === tagName);
+      // hỗ trợ case-insensitive tìm sẵn trong allTags
+      const norm = (s: string) => s.trim().toLowerCase();
+      const exists =
+        allTags.find((t) => norm(t.name) === norm(tagName)) ?? null;
       if (exists) {
         addTag(exists);
         return;
       }
       const newTag = await createTag({ name: tagName }); // server sẽ validate lại
-      setAllTags((prev) => [newTag, ...prev]);
+      setAllTags((prev) => {
+        const next = [newTag, ...prev];
+        next.sort((a, b) => a.name.localeCompare(b.name));
+        return next;
+      });
       addTag(newTag);
     } finally {
       setCreating(false);
@@ -98,6 +145,11 @@ export default function EditVideoPage() {
   };
 
   const handleSave = async () => {
+    // Batch: gửi toàn bộ id hiện tại lên BE
+    if (!dirty) {
+      toast.info("No changes to save");
+      return;
+    }
     setSaving(true);
     try {
       const linkedIds: number[] = linkedTags
@@ -107,7 +159,14 @@ export default function EditVideoPage() {
 
       // refresh linked tags từ server để đồng bộ UI
       const latestLinked: Tag[] = await getVideoTags(videoId);
-      setLinkedTags(latestLinked);
+      const sortByName = (xs: Tag[]) =>
+        [...xs].sort((a, b) => a.name.localeCompare(b.name));
+      setLinkedTags(sortByName(latestLinked));
+
+      // NEW: cập nhật snapshot sau khi save thành công
+      initialLinkedIdsRef.current = latestLinked
+        .map((t) => t.id)
+        .sort((a, b) => a - b);
 
       toast.success("Saved tags");
       router.refresh();
@@ -130,14 +189,27 @@ export default function EditVideoPage() {
 
   return (
     <main className="p-6 space-y-6">
-      <Button variant="outline" onClick={() => router.back()} disabled={saving}>
+      <Button
+        variant="outline"
+        onClick={() => {
+          // NEW: confirm khi back nếu dirty
+          if (dirty) {
+            const ok = window.confirm(
+              "You have unsaved changes. Leave without saving?",
+            );
+            if (!ok) return;
+          }
+          router.back();
+        }}
+        disabled={saving}
+      >
         <ChevronLeft />
         Back
       </Button>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Add tags to video #{videoId}</h1>
         <div className="flex gap-2">
-          <Button onClick={handleSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving || !dirty}>
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
