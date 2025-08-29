@@ -99,3 +99,36 @@ export async function getVideoTags(videoId: number): Promise<Tag[]> {
     },
   });
 }
+
+/** ✅ Link one tag immediately (commit-ngay) */
+export async function linkVideoTag(
+  videoId: number,
+  tagId: number,
+): Promise<Tag[]> {
+  const token = getAccessToken();
+  // BE: POST /videos/:id/tags body { tagId } → nên trả Tag[] linked hiện tại
+  return fetcher<Tag[]>(`/videos/${videoId}/tags`, {
+    method: "POST",
+    body: JSON.stringify({ tagId }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+/** ✅ Unlink one tag immediately (commit-ngay) */
+export async function unlinkVideoTag(
+  videoId: number,
+  tagId: number,
+): Promise<void> {
+  const token = getAccessToken();
+  // BE: DELETE /videos/:id/tags/:tagId → 204
+  return fetcher<void>(`/videos/${videoId}/tags/${tagId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}

@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Tag } from "@/types/tag";
-import { searchTags } from "@/utils/api/tag";
+import { searchTags } from "@/utils/api/tagApi";
 import { normalizeTagName } from "@/utils/youtube";
 
 /** Simple LRU cache (Map-based) */
