@@ -17,6 +17,7 @@ export interface CreateTutorialRequest {
   title: string;
   content: string;
   author_id?: number;
+  tagIds?: number[];
   tags?: string[];
 }
 

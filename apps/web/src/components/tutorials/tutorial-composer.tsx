@@ -5,7 +5,9 @@ import dynamic from "next/dynamic";
 import { createTutorial } from "@/utils/api/tutorialApi";
 import { useRouter } from "next/navigation";
 import { Toast } from "../ui/announce-success-toast";
-
+import TagPicker from "@/components/tags/tutorial/TagPicker";
+import type { Tag } from "@/types/tag";
+import { AnimatePresence, motion } from "framer-motion";
 // Dynamic import with no SSR to prevent Element undefined error
 const ToastEditor = dynamic(
   () => import("@/components/tutorials/tutorial-markdown"),
@@ -27,43 +29,18 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 const TITLE_MAX = 100;
-const TAG_SUGGESTIONS = [
-  "announcement",
-  "tips",
-  "qa",
-  "release",
-  "bug",
-  "feature",
-  "guide",
-  "howto",
-  "performance",
-  "security",
-  "design",
-];
 
 export default function TutorialComposer() {
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("text");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(""); // Markdown từ ToastEditor
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]); // ⬅️ đổi sang Tag[]
   const [submitting, setSubmitting] = useState(false);
-
-  // Tag picker
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [tagQuery, setTagQuery] = useState("");
-  const pickerRef = useRef<HTMLDivElement>(null);
-  const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
-
-  const filteredSuggestions = useMemo(() => {
-    const q = tagQuery.trim().toLowerCase();
-    const base = TAG_SUGGESTIONS.filter((t) => !tags.includes(t));
-    return q ? base.filter((t) => t.includes(q)) : base;
-  }, [tagQuery, tags]);
 
   const canPost = useMemo(
     () =>
@@ -73,25 +50,6 @@ export default function TutorialComposer() {
       Boolean(content.trim()),
     [tab, title, content],
   );
-
-  const addTag = (t: string) => {
-    const v = t.trim();
-    if (!v || tags.includes(v)) return;
-    setTags((prev) => [...prev, v]);
-    setTagQuery("");
-  };
-  const removeTag = (t: string) =>
-    setTags((prev) => prev.filter((x) => x !== t));
-
-  useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!pickerOpen) return;
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node))
-        setPickerOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [pickerOpen]);
 
   // Viết chức năng của nút bấm (handle button)
   const onSaveDraft = () => alert("Draft saved (mock)");
@@ -104,7 +62,7 @@ export default function TutorialComposer() {
         // POST /tutorials
         title: title.trim(),
         content: content.trim(),
-        tags,
+        tagIds: tags.map((t) => t.id),
       });
       console.log(created);
 
@@ -123,7 +81,6 @@ export default function TutorialComposer() {
       //**********************DEBUG HERE********************** */
       // let msg = 'Publish failed';
       // if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
-
       //   msg = (e as { message: string }).message;
       // } else if (e instanceof Error) {
       //   msg = e.message;
@@ -167,113 +124,51 @@ export default function TutorialComposer() {
             placeholder="Title"
             className="w-full h-8 rounded-xl border border-white/15 bg-black p-4 text-lg text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/15"
           />
+          {/* giữ comment: counter bên phải */}
           <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-white/50">
             {title.length}/{TITLE_MAX}
           </span>
         </div>
 
-        {/* Tags */}
-        <div className="mb-4">
-          <div className="relative inline-block" ref={pickerRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setPickerOpen((v) => !v);
-                setTimeout(() => tagInputRef.current?.focus(), 0);
-              }}
-              className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-            >
-              Add tags
-            </button>
 
-            {pickerOpen && (
-              <div className="absolute z-20 mt-2 w-80 rounded-2xl border border-white/10 bg-neutral-900 p-3 shadow-xl">
-                <div className="mb-2">
-                  <input
-                    ref={tagInputRef}
-                    value={tagQuery}
-                    onChange={(e) => setTagQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (tagQuery.trim()) addTag(tagQuery);
-                      }
-                      if (e.key === "Escape") setPickerOpen(false);
-                    }}
-                    placeholder="Search or add a tag…"
-                    className="w-full rounded-lg border border-white/10 bg-black p-2 text-sm text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/10"
-                  />
-                </div>
-
-                <div className="max-h-56 overflow-auto rounded-lg border border-white/5">
-                  {filteredSuggestions.length ? (
-                    <ul className="divide-y divide-white/5">
-                      {filteredSuggestions.map((t) => (
-                        <li key={t}>
-                          <button
-                            type="button"
-                            onClick={() => addTag(t)}
-                            className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5"
-                          >
-                            <span>#{t}</span>
-                            <span className="text-xs text-white/60">Add</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="p-3 text-sm text-white/60">
-                      No suggestions. Press{" "}
-                      <kbd className="rounded bg-white/10 px-1">Enter</kbd> to
-                      add “{tagQuery.trim()}”.
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-2 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPickerOpen(false)}
-                    className="rounded-xl border border-white/10 px-3 py-1.5 text-sm text-white/80 hover:bg-white/5"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (tagQuery.trim()) addTag(tagQuery);
-                      setPickerOpen(false);
-                    }}
-                    className="rounded-xl bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-                  >
-                    Add tag
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!!tags.length && (
-            <div className="mt-3 flex flex-wrap gap-2">
+        {/* chips ở ngoài popover */}
+        {tags.length > 0 && (
+          <AnimatePresence initial={false}>
+            <div className="flex flex-wrap gap-2 m-3">
               {tags.map((t) => (
-                <span
-                  key={t}
+                <motion.span
+                  key={t.id}
+                  layout
+                  initial={{ scale: 0.6, opacity: 0, y: -6 }}   // 👉 pop-in
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.6, opacity: 0, y: -6 }}      // 👉 pop-out khi remove
+                  transition={{ type: "spring", stiffness: 380, damping: 22 }}
                   className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
                 >
-                  #{t}
+                  #{t.name}
                   <button
                     type="button"
-                    onClick={() => removeTag(t)}
+                    onClick={() =>
+                      setTags((prev) => prev.filter((x) => x.id !== t.id))
+                    }
                     className="text-white/70 hover:text-white"
-                    aria-label={`remove ${t}`}
+                    aria-label={`remove ${t.name}`}
                   >
                     ×
                   </button>
-                </span>
+                </motion.span>
               ))}
             </div>
-          )}
+          </AnimatePresence>
+        )}
+
+
+        {/* Tags (dùng TagPicker) */}
+        <div className="mb-4">
+          <TagPicker value={tags} onChange={setTags} closeOnPick={false} />
         </div>
+
+
 
         {/* TOAST UI Editor (Markdown core) */}
         {tab === "text" ? (
