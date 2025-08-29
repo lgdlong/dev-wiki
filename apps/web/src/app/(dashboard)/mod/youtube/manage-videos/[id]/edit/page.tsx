@@ -82,7 +82,7 @@ export default function EditVideoPage() {
   // helper: so sánh 2 mảng id đã sort (để check dirty)
   const idsOf = (tags: Tag[]) => tags.map((t) => t.id).sort((a, b) => a - b);
   const isSameIds = (a: number[] | null, b: number[]) => {
-    if (!a) return false;
+    if (!a) return true; // no snapshot yet → treat as equal to avoid false dirty
     if (a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
     return true;
