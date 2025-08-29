@@ -98,7 +98,6 @@ export async function getVideoTags(videoId: number): Promise<Tag[]> {
       Authorization: `Bearer ${token}`,
     },
   });
-
 }
 
 /** ✅ Link one tag immediately (commit-ngay) */
@@ -133,4 +132,3 @@ export async function unlinkVideoTag(
     },
   });
 }
-
