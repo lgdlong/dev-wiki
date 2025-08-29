@@ -88,8 +88,10 @@ export default function EditVideoPage() {
     return true;
   };
 
-  // NEW: dirty state tính từ snapshot
+  // NEW: dirty state tính từ snapshot (don't flag before snapshot ready)
   const dirty = useMemo(() => {
+    // Guard: Not dirty until the initial state is loaded.
+    if (initialLinkedIdsRef.current === null) return false;
     const current = idsOf(linkedTags);
     return !isSameIds(initialLinkedIdsRef.current, current);
   }, [linkedTags]);
