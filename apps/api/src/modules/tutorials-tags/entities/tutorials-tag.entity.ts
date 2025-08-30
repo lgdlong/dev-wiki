@@ -18,7 +18,7 @@ export class TutorialTag {
   @Column({ name: 'tutorial_id', nullable: false })
   tutorialId: number;
 
-  @ManyToOne(() => Tutorial)
+  @ManyToOne(() => Tutorial, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tutorial_id' })
   tutorial: Tutorial;
 

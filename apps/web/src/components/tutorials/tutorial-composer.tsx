@@ -66,16 +66,14 @@ export default function TutorialComposer() {
       console.log(created);
 
       // 2) Upsert tags nếu có
-    const tagIds = Array.from(new Set(tags.map(t => t.id))); // unique
-    console.log(tagIds)
-    
-    if (tagIds.length > 0 || tags.length === 0) {
-      // nếu cho phép clear tag khi rỗng, cứ gọi luôn (BE replace-all)
-      await upsertTutorialTags(created.id, tagIds);
-    }
-   
+      const tagIds = Array.from(new Set(tags.map((t) => t.id))); // unique
+      console.log(tagIds);
 
-      
+      if (tagIds.length > 0 || tags.length === 0) {
+        // nếu cho phép clear tag khi rỗng, cứ gọi luôn (BE replace-all)
+        await upsertTutorialTags(created.id, tagIds);
+      }
+
       // UX tuỳ bạn: reset hoặc điều hướng
       setTitle("");
       setContent("");
@@ -140,7 +138,6 @@ export default function TutorialComposer() {
           </span>
         </div>
 
-
         {/* chips ở ngoài popover */}
         {tags.length > 0 && (
           <AnimatePresence initial={false}>
@@ -149,9 +146,9 @@ export default function TutorialComposer() {
                 <motion.span
                   key={t.id}
                   layout
-                  initial={{ scale: 0.6, opacity: 0, y: -6 }}   // 👉 pop-in
+                  initial={{ scale: 0.6, opacity: 0, y: -6 }} // 👉 pop-in
                   animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.6, opacity: 0, y: -6 }}      // 👉 pop-out khi remove
+                  exit={{ scale: 0.6, opacity: 0, y: -6 }} // 👉 pop-out khi remove
                   transition={{ type: "spring", stiffness: 380, damping: 22 }}
                   className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
                 >
@@ -172,13 +169,10 @@ export default function TutorialComposer() {
           </AnimatePresence>
         )}
 
-
         {/* Tags (dùng TagPicker) */}
         <div className="mb-4">
           <TagPicker value={tags} onChange={setTags} closeOnPick={false} />
         </div>
-
-
 
         {/* TOAST UI Editor (Markdown core) */}
         {tab === "text" ? (

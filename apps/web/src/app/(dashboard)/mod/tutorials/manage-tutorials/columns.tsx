@@ -69,13 +69,6 @@ export function makeTutorialColumns({
       },
     },
     {
-      accessorKey: "tags",
-      header: "Tags",
-      cell: ({ row }) => renderTags((row.original as any).tags),
-      size: 220,
-      enableSorting: false,
-    },
-    {
       accessorKey: "views",
       header: "Views",
       cell: ({ row }) => {

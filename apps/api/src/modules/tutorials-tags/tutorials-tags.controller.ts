@@ -31,7 +31,7 @@ export class TutorialTagsController {
     return this.tutorialTagsService.unlinkTutorialFromTag(tutorialId, tagId);
   }
 
-  @Get('tutorial/:tutorialId/tags')
+  @Get('/:tutorialId/tags')
   getTutorialTags(@Param('tutorialId', ParseIntPipe) tutorialId: number) {
     return this.tutorialTagsService.getTutorialTags(tutorialId);
   }
@@ -70,7 +70,4 @@ export class TutorialTagsController {
   async getTags(@Param('id', ParseIntPipe) id: number) {
     return this.tutorialTagsService.getTutorialTags(id);
   }
-
-
-  
 }

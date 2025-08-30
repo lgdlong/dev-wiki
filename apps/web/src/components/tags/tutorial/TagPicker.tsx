@@ -11,18 +11,22 @@ import { ChevronDown } from "lucide-react";
 import { TagSearchBox } from "./TagSearchBox";
 import { TagSuggestionList } from "./TagSuggestList";
 import { TagCreateButton } from "./TagCreate";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 export default function TagPicker({
   value,
   onChange,
-  closeOnPick = false,      
+  closeOnPick = false,
   width = 340,
   listMaxHeight = 240,
 }: {
   value: Tag[];
   onChange: (tags: Tag[]) => void;
-  closeOnPick?: boolean;       
+  closeOnPick?: boolean;
   width?: number;
   listMaxHeight?: number;
 }) {
@@ -47,7 +51,9 @@ export default function TagPicker({
   const selectedIds = useMemo(() => new Set(value.map((t) => t.id)), [value]);
   const filtered = useMemo(() => {
     const k = q.trim().toLowerCase();
-    return k ? allTags.filter((t) => t.name.toLowerCase().includes(k)) : allTags;
+    return k
+      ? allTags.filter((t) => t.name.toLowerCase().includes(k))
+      : allTags;
   }, [q, allTags]);
 
   const canCreate =
@@ -59,7 +65,7 @@ export default function TagPicker({
       onChange(value.filter((x) => x.id !== tag.id));
     } else {
       onChange([...value, tag]);
-      if (closeOnPick) setOpen(false);  
+      if (closeOnPick) setOpen(false);
     }
   }
 
@@ -71,7 +77,7 @@ export default function TagPicker({
       setAllTags((prev) => [newTag, ...prev]);
       onChange([...value, newTag]);
       setQ("");
-      if (closeOnPick) setOpen(false); 
+      if (closeOnPick) setOpen(false);
     } finally {
       setCreating(false);
     }
@@ -80,11 +86,17 @@ export default function TagPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="secondary" className="rounded-full px-3 py-1.5 text-sm">
+        <Button
+          type="button"
+          variant="secondary"
+          className="rounded-full px-3 py-1.5 text-sm"
+        >
           Add tags
           <ChevronDown className="ml-1 h-4 w-4 opacity-80" />
           {value.length > 0 && (
-            <span className="ml-2 rounded-full bg-black/60 px-2 py-0.5 text-xs">{value.length}</span>
+            <span className="ml-2 rounded-full bg-black/60 px-2 py-0.5 text-xs">
+              {value.length}
+            </span>
           )}
         </Button>
       </PopoverTrigger>
@@ -109,14 +121,21 @@ export default function TagPicker({
         {/* Suggestions */}
         <div className="px-2">
           <Card className="border-white/10 bg-neutral-900">
-            <div className="w-full overflow-auto" style={{ maxHeight: listMaxHeight }}>
+            <div
+              className="w-full overflow-auto"
+              style={{ maxHeight: listMaxHeight }}
+            >
               {loading ? (
                 <div className="space-y-2 p-3">
                   <div className="h-6 w-32 animate-pulse rounded bg-white/10" />
                   <div className="h-6 w-40 animate-pulse rounded bg-white/10" />
                 </div>
               ) : (
-                <TagSuggestionList tags={filtered} selectedIds={selectedIds} onToggle={toggle} />
+                <TagSuggestionList
+                  tags={filtered}
+                  selectedIds={selectedIds}
+                  onToggle={toggle}
+                />
               )}
             </div>
           </Card>

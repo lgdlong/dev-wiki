@@ -15,7 +15,8 @@ export function TagSuggestionList({
   if (!tags.length) {
     return (
       <div className="p-3 text-sm text-white/60">
-        No results. Press <kbd className="rounded bg-white/10 px-1">Enter</kbd> to create.
+        No results. Press <kbd className="rounded bg-white/10 px-1">Enter</kbd>{" "}
+        to create.
       </div>
     );
   }

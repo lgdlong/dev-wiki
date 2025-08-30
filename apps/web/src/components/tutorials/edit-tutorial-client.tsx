@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Toast } from "@/components/ui/announce-success-toast";
-import { getTutorialById, updateTutorial } from "@/utils/api/tutorialApi";
+import {
+  getTutorialById,
+  getTutorialTags,
+  updateTutorial,
+  upsertTutorialTags,
+} from "@/utils/api/tutorialApi";
 import TagPicker from "@/components/tags/tutorial/TagPicker";
 import type { Tag } from "@/types/tag";
 
@@ -32,7 +37,7 @@ const TABS: { key: TabKey; label: string }[] = [
 export default function EditTutorialClient({ id }: { id: number }) {
   // ===== UI State =====
   const [tab, setTab] = useState<TabKey>("text");
-  const [loading, setLoading] = useState(true); // skeleton-first; will be turned off on mount
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
@@ -40,7 +45,10 @@ export default function EditTutorialClient({ id }: { id: number }) {
   // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState<Tag[]>([]); // ⬅️ đổi sang Tag[]
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [initialTitle, setInitialTitle] = useState("");
+  const [initialContent, setInitialContent] = useState("");
+  const [initialTags, setInitialTags] = useState<Tag[]>([]);
 
   // ===== Load tutorial =====
   useEffect(() => {
@@ -48,20 +56,23 @@ export default function EditTutorialClient({ id }: { id: number }) {
     setLoading(true);
     (async () => {
       try {
-        const t = await getTutorialById(id);
+        const [t, tagList] = await Promise.all([
+          getTutorialById(id),
+          getTutorialTags(id), // ⬅️ lấy tags từ BE
+        ]);
         if (!alive) return;
+
+        const safeTags = Array.isArray(tagList) ? tagList : [];
+
         setTitle(t?.title ?? "");
         setContent(t?.content ?? "");
-        // nếu BE trả tags dạng { id, name }[] thì set thẳng:
-        if (Array.isArray((t as any)?.tags) && (t as any).tags.length) {
-          const arr = (t as any).tags.map((x: any) =>
-            typeof x === "string" ? ({ id: -Math.random(), name: x } as Tag) : (x as Tag),
-          );
-          setTags(arr);
-        } else {
-          setTags([]); // không có tags ở BE
-        }
-      } catch (e) {
+        setTags(Array.isArray(tagList) ? tagList : []); // tagList: Tag[]
+
+        // set initial values
+        setInitialTitle(t?.title ?? "");
+        setInitialContent(t?.content ?? "");
+        setInitialTags(safeTags);
+      } catch {
         setToastMsg("Failed to load tutorial");
         setToastOpen(true);
       } finally {
@@ -84,9 +95,12 @@ export default function EditTutorialClient({ id }: { id: number }) {
       await updateTutorial(id, {
         title: title.trim(),
         content: content.trim(),
-        // nếu BE legacy cần thêm tên tag:
-        // tags: tags.map(t => t.name),
       });
+
+      const tagIds = Array.from(new Set(tags.map((t) => t.id))); // unique
+      // Gọi upsert để replace toàn bộ liên kết tags của tutorial
+      await upsertTutorialTags(id, tagIds);
+
       setToastMsg("Update success");
       setToastOpen(true);
 
@@ -100,6 +114,34 @@ export default function EditTutorialClient({ id }: { id: number }) {
     }
   };
 
+  // =================dirty status========================
+  const dirty = useMemo(() => {
+    if (title.trim() !== initialTitle.trim()) return true;
+    if (content.trim() !== initialContent.trim()) return true;
+    // so sánh tags theo id
+    const currentIds = tags.map((t) => t.id).sort();
+    const initialIds = initialTags.map((t) => t.id).sort();
+    if (currentIds.length !== initialIds.length) return true;
+    for (let i = 0; i < currentIds.length; i++) {
+      if (currentIds[i] !== initialIds[i]) return true;
+    }
+    return false;
+  }, [title, content, tags, initialTitle, initialContent, initialTags]);
+
+  //================want leave page?===========================
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (dirty) {
+        e.preventDefault();
+        e.returnValue = ""; // Chrome cần dòng này để hiện popup
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [dirty]);
+
   return (
     <div className="space-y-4">
       {/* Tabs (đen/trắng) */}
@@ -109,10 +151,11 @@ export default function EditTutorialClient({ id }: { id: number }) {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${tab === t.key
+              className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${
+                tab === t.key
                   ? "border-white text-white"
                   : "border-transparent text-white/60 hover:text-white"
-                }`}
+              }`}
             >
               {t.label}
             </button>
@@ -143,7 +186,6 @@ export default function EditTutorialClient({ id }: { id: number }) {
 
         {/* Tags (dùng TagPicker + chips hiển thị bên ngoài) */}
         <div className="mb-4 space-y-3">
-
           {/* chips hiển thị bên ngoài, có khoảng cách */}
           {!!tags.length && (
             <div className="flex flex-wrap gap-2">
@@ -178,7 +220,11 @@ export default function EditTutorialClient({ id }: { id: number }) {
             <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] w-full rounded-2xl bg-white/5 animate-pulse" />
           ) : (
             <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
-              <ToastEditor value={content} onChange={setContent} height="100%" />
+              <ToastEditor
+                value={content}
+                onChange={setContent}
+                height="100%"
+              />
             </div>
           )
         ) : (
@@ -191,11 +237,11 @@ export default function EditTutorialClient({ id }: { id: number }) {
       {/* Footer */}
       <div className="flex items-center justify-end gap-3">
         <button
-          disabled={!canUpdate || saving}
+          disabled={!canUpdate || saving || !dirty}
           onClick={onUpdate}
           className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {saving ? "Updating…" : "Update"}
+          {saving ? "Updating…" : dirty ? "Update" : "No changes"}
         </button>
       </div>
 

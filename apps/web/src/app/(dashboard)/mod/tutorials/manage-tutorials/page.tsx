@@ -63,11 +63,7 @@ export default function ManageTutorialPage() {
     if (!q) return tutorials;
     const k = q.toLowerCase();
     return tutorials.filter((t) => {
-      const haystack = [
-        t.title,
-        t.content,
-        String(t.authorId),
-      ]
+      const haystack = [t.title, t.content, String(t.authorId)]
         .filter(Boolean)
         .map((x) => String(x).toLowerCase());
       return haystack.some((s) => s.includes(k));
