@@ -57,7 +57,8 @@ export default function TagPicker({
   }, [q, allTags]);
 
   const canCreate =
-    q.trim().length > 0 &&
+    q.trim().length >= 2 &&
+    /^[a-zA-Z0-9\s-_]+$/.test(q.trim()) &&
     !allTags.some((t) => t.name.toLowerCase() === q.trim().toLowerCase());
 
   function toggle(tag: Tag) {
