@@ -84,7 +84,6 @@ export default function EditTutorialClient({ id }: { id: number }) {
       await updateTutorial(id, {
         title: title.trim(),
         content: content.trim(),
-        tagIds: tags.map((t) => t.id), // ⬅️ gửi id
         // nếu BE legacy cần thêm tên tag:
         // tags: tags.map(t => t.name),
       });

@@ -6,9 +6,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { TutorialTagsService } from './tutorials-tags.service';
 import { CreateTutorialTagDto } from './dto/create-tutorials-tag.dto';
+import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
+import { UpsertTagsDto } from './dto/upsert-tags.dto';
 
 @Controller('tutorial-tags')
 export class TutorialTagsController {
@@ -51,4 +55,22 @@ export class TutorialTagsController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tutorialTagsService.remove(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/tags')
+  async upsertTags(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpsertTagsDto, // { tagIds: number[] }
+  ) {
+    // Trả về danh sách tag sau khi cập nhật cho tiện FE
+    return this.tutorialTagsService.upsertTags(id, dto.tagIds);
+  }
+
+  @Get(':id/tags')
+  async getTags(@Param('id', ParseIntPipe) id: number) {
+    return this.tutorialTagsService.getTutorialTags(id);
+  }
+
+
+  
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { createTutorial } from "@/utils/api/tutorialApi";
+import { createTutorial, upsertTutorialTags } from "@/utils/api/tutorialApi";
 import { useRouter } from "next/navigation";
 import { Toast } from "../ui/announce-success-toast";
 import TagPicker from "@/components/tags/tutorial/TagPicker";
@@ -62,10 +62,20 @@ export default function TutorialComposer() {
         // POST /tutorials
         title: title.trim(),
         content: content.trim(),
-        tagIds: tags.map((t) => t.id),
       });
       console.log(created);
 
+      // 2) Upsert tags nếu có
+    const tagIds = Array.from(new Set(tags.map(t => t.id))); // unique
+    console.log(tagIds)
+    
+    if (tagIds.length > 0 || tags.length === 0) {
+      // nếu cho phép clear tag khi rỗng, cứ gọi luôn (BE replace-all)
+      await upsertTutorialTags(created.id, tagIds);
+    }
+   
+
+      
       // UX tuỳ bạn: reset hoặc điều hướng
       setTitle("");
       setContent("");

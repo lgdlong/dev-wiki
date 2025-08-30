@@ -67,7 +67,6 @@ export default function ManageTutorialPage() {
         t.title,
         t.content,
         String(t.authorId),
-        ...(t.tags ?? []),
       ]
         .filter(Boolean)
         .map((x) => String(x).toLowerCase());
