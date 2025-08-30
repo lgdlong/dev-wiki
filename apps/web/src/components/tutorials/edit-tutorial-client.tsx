@@ -1,10 +1,11 @@
-// apps/web/src/components/tutorials/edit-tutorial-client.tsx
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Toast } from "@/components/ui/announce-success-toast";
 import { getTutorialById, updateTutorial } from "@/utils/api/tutorialApi";
+import TagPicker from "@/components/tags/tutorial/TagPicker";
+import type { Tag } from "@/types/tag";
 
 const ToastEditor = dynamic(
   () => import("@/components/tutorials/tutorial-markdown"),
@@ -28,20 +29,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "ama", label: "AMA" },
 ];
 
-const TAG_SUGGESTIONS = [
-  "announcement",
-  "tips",
-  "qa",
-  "release",
-  "bug",
-  "feature",
-  "guide",
-  "howto",
-  "performance",
-  "security",
-  "design",
-];
-
 export default function EditTutorialClient({ id }: { id: number }) {
   // ===== UI State =====
   const [tab, setTab] = useState<TabKey>("text");
@@ -53,15 +40,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
   // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]); // ⬅️ đổi sang Tag[]
 
-  // Tag picker state/refs
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [tagQuery, setTagQuery] = useState("");
-  const pickerRef = useRef<HTMLDivElement | null>(null);
-  const tagInputRef = useRef<HTMLInputElement | null>(null);
-
-  // ===== Skeleton only: no API calls (just flip loading off on mount) =====
+  // ===== Load tutorial =====
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -69,10 +50,17 @@ export default function EditTutorialClient({ id }: { id: number }) {
       try {
         const t = await getTutorialById(id);
         if (!alive) return;
-        setTitle(t.title ?? "");
-        setContent(t.content ?? "");
-        // nếu có tags ở BE:
-        // setTags(t.tags ?? []);
+        setTitle(t?.title ?? "");
+        setContent(t?.content ?? "");
+        // nếu BE trả tags dạng { id, name }[] thì set thẳng:
+        if (Array.isArray((t as any)?.tags) && (t as any).tags.length) {
+          const arr = (t as any).tags.map((x: any) =>
+            typeof x === "string" ? ({ id: -Math.random(), name: x } as Tag) : (x as Tag),
+          );
+          setTags(arr);
+        } else {
+          setTags([]); // không có tags ở BE
+        }
       } catch (e) {
         setToastMsg("Failed to load tutorial");
         setToastOpen(true);
@@ -85,42 +73,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
     };
   }, [id]);
 
-  // ===== Helpers for Tags =====
-  const filteredSuggestions = useMemo(() => {
-    const q = tagQuery.trim().toLowerCase();
-    if (!q) return TAG_SUGGESTIONS.filter((t) => !tags.includes(t));
-    return TAG_SUGGESTIONS.filter((t) => t.includes(q) && !tags.includes(t));
-  }, [tagQuery, tags]);
-
-  function addTag(t: string) {
-    const v = t.trim().toLowerCase();
-    if (!v) return;
-    if (!tags.includes(v)) setTags((s) => [...s, v]);
-    setTagQuery("");
-  }
-  function removeTag(t: string) {
-    setTags((s) => s.filter((x) => x !== t));
-  }
-
-  // Click outside to close picker
-  useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!pickerRef.current) return;
-      const target = e.target as Node;
-      if (!pickerRef.current.contains(target)) setPickerOpen(false);
-    }
-    if (pickerOpen) document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [pickerOpen]);
-
-  // ===== Actions (skeleton only, no API) =====
+  // ===== Actions (giống Create) =====
   const canUpdate =
     title.trim().length > 0 && content.trim().length > 0 && !saving;
-
-  const onSaveDraft = () => {
-    setToastMsg("Saved draft (skeleton).");
-    setToastOpen(true);
-  };
 
   const onUpdate = async () => {
     if (!canUpdate) return;
@@ -129,7 +84,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
       await updateTutorial(id, {
         title: title.trim(),
         content: content.trim(),
-        // nếu có tags: tags
+        tagIds: tags.map((t) => t.id), // ⬅️ gửi id
+        // nếu BE legacy cần thêm tên tag:
+        // tags: tags.map(t => t.name),
       });
       setToastMsg("Update success");
       setToastOpen(true);
@@ -153,11 +110,10 @@ export default function EditTutorialClient({ id }: { id: number }) {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${
-                tab === t.key
+              className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${tab === t.key
                   ? "border-white text-white"
                   : "border-transparent text-white/60 hover:text-white"
-              }`}
+                }`}
             >
               {t.label}
             </button>
@@ -186,100 +142,25 @@ export default function EditTutorialClient({ id }: { id: number }) {
           )}
         </div>
 
-        {/* Tags */}
-        <div className="mb-4">
-          <div className="relative inline-block" ref={pickerRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setPickerOpen((v) => !v);
-                setTimeout(() => tagInputRef.current?.focus(), 0);
-              }}
-              className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-            >
-              Add tags
-            </button>
+        {/* Tags (dùng TagPicker + chips hiển thị bên ngoài) */}
+        <div className="mb-4 space-y-3">
 
-            {pickerOpen && (
-              <div className="absolute z-20 mt-2 w-80 rounded-2xl border border-white/10 bg-neutral-900 p-3 shadow-xl">
-                <div className="mb-2">
-                  <input
-                    ref={tagInputRef}
-                    value={tagQuery}
-                    onChange={(e) => setTagQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (tagQuery.trim()) addTag(tagQuery);
-                      }
-                      if (e.key === "Escape") setPickerOpen(false);
-                    }}
-                    placeholder="Search or add a tag…"
-                    className="w-full rounded-lg border border-white/10 bg-black p-2 text-sm text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/10"
-                  />
-                </div>
-
-                <div className="max-h-56 overflow-auto rounded-lg border border-white/5">
-                  {filteredSuggestions.length ? (
-                    <ul className="divide-y divide-white/5">
-                      {filteredSuggestions.map((t) => (
-                        <li key={t}>
-                          <button
-                            type="button"
-                            onClick={() => addTag(t)}
-                            className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5"
-                          >
-                            <span>#{t}</span>
-                            <span className="text-xs text-white/60">Add</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="p-3 text-sm text-white/60">
-                      No suggestions. Press{" "}
-                      <kbd className="rounded bg-white/10 px-1">Enter</kbd> to
-                      add “{tagQuery.trim()}”.
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-2 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPickerOpen(false)}
-                    className="rounded-xl border border-white/10 px-3 py-1.5 text-sm text-white/80 hover:bg-white/5"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (tagQuery.trim()) addTag(tagQuery);
-                      setPickerOpen(false);
-                    }}
-                    className="rounded-xl bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-                  >
-                    Add tag
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
+          {/* chips hiển thị bên ngoài, có khoảng cách */}
           {!!tags.length && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {tags.map((t) => (
                 <span
-                  key={t}
+                  key={t.id}
                   className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
                 >
-                  #{t}
+                  #{t.name}
                   <button
                     type="button"
-                    onClick={() => removeTag(t)}
+                    onClick={() =>
+                      setTags((prev) => prev.filter((x) => x.id !== t.id))
+                    }
                     className="text-white/70 hover:text-white"
-                    aria-label={`remove ${t}`}
+                    aria-label={`remove ${t.name}`}
                   >
                     ×
                   </button>
@@ -287,6 +168,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
               ))}
             </div>
           )}
+
+          {/* popover chọn tag; closeOnPick=false để chọn liên tục */}
+          <TagPicker value={tags} onChange={setTags} closeOnPick={false} />
         </div>
 
         {/* Editor */}
@@ -295,11 +179,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
             <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] w-full rounded-2xl bg-white/5 animate-pulse" />
           ) : (
             <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
-              <ToastEditor
-                value={content}
-                onChange={setContent}
-                height="100%"
-              />
+              <ToastEditor value={content} onChange={setContent} height="100%" />
             </div>
           )
         ) : (

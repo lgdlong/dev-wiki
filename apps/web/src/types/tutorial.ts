@@ -27,5 +27,5 @@ export interface UpdateTutorialRequest {
   content?: string;
   author_id?: number;
   views?: number;
-  tags?: string[];
+  tagIds?: Number[];
 }
