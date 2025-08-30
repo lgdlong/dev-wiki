@@ -132,8 +132,10 @@ export default function EditTutorialClient({ id }: { id: number }) {
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (dirty) {
+        const message = "You have unsaved changes. Are you sure you want to leave?";
         e.preventDefault();
-        e.returnValue = ""; // Chrome cần dòng này để hiện popup
+        e.returnValue = message;
+        return message;
       }
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
