@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 10, // setup số lượng hàng trên mỗi trang của pagination
+        pageSize: 7, // setup số lượng hàng trên mỗi trang của pagination
       },
     },
   });
