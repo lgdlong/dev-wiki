@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllCategories } from "@/utils/api/categories";
 import CategoryList from "@/components/categories/CategoryList";
 
-export default function CategoriePage() {
+export default function CategoriesPage() {
   const {
     data: categories = [],
     isLoading,
