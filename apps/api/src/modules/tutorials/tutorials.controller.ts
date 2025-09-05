@@ -14,7 +14,6 @@ import { TutorialService } from './tutorials.service';
 import { CreateTutorialDto } from './dto/create-tutorials.dto';
 import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
-import { GetUser } from 'src/core/decorators/get-user.decorator';
 import { GetUserId } from 'src/core/decorators/get-user-id.decorator';
 
 @Controller('tutorials')
