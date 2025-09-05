@@ -1,11 +1,5 @@
-import { Expose } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  Length,
-  MinLength,
-} from 'class-validator';
+// apps/api/src/modules/tutorials/dto/create-tutorials.dto.ts
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateTutorialDto {
   @IsString()
@@ -18,5 +12,4 @@ export class CreateTutorialDto {
   content: string;
 
   // nếu dùng JWT để lấy author_id từ token thì field này không cần trong body
-  // ahthour_id đã bị xóa
 }
