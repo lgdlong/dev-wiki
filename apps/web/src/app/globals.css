@@ -1,5 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* pick ONE theme */
+@import "prism-themes/themes/prism-vsc-dark-plus.css";
+/* or: @import "prism-themes/themes/prism-one-light.css"; */
 
 @custom-variant dark (&:is(.dark *));
 
