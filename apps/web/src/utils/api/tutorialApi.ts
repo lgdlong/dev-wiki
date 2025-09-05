@@ -23,11 +23,7 @@ export async function createTutorial(
   const body = {
     title: data.title,
     content: data.content,
-    // only include author_id if present; avoid NaN
-    ...(data.author_id !== undefined && data.author_id !== null
-      ? { author_id: Number(data.author_id) }
-      : {}),
-    tags: data.tags,
+    //lý do có JWT hỗ trợ nên không gửi về
   };
 
   return fetcher<Tutorial>("/tutorials", {
@@ -109,7 +105,7 @@ export async function upsertTutorialTags(
   tagIds: number[],
 ): Promise<{ success: boolean }> {
   const token = getAccessToken();
-  return fetcher<{ success: boolean }>(`/tutorials/${tutorialId}/tags`, {
+  return fetcher<{ success: boolean }>(`/tutorial-tags/${tutorialId}/tags`, {
     method: "PATCH",
     body: JSON.stringify({ tagIds }),
     headers: {
@@ -125,7 +121,7 @@ export async function upsertTutorialTags(
  */
 export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
   const token = getAccessToken();
-  return fetcher<Tag[]>(`/tutorials/${tutorialId}/tags`, {
+  return fetcher<Tag[]>(`/tutorial-tags/${tutorialId}/tags`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

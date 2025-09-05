@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import type { Tutorial } from "@/types/tutorial";
+import Link from "next/link";
 
 // --- Helpers ---
 function formatDate(input?: string | number | Date) {
@@ -19,27 +20,6 @@ function formatDate(input?: string | number | Date) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-function renderTags(tags?: string[]) {
-  if (!tags || tags.length === 0)
-    return <span className="text-sm text-muted-foreground">—</span>;
-  const shown = tags.slice(0, 3);
-  const rest = tags.length - shown.length;
-  return (
-    <div className="flex flex-wrap gap-1 max-w-[280px]">
-      {shown.map((t) => (
-        <Badge key={t} variant="secondary" className="px-2 py-0.5">
-          {t}
-        </Badge>
-      ))}
-      {rest > 0 && (
-        <Badge variant="outline" className="px-2 py-0.5">
-          +{rest}
-        </Badge>
-      )}
-    </div>
-  );
 }
 
 export function makeTutorialColumns({
@@ -59,7 +39,14 @@ export function makeTutorialColumns({
         const t = row.original;
         return (
           <div className="max-w-[520px] truncate">
-            <div className="font-medium">{t.title || "(Untitled)"}</div>
+            <div className="font-medium">
+            <Link 
+              href={`/mod/tutorials/${t.id}/edit`} 
+              className="hover:underline text-white-500"
+            >
+              {t.title || "(Untitled)"}
+            </Link>
+            </div>
             {/* subtitle: author / id */}
             <div className="text-xs text-muted-foreground">
               {t.authorName ? `by ${t.authorName}` : "Name: Unknown"}
@@ -67,13 +54,6 @@ export function makeTutorialColumns({
           </div>
         );
       },
-    },
-    {
-      accessorKey: "tags",
-      header: "Tags",
-      cell: ({ row }) => renderTags((row.original as any).tags),
-      size: 220,
-      enableSorting: false,
     },
     {
       accessorKey: "views",
