@@ -11,11 +11,12 @@ import { Tutorial } from "@/types/tutorial";
 export default async function TutorialPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
 
   const tutorial: Tutorial | null = await getTutorialBySlug(slug);
+
   if (!tutorial) notFound();
 
   // sanitize schema: giữ className/id cho highlight + anchor
