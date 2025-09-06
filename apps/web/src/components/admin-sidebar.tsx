@@ -124,7 +124,7 @@ const data = {
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+      className="top-[var(--header-height)] !h-[calc(100svh-var(--header-height))]"
       {...props}
     >
       <SidebarHeader>
