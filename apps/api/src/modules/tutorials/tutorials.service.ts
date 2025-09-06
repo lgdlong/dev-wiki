@@ -12,6 +12,9 @@ import { CreateTutorialDto } from './dto/create-tutorials.dto';
 import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 import { TutorialDetailDto, TutorialListItemDto } from './dto/tutorials.dto';
 import { generateSlug } from '../../shared/helpers/slug';
+import { TutorialTag } from '../tutorials-tags/entities/tutorials-tag.entity';
+import { Tag } from '../tags/entities/tag.entity';
+import { In } from 'typeorm';
 
 @Injectable()
 export class TutorialService {
@@ -108,6 +111,14 @@ export class TutorialService {
       relations: ['author'],
     });
     if (!row) throw new NotFoundException(`Post #${slug} not found`);
+
+    // Fetch tags for this tutorial
+    const tutorialTags = await this.repo.manager.find(TutorialTag, {
+      where: { tutorialId: row.id },
+      relations: ['tag'],
+    });
+    const tags: Tag[] = tutorialTags.map((tt) => tt.tag);
+
     return {
       id: row.id,
       title: row.title,
@@ -118,6 +129,7 @@ export class TutorialService {
       slug: row.slug,
       views: row.views,
       isPublished: row.isPublished,
+      tags,
     };
   }
 

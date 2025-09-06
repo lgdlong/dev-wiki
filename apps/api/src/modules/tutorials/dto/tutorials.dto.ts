@@ -6,6 +6,8 @@
 
 // TutorialListItemDto: Dùng để hiển thị danh sách bài viết
 // TutorialDetailDto: Dùng để hiển thị chi tiết một bài viết cụ thể
+import { Tag } from '../../tags/entities/tag.entity';
+
 export class TutorialListItemDto {
   id!: number;
   title!: string;
@@ -19,6 +21,7 @@ export class TutorialDetailDto extends TutorialListItemDto {
   slug: string;
   views: number;
   isPublished: boolean;
+  tags: Tag[]; // <-- Add tags field
 }
 
 // khi quản lý không cần hiển thị content nếu không tốn bộ nhớ
