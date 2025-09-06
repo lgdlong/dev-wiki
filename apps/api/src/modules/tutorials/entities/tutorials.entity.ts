@@ -22,6 +22,7 @@ export class Tutorial {
   @Column({ type: 'text', nullable: false }) //markdown từ Toast UI
   content: string;
 
+  @Index()
   @Column({ name: 'author_id', nullable: false })
   authorId: number;
 
@@ -33,7 +34,7 @@ export class Tutorial {
   views: number;
 
   @Index({ unique: true })
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   slug: string;
 
   @Column({ name: 'is_published', type: 'boolean', default: true })
