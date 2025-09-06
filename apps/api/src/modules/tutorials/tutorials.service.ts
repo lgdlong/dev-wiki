@@ -152,7 +152,7 @@ export class TutorialService {
     const row = await this.repo.findOne({ where: { id } });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
 
-    this.assertOwnership(row, userId);
+    //this.assertOwnership(row, userId); (block update tutorial by other user)
 
     // Không cho sửa authorId qua body
     const {

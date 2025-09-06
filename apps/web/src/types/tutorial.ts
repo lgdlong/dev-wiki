@@ -1,3 +1,4 @@
+// apps/web/src/types/tutorial.ts
 export interface Tutorial {
   id: number;
   title: string;

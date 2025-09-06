@@ -1,10 +1,16 @@
-// apps/web/src/components/tutorials/edit-tutorial-client.tsx
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Toast } from "@/components/ui/announce-success-toast";
-import { getTutorialById, updateTutorial } from "@/utils/api/tutorialApi";
+import {
+  getTutorialById,
+  getTutorialTags,
+  updateTutorial,
+  upsertTutorialTags,
+} from "@/utils/api/tutorialApi";
+import TagPicker from "@/components/tags/tutorial/TagPicker";
+import type { Tag } from "@/types/tag";
 
 const ToastEditor = dynamic(
   () => import("@/components/tutorials/tutorial-markdown"),
@@ -28,24 +34,10 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "ama", label: "AMA" },
 ];
 
-const TAG_SUGGESTIONS = [
-  "announcement",
-  "tips",
-  "qa",
-  "release",
-  "bug",
-  "feature",
-  "guide",
-  "howto",
-  "performance",
-  "security",
-  "design",
-];
-
 export default function EditTutorialClient({ id }: { id: number }) {
   // ===== UI State =====
   const [tab, setTab] = useState<TabKey>("text");
-  const [loading, setLoading] = useState(true); // skeleton-first; will be turned off on mount
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
@@ -53,27 +45,34 @@ export default function EditTutorialClient({ id }: { id: number }) {
   // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [initialTitle, setInitialTitle] = useState("");
+  const [initialContent, setInitialContent] = useState("");
+  const [initialTags, setInitialTags] = useState<Tag[]>([]);
 
-  // Tag picker state/refs
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [tagQuery, setTagQuery] = useState("");
-  const pickerRef = useRef<HTMLDivElement | null>(null);
-  const tagInputRef = useRef<HTMLInputElement | null>(null);
-
-  // ===== Skeleton only: no API calls (just flip loading off on mount) =====
+  // ===== Load tutorial =====
   useEffect(() => {
     let alive = true;
     setLoading(true);
     (async () => {
       try {
-        const t = await getTutorialById(id);
+        const [t, tagList] = await Promise.all([
+          getTutorialById(id),
+          getTutorialTags(id), // ⬅️ lấy tags từ BE
+        ]);
         if (!alive) return;
-        setTitle(t.title ?? "");
-        setContent(t.content ?? "");
-        // nếu có tags ở BE:
-        // setTags(t.tags ?? []);
-      } catch (e) {
+
+        const safeTags = Array.isArray(tagList) ? tagList : [];
+
+        setTitle(t?.title ?? "");
+        setContent(t?.content ?? "");
+        setTags(Array.isArray(tagList) ? tagList : []); // tagList: Tag[]
+
+        // set initial values
+        setInitialTitle(t?.title ?? "");
+        setInitialContent(t?.content ?? "");
+        setInitialTags(safeTags);
+      } catch {
         setToastMsg("Failed to load tutorial");
         setToastOpen(true);
       } finally {
@@ -85,42 +84,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
     };
   }, [id]);
 
-  // ===== Helpers for Tags =====
-  const filteredSuggestions = useMemo(() => {
-    const q = tagQuery.trim().toLowerCase();
-    if (!q) return TAG_SUGGESTIONS.filter((t) => !tags.includes(t));
-    return TAG_SUGGESTIONS.filter((t) => t.includes(q) && !tags.includes(t));
-  }, [tagQuery, tags]);
-
-  function addTag(t: string) {
-    const v = t.trim().toLowerCase();
-    if (!v) return;
-    if (!tags.includes(v)) setTags((s) => [...s, v]);
-    setTagQuery("");
-  }
-  function removeTag(t: string) {
-    setTags((s) => s.filter((x) => x !== t));
-  }
-
-  // Click outside to close picker
-  useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!pickerRef.current) return;
-      const target = e.target as Node;
-      if (!pickerRef.current.contains(target)) setPickerOpen(false);
-    }
-    if (pickerOpen) document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [pickerOpen]);
-
-  // ===== Actions (skeleton only, no API) =====
+  // ===== Actions (giống Create) =====
   const canUpdate =
     title.trim().length > 0 && content.trim().length > 0 && !saving;
-
-  const onSaveDraft = () => {
-    setToastMsg("Saved draft (skeleton).");
-    setToastOpen(true);
-  };
 
   const onUpdate = async () => {
     if (!canUpdate) return;
@@ -129,8 +95,12 @@ export default function EditTutorialClient({ id }: { id: number }) {
       await updateTutorial(id, {
         title: title.trim(),
         content: content.trim(),
-        // nếu có tags: tags
       });
+
+      const tagIds = Array.from(new Set(tags.map((t) => t.id))); // unique
+      // Gọi upsert để replace toàn bộ liên kết tags của tutorial
+      await upsertTutorialTags(id, tagIds);
+
       setToastMsg("Update success");
       setToastOpen(true);
 
@@ -143,6 +113,36 @@ export default function EditTutorialClient({ id }: { id: number }) {
       setSaving(false);
     }
   };
+
+  // =================dirty status========================
+  const dirty = useMemo(() => {
+    if (title.trim() !== initialTitle.trim()) return true;
+    if (content.trim() !== initialContent.trim()) return true;
+    // so sánh tags theo id
+    const currentIds = tags.map((t) => t.id).sort();
+    const initialIds = initialTags.map((t) => t.id).sort();
+    if (currentIds.length !== initialIds.length) return true;
+    for (let i = 0; i < currentIds.length; i++) {
+      if (currentIds[i] !== initialIds[i]) return true;
+    }
+    return false;
+  }, [title, content, tags, initialTitle, initialContent, initialTags]);
+
+  //================want leave page?===========================
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (dirty) {
+        const message = "You have unsaved changes. Are you sure you want to leave?";
+        e.preventDefault();
+        e.returnValue = message;
+        return message;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [dirty]);
 
   return (
     <div className="space-y-4">
@@ -186,100 +186,24 @@ export default function EditTutorialClient({ id }: { id: number }) {
           )}
         </div>
 
-        {/* Tags */}
-        <div className="mb-4">
-          <div className="relative inline-block" ref={pickerRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setPickerOpen((v) => !v);
-                setTimeout(() => tagInputRef.current?.focus(), 0);
-              }}
-              className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-            >
-              Add tags
-            </button>
-
-            {pickerOpen && (
-              <div className="absolute z-20 mt-2 w-80 rounded-2xl border border-white/10 bg-neutral-900 p-3 shadow-xl">
-                <div className="mb-2">
-                  <input
-                    ref={tagInputRef}
-                    value={tagQuery}
-                    onChange={(e) => setTagQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (tagQuery.trim()) addTag(tagQuery);
-                      }
-                      if (e.key === "Escape") setPickerOpen(false);
-                    }}
-                    placeholder="Search or add a tag…"
-                    className="w-full rounded-lg border border-white/10 bg-black p-2 text-sm text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/10"
-                  />
-                </div>
-
-                <div className="max-h-56 overflow-auto rounded-lg border border-white/5">
-                  {filteredSuggestions.length ? (
-                    <ul className="divide-y divide-white/5">
-                      {filteredSuggestions.map((t) => (
-                        <li key={t}>
-                          <button
-                            type="button"
-                            onClick={() => addTag(t)}
-                            className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5"
-                          >
-                            <span>#{t}</span>
-                            <span className="text-xs text-white/60">Add</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="p-3 text-sm text-white/60">
-                      No suggestions. Press{" "}
-                      <kbd className="rounded bg-white/10 px-1">Enter</kbd> to
-                      add “{tagQuery.trim()}”.
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-2 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPickerOpen(false)}
-                    className="rounded-xl border border-white/10 px-3 py-1.5 text-sm text-white/80 hover:bg-white/5"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (tagQuery.trim()) addTag(tagQuery);
-                      setPickerOpen(false);
-                    }}
-                    className="rounded-xl bg-white px-3 py-1.5 text-sm font-medium text-black hover:opacity-90"
-                  >
-                    Add tag
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
+        {/* Tags (dùng TagPicker + chips hiển thị bên ngoài) */}
+        <div className="mb-4 space-y-3">
+          {/* chips hiển thị bên ngoài, có khoảng cách */}
           {!!tags.length && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {tags.map((t) => (
                 <span
-                  key={t}
+                  key={t.id}
                   className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
                 >
-                  #{t}
+                  #{t.name}
                   <button
                     type="button"
-                    onClick={() => removeTag(t)}
+                    onClick={() =>
+                      setTags((prev) => prev.filter((x) => x.id !== t.id))
+                    }
                     className="text-white/70 hover:text-white"
-                    aria-label={`remove ${t}`}
+                    aria-label={`remove ${t.name}`}
                   >
                     ×
                   </button>
@@ -287,6 +211,9 @@ export default function EditTutorialClient({ id }: { id: number }) {
               ))}
             </div>
           )}
+
+          {/* popover chọn tag; closeOnPick=false để chọn liên tục */}
+          <TagPicker value={tags} onChange={setTags} closeOnPick={false} />
         </div>
 
         {/* Editor */}
@@ -312,11 +239,11 @@ export default function EditTutorialClient({ id }: { id: number }) {
       {/* Footer */}
       <div className="flex items-center justify-end gap-3">
         <button
-          disabled={!canUpdate || saving}
+          disabled={!canUpdate || saving || !dirty}
           onClick={onUpdate}
           className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {saving ? "Updating…" : "Update"}
+          {saving ? "Updating…" : dirty ? "Update" : "No changes"}
         </button>
       </div>
 

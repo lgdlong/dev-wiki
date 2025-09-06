@@ -45,17 +45,6 @@ export async function getTutorialBySlug(slug: string): Promise<Tutorial> {
 }
 
 /**
- * Get tutorial tags (requires auth if your BE enforces it)
- * GET /tutorials/:id/tags
- */
-export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
-  return fetcher<Tag[]>(`/tutorials/${tutorialId}/tags`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
-}
-
-/**
  * Get a published tutorial by ID
  * GET /tutorials/:id/published
  */
@@ -82,11 +71,7 @@ export async function createTutorial(
   const body = {
     title: data.title,
     content: data.content,
-    // only include author_id if present; avoid NaN
-    ...(data.author_id !== undefined && data.author_id !== null
-      ? { author_id: Number(data.author_id) }
-      : {}),
-    tags: data.tags,
+    //lý do có JWT hỗ trợ nên không gửi về
   };
 
   return fetcher<Tutorial>("/tutorials", {
@@ -130,9 +115,20 @@ export async function upsertTutorialTags(
   tutorialId: number,
   tagIds: number[],
 ): Promise<{ success: boolean }> {
-  return fetcher<{ success: boolean }>(`/tutorials/${tutorialId}/tags`, {
+  return fetcher<{ success: boolean }>(`/tutorial-tags/${tutorialId}/tags`, {
     method: "PATCH",
     body: JSON.stringify({ tagIds }),
+    headers: getAuthHeaders(),
+  });
+}
+
+/**
+ * Get tutorial tags (requires auth if your BE enforces it)
+ * GET /tutorials/:id/tags
+ */
+export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
+  return fetcher<Tag[]>(`/tutorial-tags/${tutorialId}/tags`, {
+    method: "GET",
     headers: getAuthHeaders(),
   });
 }
