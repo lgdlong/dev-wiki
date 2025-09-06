@@ -10,7 +10,8 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:api": "turbo run test --filter=api",
-    "test:web": "turbo run test --filter=web"
+    "test:web": "turbo run test --filter=web",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
@@ -21,7 +22,15 @@
     "prettier": "^3.6.2",
     "turbo": "^2.5.4",
     "typescript": "5.8.3",
-    "typescript-eslint": "^8.40.0"
+    "typescript-eslint": "^8.40.0",
+    "husky": "^9",
+    "lint-staged": "^15"
+  },
+  "lint-staged": {
+    "*.{sh,bash,sql,yml,yaml,env}": [
+      "bash -lc \"sed -i 's/\\r$//' $(git ls-files --cached)\"",
+      "bash -lc \"for f in $FILES; do tail -c1 \\\"$f\\\" | read r || echo >> \\\"$f\\\"; done\""
+    ]
   },
   "packageManager": "pnpm@10.15.0",
   "engines": {
