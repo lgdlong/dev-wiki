@@ -45,10 +45,11 @@ export class TutorialService {
       const slugTrimmed = generateSlug(titleTrimmed);
 
       // Kiểm tra trùng slug
-      const duplicated = await this.repo.exists({
+      const duplicated = await this.repo.findOne({
         where: { slug: slugTrimmed },
+        select: ['id'],
       });
-      if (duplicated) {
+      if (duplicated !== null) {
         throw new BadRequestException(
           'A tutorial with a similar title already exists. Please choose a different title.',
         );
