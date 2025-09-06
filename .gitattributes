@@ -1,0 +1,10 @@
+# Chuẩn hoá text
+*               text=auto
+
+# Ép LF cho file dễ nhạy cảm với newline
+*.sh            text eol=lf
+*.bash          text eol=lf
+*.sql           text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.env           text eol=lf
