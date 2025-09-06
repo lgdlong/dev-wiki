@@ -1,0 +1,9 @@
+FROM postgres:17
+
+# Copy và đảm bảo LF + quyền thực thi trong quá trình build
+COPY apps/db/init.sh /docker-entrypoint-initdb.d/init.sh
+RUN sed -i 's/\r$//' /docker-entrypoint-initdb.d/init.sh && \
+    chmod +x /docker-entrypoint-initdb.d/init.sh
+
+# (tuỳ chọn) copy dump nếu muốn đóng gói sẵn
+# COPY apps/db/*.dump /docker-entrypoint-initdb.d/
