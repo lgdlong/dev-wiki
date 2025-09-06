@@ -1,4 +1,4 @@
-// src/posts/posts.service.ts
+// apps/api/src/modules/tutorials/tutorials.service.ts
 import {
   BadRequestException,
   ForbiddenException,
@@ -11,6 +11,10 @@ import { Tutorial } from './entities/tutorials.entity';
 import { CreateTutorialDto } from './dto/create-tutorials.dto';
 import { UpdateTutorialDto } from './dto/update-tutorials.dto';
 import { TutorialDetailDto, TutorialListItemDto } from './dto/tutorials.dto';
+import { generateSlug } from '../../shared/helpers/slug';
+import { TutorialTag } from '../tutorials-tags/entities/tutorials-tag.entity';
+import { Tag } from '../tags/entities/tag.entity';
+import { In } from 'typeorm';
 
 @Injectable()
 export class TutorialService {
@@ -35,14 +39,33 @@ export class TutorialService {
       if (finalAuthorId == null)
         throw new BadRequestException('author_id is required');
 
-      const post = this.repo.create({
-        title: dto.title.trim(),
-        content: dto.content.trim(),
+      // Validate dữ liệu (DTO đã trim, nhưng double-check)
+      const titleTrimmed = dto.title.trim();
+      const contentTrimmed = dto.content.trim();
+      const slugTrimmed = generateSlug(titleTrimmed);
+
+      // Kiểm tra trùng slug
+      const duplicated = await this.repo.findOne({
+        where: { slug: slugTrimmed },
+        select: ['id'],
+      });
+      if (duplicated !== null) {
+        throw new BadRequestException(
+          'A tutorial with a similar title already exists. Please choose a different title.',
+        );
+      }
+
+      // Tạo entity & lưu vào DB
+      const tutorial = this.repo.create({
+        title: titleTrimmed,
+        content: contentTrimmed,
         authorId: finalAuthorId, // map snake_case -> camelCase
         views: 0,
+        slug: slugTrimmed,
+        isPublished: true,
       });
 
-      return await this.repo.save(post);
+      return await this.repo.save(tutorial);
     } catch (e) {
       console.error('TutorialService.create error:', e);
       throw e; // đừng nuốt lỗi, để controller/global filter xử lý
@@ -59,6 +82,7 @@ export class TutorialService {
     return tutorials.map((tutorial) => ({
       id: tutorial.id,
       title: tutorial.title,
+      slug: tutorial.slug,
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       authorName: tutorial.author?.name || 'Unknown',
@@ -70,8 +94,6 @@ export class TutorialService {
       relations: ['author'],
     });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
-
-    console.log('[DEBUG] Tutorial in findOne:', row);
     return {
       id: row.id,
       title: row.title,
@@ -79,6 +101,36 @@ export class TutorialService {
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       authorName: row.author?.name || 'Unknown',
+      slug: row.slug,
+      views: row.views,
+      isPublished: row.isPublished,
+    };
+  }
+  async findOneBySlug(slug: string): Promise<TutorialDetailDto> {
+    const row = await this.repo.findOne({
+      where: { slug },
+      relations: ['author'],
+    });
+    if (!row) throw new NotFoundException(`Post #${slug} not found`);
+
+    // Fetch tags for this tutorial
+    const tutorialTags = await this.repo.manager.find(TutorialTag, {
+      where: { tutorialId: row.id },
+      relations: ['tag'],
+    });
+    const tags: Tag[] = tutorialTags.map((tt) => tt.tag);
+
+    return {
+      id: row.id,
+      title: row.title,
+      content: row.content,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      authorName: row.author?.name || 'Unknown',
+      slug: row.slug,
+      views: row.views,
+      isPublished: row.isPublished,
+      tags,
     };
   }
 

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* pick ONE theme */
+@import "prism-themes/themes/prism-vsc-dark-plus.css";
+/* or: @import "prism-themes/themes/prism-one-light.css"; */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,4 +124,19 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Ensure code blocks wrap and dark bg = zinc-950 */
+.prose :where(pre[class*="language-"]) {
+  white-space: pre-wrap !important;
+  overflow-x: visible !important;
+}
+.dark .prose :where(pre[class*="language-"]) {
+  background-color: rgb(9 9 11) !important; /* zinc-950 */
+}
+.prose :where(code[class*="language-"]) { white-space: inherit !important; word-break: break-word; }
+
+.prose :where(h1,h2,h3,h4,h5,h6) a {
+  text-decoration: none;
+  color: inherit;
 }
