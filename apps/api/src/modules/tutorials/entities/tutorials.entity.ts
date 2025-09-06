@@ -1,12 +1,13 @@
+// apps/api/src/modules/tutorials/entities/tutorial.entity.ts
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { Account } from '../../account/entities/account.entity';
 
@@ -21,6 +22,7 @@ export class Tutorial {
   @Column({ type: 'text', nullable: false }) //markdown từ Toast UI
   content: string;
 
+  @Index()
   @Column({ name: 'author_id', nullable: false })
   authorId: number;
 
@@ -31,18 +33,16 @@ export class Tutorial {
   @Column({ type: 'bigint', default: 0 })
   views: number;
 
-  @Column({
-    name: 'created_at',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Index({ unique: true })
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  slug: string;
+
+  @Column({ name: 'is_published', type: 'boolean', default: true })
+  isPublished: boolean;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column({
-    name: 'updated_at',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone' })
   updatedAt: Date;
 }
