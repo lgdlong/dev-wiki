@@ -11,6 +11,7 @@ import { Tutorial } from "@/types/tutorial";
 import { Clock } from "lucide-react";
 import GithubSlugger from "github-slugger";
 import HashScroll from "@/components/hash-scroll";
+import { estimateReadTime, extractHeadings } from "@/utils/markdownHelpers";
 
 export default async function TutorialPage({
   params,
@@ -19,7 +20,13 @@ export default async function TutorialPage({
 }) {
   const { slug } = await params;
 
-  const tutorial: Tutorial | null = await getTutorialBySlug(slug);
+  let tutorial: Tutorial | null = null;
+  try {
+    tutorial = await getTutorialBySlug(slug);
+  } catch (error) {
+    // Handle API errors gracefully (e.g., 404, network error)
+    notFound();
+  }
 
   if (!tutorial) notFound();
 
@@ -28,7 +35,6 @@ export default async function TutorialPage({
     ...defaultSchema,
     attributes: {
       ...defaultSchema.attributes,
-      // inline token màu của Shiki
       span: [
         ...(defaultSchema.attributes?.span ?? []),
         ["className"],
@@ -54,29 +60,6 @@ export default async function TutorialPage({
     },
   };
 
-  // Calculate estimated read time
-  const estimateReadTime = (content: string) => {
-    const words = content.trim().split(/\s+/).length;
-    const minutes = Math.max(1, Math.round(words / 200));
-    return `${minutes} min read`;
-  };
-
-  // Extract headings for table of contents
-  const extractHeadings = (content: string) => {
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const slugger = new GithubSlugger();
-    slugger.reset();
-
-    const headings: Array<{ level: number; text: string; id: string }> = [];
-    let match;
-    while ((match = headingRegex.exec(content)) !== null) {
-      const level = match[1].length;
-      const text = match[2].trim();
-      const id = slugger.slug(text); // <-- identical to rehype-slug
-      headings.push({ level, text, id });
-    }
-    return headings;
-  };
 
   const headings = extractHeadings(tutorial.content || '');
 
@@ -93,8 +76,7 @@ export default async function TutorialPage({
           {/* Meta Info Row */}
           <div className="flex items-center space-x-6 text-sm text-zinc-600 dark:text-zinc-400 mb-8">
             <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full"></div>
-              <span className="font-medium text-black dark:text-white">Dev Wiki</span>
+              <span className="font-medium text-black dark:text-white">{tutorial.authorName}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Clock className="w-4 h-4" />
@@ -207,11 +189,6 @@ export default async function TutorialPage({
                         alt={alt}
                         className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700"
                       />
-                      {alt && (
-                        <figcaption className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-3">
-                          {alt}
-                        </figcaption>
-                      )}
                     </figure>
                   );
                 },
