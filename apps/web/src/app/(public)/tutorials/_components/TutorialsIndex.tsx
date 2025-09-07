@@ -12,10 +12,10 @@ const DATE_FMT: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", 
 function formatDate(d: string | number | Date) {
   try { return new Date(d).toLocaleDateString(undefined, DATE_FMT); } catch { return ""; }
 }
-function estimateReadTime(text?: string) {
+function estimateReadTime(text?: string): string {
   if (!text) return "";
-  const words = text.trim().split(/\s+/).length;
-  const minutes = Math.max(1, Math.round(words / 200));
+  const words: number = text.trim().split(/\s+/).length;
+  const minutes: number = Math.max(1, Math.round(words / 200));
   return `${minutes} min read`;
 }
 
@@ -81,9 +81,9 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
 
       {filtered.length > 0 && (
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((t) => {
+          {filtered.map((t: Tutorial) => {
             const href = `/tutorials/${t.slug}`;
-            const subtitle = [
+            const subtitle: string = [
               t.createdAt ? formatDate(t.createdAt as any) : undefined,
               t.views != null ? `${t.views} views` : undefined,
               estimateReadTime(t.content as any),
