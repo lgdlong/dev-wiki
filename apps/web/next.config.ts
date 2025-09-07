@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "img.youtube.com", pathname: "/vi/**" },
       { protocol: "https", hostname: "i1.ytimg.com", pathname: "/vi/**" },
       { protocol: "https", hostname: "i2.ytimg.com", pathname: "/vi/**" },
-      { protocol: "https", hostname: "i3.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "i2.ytimg.com", pathname: "/vi/**" },
+      { hostname: "lh3.googleusercontent.com", pathname: "/**" },
     ],
   },
 };

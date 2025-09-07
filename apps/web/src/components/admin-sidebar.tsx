@@ -51,9 +51,9 @@ const data = {
         icon: Users,
         isActive: true,
         items: [
-          { title: "Accounts", url: "/admin/users" },
-          { title: "Invitations", url: "/admin/users/invitations" },
-          { title: "Audit Logs", url: "/admin/users/audit-logs" },
+          { title: "Accounts", url: "/admin/manage-accounts" },
+          // { title: "Invitations", url: "/admin/users/invitations" },
+          // { title: "Audit Logs", url: "/admin/users/audit-logs" },
         ],
       },
       {
