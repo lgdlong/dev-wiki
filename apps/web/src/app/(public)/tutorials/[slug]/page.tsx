@@ -14,7 +14,7 @@ import HashScroll from "@/components/hash-scroll";
 import Link from "next/link";
 import { estimateReadTime, extractHeadings } from "@/utils/markdownHelpers";
 
-async function fetchTutorial(slug: string): Promise<Tutorial | null> {
+async function fetchTutorial(slug: string): Promise<Tutorial> {
   try {
     return await getTutorialBySlug(slug);
   } catch(e) {
