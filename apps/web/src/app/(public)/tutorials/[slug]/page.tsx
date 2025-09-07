@@ -1,3 +1,4 @@
+// apps/web/src/app/(public)/tutorials/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -8,22 +9,27 @@ import rehypePrism from "rehype-prism-plus";
 import { getTutorialBySlug } from "@/utils/api/tutorialApi";
 import ReactMarkdown from "react-markdown";
 import type { Tutorial } from "@/types/tutorial";
+import type { Tag } from "@/types/tag";
 import { Clock } from "lucide-react";
 import HashScroll from "@/components/hash-scroll";
 import Link from "next/link";
 import { estimateReadTime, extractHeadings } from "@/utils/markdownHelpers";
 
-export default async function TutorialPage({
-                                             params,
-                                           }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-
-  let tutorial: Tutorial | null = null;
+async function fetchTutorial(slug: string): Promise<Tutorial | null> {
   try {
-    tutorial = await getTutorialBySlug(slug);
-  } catch {
+    return await getTutorialBySlug(slug);
+  } catch(e) {
+    console.error("Failed to fetch tutorial:", e);
     notFound();
   }
+}
+
+export default async function TutorialPage({
+  params,
+}: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+
+  let tutorial: Tutorial | null = await fetchTutorial(slug);
   if (!tutorial) notFound();
 
   // Sanitize: allow IDs on headings + class names for Prism; allow basic img/a attrs.
@@ -61,9 +67,12 @@ export default async function TutorialPage({
 
         {/* Header */}
         <header className="mb-12">
+          {/* Title */}
           <h1 className="text-4xl font-bold text-black dark:text-white mb-6 leading-tight">
             {tutorial.title}
           </h1>
+
+          {/* Meta: author, date, read time, views */}
           <div className="flex items-center gap-6 text-sm text-zinc-600 dark:text-zinc-400">
             <span className="font-medium text-black dark:text-white">{tutorial.authorName}</span>
             <span className="flex items-center gap-1">
@@ -73,6 +82,20 @@ export default async function TutorialPage({
             <span>{estimateReadTime(tutorial.content || "")}</span>
             <span className="text-zinc-500 dark:text-zinc-500">{tutorial.views} views</span>
           </div>
+
+          {/* Tags of tutorial */}
+          {tutorial.tags && tutorial.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {tutorial.tags.map(tag => (
+                <span
+                  key={tag.id}
+                  className="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-300 dark:border-zinc-700"
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
         </header>
 
         {/* TOC */}
