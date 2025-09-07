@@ -43,12 +43,14 @@ function StatusBadge({ status }: { status: Account["status"] }) {
     inactive: "Inactive",
     suspended: "Suspended",
     banned: "Banned",
+    deleted: "Deleted",
   };
   const classMap: Record<Account["status"], string> = {
     active: "bg-emerald-100/20 text-emerald-300",
     inactive: "bg-muted text-foreground",
     suspended: "bg-red-100/20 text-red-300",
     banned: "bg-red-100/20 text-red-300",
+    deleted: "bg-red-100/20 text-red-300"
   };
   return <Badge className={classMap[status]}>{map[status]}</Badge>;
 }
@@ -67,7 +69,7 @@ export function makeAccountColumns({
   return [
     {
       accessorKey: "user",
-      header: "User",
+      header: "User", 
       cell: ({ row }) => {
         const a = row.original;
         return (
@@ -130,10 +132,11 @@ export function makeAccountColumns({
       id: "actions",
       header: "",
       cell: ({ row }) => {
+        const a = row.original;
         const id = Number(row.original.id);
         const isDeleting = Number.isFinite(id) && deletingIds.has(id);
         return (
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-start gap-2">
             <Button
               size="icon"
               variant="outline"
@@ -152,19 +155,23 @@ export function makeAccountColumns({
             >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="destructive"
-              aria-label="Delete user"
-              onClick={() => onRequestDelete(id)}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </Button>
+
+            {/* Delete chỉ hiển thị nếu status !== "deleted" */}
+            {a.status !== "deleted" && (
+              <Button
+                size="icon"
+                variant="destructive"
+                aria-label="Delete user"
+                onClick={() => onRequestDelete(id)}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
           </div>
         );
       },

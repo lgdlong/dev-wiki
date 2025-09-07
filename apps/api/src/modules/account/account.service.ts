@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
 import { DEFAULT_SALT_ROUNDS } from '../../shared/constants';
 import { ConfigService } from '@nestjs/config';
+import { SetStatusDto } from './dto/set-status.dto';
 
 @Injectable()
 export class AccountService {
@@ -80,4 +81,26 @@ export class AccountService {
     const result: DeleteResult = await this.repo.delete(id);
     return { deleted: (result.affected ?? 0) > 0 };
   }
+
+
+  async setStatus(id: number, dto: SetStatusDto): Promise<Account> {
+    const account = await this.repo.findOne({ where: { id } });
+    if (!account) throw new NotFoundException(`Account ${id} not found`);
+  
+    account.status = dto.status;
+  
+    // ⚠️ Với design cũ: DB không có cột reason / expiresAt
+    // => chỉ có thể lưu status. 
+    // Nếu muốn dùng reason / expiresAt thì cần bảng khác (warnings/bans).
+    // Ở đây chỉ log tạm.
+    if (dto.reason) {
+      console.log(`Reason for status change: ${dto.reason}`);
+    }
+    if (dto.expiresAt) {
+      console.log(`Expires at: ${dto.expiresAt}`);
+    }
+  
+    return this.repo.save(account);
+  }
+  
 }

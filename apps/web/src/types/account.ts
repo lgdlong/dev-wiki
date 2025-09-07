@@ -1,6 +1,6 @@
 // apps/web/src/types/account.ts
 export type AccountRole = "user" | "premium" | "mod" | "admin";
-export type AccountStatus = "active" | "inactive" | "suspended" | "banned";
+export type AccountStatus = "active" | "inactive" | "suspended" | "banned" | "deleted";
 
 export interface Account {
   id: number;

@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/app/(dashboard)/admin/manage-accounts/data-table";
 import { makeAccountColumns } from "./columns";
 import type { Account, AccountStatus } from "@/types/account";
-import { getAllAccounts, deleteAccount } from "@/utils/api/accountApi";
+import { getAllAccounts, deleteAccount, markAccountDeleted } from "@/utils/api/accountApi";
 import { Plus, RefreshCw, ChevronDown } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
@@ -29,6 +29,7 @@ const STATUS_LABEL: Record<AccountStatus | "all", string> = {
   inactive: "Inactive",
   suspended: "Suspended",
   banned: "Banned",
+  deleted: "Deleted"
 };
 
 export default function ManageAccountsPage() {
@@ -97,9 +98,13 @@ export default function ManageAccountsPage() {
     setDeletingIds((prev) => new Set(prev).add(pendingId));
     setOpenDelete(false);
     try {
-      await deleteAccount(pendingId);
-      setAccounts((prev) => prev.filter((x) => x.id !== pendingId));
-      setToast({ open: true, kind: "success", message: `Deleted account #${pendingId}` });
+      await markAccountDeleted(pendingId);
+      setAccounts((prev) =>
+        prev.map((x) =>
+          x.id === pendingId ? { ...x, status: "deleted" } : x
+        )
+      );
+      setToast({ open: true, kind: "success", message: `Marked account #${pendingId} as deleted` });
     } catch (e: any) {
       setToast({ open: true, kind: "error", message: e?.message ?? "Delete failed. Please try again." });
     } finally {
@@ -149,7 +154,7 @@ export default function ManageAccountsPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                {(["all", "active", "inactive", "suspended", "banned"] as const).map((s) => (
+                {(["all", "active", "inactive", "suspended", "banned", "deleted"] as const).map((s) => (
                   <DropdownMenuItem key={s} onClick={() => setStatus(s as any)}>
                     {STATUS_LABEL[s]}
                   </DropdownMenuItem>
