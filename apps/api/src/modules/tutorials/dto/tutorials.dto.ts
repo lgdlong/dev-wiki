@@ -6,23 +6,50 @@
 
 // TutorialListItemDto: Dùng để hiển thị danh sách bài viết
 // TutorialDetailDto: Dùng để hiển thị chi tiết một bài viết cụ thể
-import { Tag } from '../../tags/entities/tag.entity';
+// import { Tag } from '../../tags/entities/tag.entity';
+//
+// export class TutorialListItemDto {
+//   id!: number;
+//   title!: string;
+//   createdAt!: Date;
+//   updatedAt!: Date;
+//   authorName!: string;
+// }
+//
+// export class TutorialDetailDto extends TutorialListItemDto {
+//   authorAvatarUrl!: string;
+//   content!: string; //(!) non-null assertion
+//   slug: string;
+//   views: number;
+//   isPublished: boolean;
+//   tags: Tag[]; // <-- Add tags field
+// }
+// khi quản lý không cần hiển thị content nếu không tốn bộ nhớ
+// khi mod click vào bài cụ thể -> hiển thị content -> tiết kiệm hơn
 
+// using contructor to easily create instances from partial data
 export class TutorialListItemDto {
   id!: number;
   title!: string;
   createdAt!: Date;
   updatedAt!: Date;
   authorName!: string;
+
+  constructor(partial: Partial<TutorialListItemDto>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class TutorialDetailDto extends TutorialListItemDto {
-  content!: string; //(!) non-null assertion
-  slug: string;
-  views: number;
-  isPublished: boolean;
-  tags: Tag[]; // <-- Add tags field
-}
+  authorAvatarUrl!: string;
+  content!: string;
+  slug!: string;
+  views!: number;
+  isPublished!: boolean;
+  tags!: Tag[];
 
-// khi quản lý không cần hiển thị content nếu không tốn bộ nhớ
-// khi mod click vào bài cụ thể -> hiển thị content -> tiết kiệm hơn
+  constructor(partial: Partial<TutorialDetailDto>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+}
