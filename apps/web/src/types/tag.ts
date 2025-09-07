@@ -1,10 +1,11 @@
 export interface Tag {
   id: number;
   name: string;
-  description?: string | null;
+  description?: string;
 }
 
 export interface CreateTagRequest {
   name: string;
-  description?: string | null;
+  description?: string;
 }
+

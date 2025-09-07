@@ -15,10 +15,15 @@ import { generateSlug } from '../../shared/helpers/slug';
 import { TutorialTag } from '../tutorials-tags/entities/tutorials-tag.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { In } from 'typeorm';
+import { DEFAULT_AUTHOR_NAME, DEFAULT_AVATAR_URL } from '../../shared/constants';
+import { TutorialMapper } from './mappers/tutorials.mapper';
 
 @Injectable()
 export class TutorialService {
-  constructor(@InjectRepository(Tutorial) private repo: Repository<Tutorial>) {}
+  constructor(
+    @InjectRepository(Tutorial) private repo: Repository<Tutorial>,
+    private readonly mapper: TutorialMapper,
+  ) {}
 
   // ✅ Overload signatures
   create(dto: CreateTutorialDto): Promise<Tutorial>;
@@ -74,64 +79,48 @@ export class TutorialService {
 
   // ===================== GET ======================
   async findAll(): Promise<TutorialListItemDto[]> {
-    const tutorials = await this.repo.find({
+    const rows = await this.repo.find({
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        createdAt: true,
+        updatedAt: true,
+        // content: false (không cần vì không đưa vào select)
+      },
+      relations: { author: true },
       order: { createdAt: 'DESC' },
-      relations: ['author'], //DEBUG: check entity để fix name (này cũng join Account)
     });
-    console.log('[DEBUG] Tutorials in findAll:', tutorials);
-    return tutorials.map((tutorial) => ({
-      id: tutorial.id,
-      title: tutorial.title,
-      slug: tutorial.slug,
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      authorName: tutorial.author?.name || 'Unknown',
-    }));
+
+    return rows.map((row) => this.mapper.toListItem(row));
   }
+
   async findOne(id: number): Promise<TutorialDetailDto> {
     const row = await this.repo.findOne({
       where: { id },
-      relations: ['author'],
+      relations: { author: true },
+      // có thể thêm select cụ thể nếu muốn kiểm soát chặt chẽ hơn
     });
     if (!row) throw new NotFoundException(`Post #${id} not found`);
-    return {
-      id: row.id,
-      title: row.title,
-      content: row.content,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      authorName: row.author?.name || 'Unknown',
-      slug: row.slug,
-      views: row.views,
-      isPublished: row.isPublished,
-    };
+
+    return this.mapper.toDetail(row, []);
   }
+
   async findOneBySlug(slug: string): Promise<TutorialDetailDto> {
     const row = await this.repo.findOne({
       where: { slug },
-      relations: ['author'],
+      relations: { author: true },
     });
     if (!row) throw new NotFoundException(`Post #${slug} not found`);
 
-    // Fetch tags for this tutorial
+    // Lấy tags (giữ 2 query cho code rõ ràng; nếu cần tối ưu thành 1 query có thể dùng QB join)
     const tutorialTags = await this.repo.manager.find(TutorialTag, {
       where: { tutorialId: row.id },
       relations: ['tag'],
     });
     const tags: Tag[] = tutorialTags.map((tt) => tt.tag);
 
-    return {
-      id: row.id,
-      title: row.title,
-      content: row.content,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      authorName: row.author?.name || 'Unknown',
-      slug: row.slug,
-      views: row.views,
-      isPublished: row.isPublished,
-      tags,
-    };
+    return this.mapper.toDetail(row, tags);
   }
 
   // ===== helper: check quyền sở hữu (nếu có userId) =====
@@ -212,18 +201,3 @@ export class TutorialService {
     return { id };
   }
 }
-
-// gọn gàn với không valid
-// async create(dto: CreateTutorialDto, authorId?: number): Promise<Tutorial> {
-//   try {
-//     const post = this.repo.create({
-//       title: dto.title.trim(),
-//       content: dto.content.trim(),
-//       authorId: authorId ?? undefined,
-//       views: 0,
-//     });
-//     return this.repo.save(post);
-//   } catch (error) {
-//     console.error("error at tutorials.service" + error);
-//   }
-// }

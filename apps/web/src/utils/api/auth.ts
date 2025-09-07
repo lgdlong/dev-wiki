@@ -59,7 +59,7 @@ export async function meApi(): Promise<MeApiResponse> {
       }
       throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
     }
-    return fetcher("/me", {
+    return fetcher<MeApiResponse>("/me", {
       method: "GET",
       credentials: "include",
       headers: {

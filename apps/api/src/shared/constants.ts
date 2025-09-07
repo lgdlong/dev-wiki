@@ -6,3 +6,6 @@ export const DEFAULT_API_BASE_URL =
 export const DEFAULT_SALT_ROUNDS = 12;
 export const ROLES_KEY = 'roles';
 export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_AVATAR_URL = 'https://avatar.iran.liara.run/public';
+export const DEFAULT_AUTHOR_NAME = 'Unknown';
+
