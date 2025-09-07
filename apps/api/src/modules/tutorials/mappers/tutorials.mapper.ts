@@ -14,6 +14,7 @@ export class TutorialMapper {
     return {
       id: row.id,
       title: row.title,
+      slug: row.slug,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       authorName: row.author?.name || DEFAULT_AUTHOR_NAME,

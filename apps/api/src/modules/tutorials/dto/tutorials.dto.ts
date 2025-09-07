@@ -33,6 +33,7 @@ import { Tag } from '../../tags/entities/tag.entity';
 export class TutorialListItemDto {
   id!: number;
   title!: string;
+  slug!: string;
   createdAt!: Date;
   updatedAt!: Date;
   authorName!: string;
@@ -45,7 +46,6 @@ export class TutorialListItemDto {
 export class TutorialDetailDto extends TutorialListItemDto {
   authorAvatarUrl!: string;
   content!: string;
-  slug!: string;
   views!: number;
   isPublished!: boolean;
   tags!: Tag[];
