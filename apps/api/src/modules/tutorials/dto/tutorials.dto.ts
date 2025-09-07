@@ -28,6 +28,8 @@
 // khi mod click vào bài cụ thể -> hiển thị content -> tiết kiệm hơn
 
 // using contructor to easily create instances from partial data
+import { Tag } from '../../tags/entities/tag.entity';
+
 export class TutorialListItemDto {
   id!: number;
   title!: string;
