@@ -9,7 +9,6 @@ import rehypePrism from "rehype-prism-plus";
 import { getTutorialBySlug } from "@/utils/api/tutorialApi";
 import ReactMarkdown from "react-markdown";
 import type { Tutorial } from "@/types/tutorial";
-import type { Tag } from "@/types/tag";
 import { Clock } from "lucide-react";
 import HashScroll from "@/components/hash-scroll";
 import Link from "next/link";
@@ -74,19 +73,53 @@ export default async function TutorialPage({
 
           {/* Meta: author, date, read time, views */}
           <div className="flex items-center gap-6 text-sm text-zinc-600 dark:text-zinc-400">
-            <span className="font-medium text-black dark:text-white">{tutorial.authorName}</span>
+            {/* Avatar */}
+            <div className="flex items-center gap-2">
+              {tutorial.authorAvatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={tutorial.authorAvatarUrl}
+                  alt={`${tutorial.authorName}'s avatar`}
+                  className="w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-600 object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  width={20}
+                  height={20}
+                />
+              ) : (
+                // Placeholder avatar with initial
+                <div className="w-5 h-5 rounded-full bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center">
+                  <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                    {tutorial.authorName?.charAt(0).toUpperCase() || 'A'}
+                  </span>
+                </div>
+              )}
+
+              {/* Author name */}
+              <span className="font-medium text-black dark:text-white">
+                {tutorial.authorName}
+              </span>
+            </div>
+
+            {/* Publish time */}
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               {new Date(tutorial.createdAt).toLocaleDateString()}
             </span>
+
+            {/* Estimate read time */}
             <span>{estimateReadTime(tutorial.content || "")}</span>
-            <span className="text-zinc-500 dark:text-zinc-500">{tutorial.views} views</span>
+
+            {/* View */}
+            <span className="text-zinc-500 dark:text-zinc-500">
+              {tutorial.views} views
+            </span>
           </div>
 
-          {/* Tags of tutorial */}
+          {/* Tags */}
           {tutorial.tags && tutorial.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
-              {tutorial.tags.map(tag => (
+              {tutorial.tags.map((tag) => (
                 <span
                   key={tag.id}
                   className="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-300 dark:border-zinc-700"
@@ -97,6 +130,7 @@ export default async function TutorialPage({
             </div>
           )}
         </header>
+
 
         {/* TOC */}
         {headings.length > 0 && (

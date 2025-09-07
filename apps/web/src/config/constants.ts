@@ -7,3 +7,4 @@ export const NEXT_PUBLIC_GOOGLE_AUTH_URL =
   process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:8000/google"; // URL đăng nhập Google mặc định
 
 export const ACCESS_TOKEN_KEY = "access_token";
+export const DEFAULT_AVATAR_URL = "https://avatar.iran.liara.run/public";

@@ -7,6 +7,7 @@ export interface Tutorial {
   content: string; // markdown or text
   authorId: number; // khóa ngoại tới User
   authorName?: string;
+  authorAvatarUrl?: string;
   views: number; // mặc định = 0
   tags?: Tag[]; // hoặc mảng Tag nếu backend có entity riêng
   slug?: string; // SEO-friendly URL segment
