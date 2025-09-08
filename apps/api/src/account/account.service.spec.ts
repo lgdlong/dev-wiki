@@ -196,38 +196,47 @@ describe('AccountService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all accounts', async () => {
+    it('should return all active accounts without passwords', async () => {
       const accounts = [
-        { id: 1, email: 'user1@example.com' },
-        { id: 2, email: 'user2@example.com' },
+        { id: 1, email: 'user1@example.com', status: 'active' },
+        { id: 2, email: 'user2@example.com', status: 'active' },
       ] as Account[];
 
       mockRepository.find.mockResolvedValue(accounts);
 
       const result = await service.findAll();
 
-      expect(mockRepository.find).toHaveBeenCalledWith();
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { status: 'active' },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toEqual(accounts);
     });
 
-    it('should return empty array when no accounts exist', async () => {
+    it('should return empty array when no active accounts exist', async () => {
       mockRepository.find.mockResolvedValue([]);
 
       const result = await service.findAll();
 
-      expect(mockRepository.find).toHaveBeenCalledWith();
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { status: 'active' },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toEqual([]);
     });
   });
 
   describe('findOne', () => {
-    it('should return account when found', async () => {
+    it('should return account without password when found', async () => {
       const account = { id: 1, email: 'test@example.com' } as Account;
       mockRepository.findOne.mockResolvedValue(account);
 
       const result = await service.findOne(1);
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ 
+        where: { id: 1 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toEqual(account);
     });
 
@@ -238,6 +247,7 @@ describe('AccountService', () => {
 
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 999 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
       });
       expect(result).toBeNull();
     });
@@ -247,7 +257,10 @@ describe('AccountService', () => {
 
       const result = await service.findOne(0);
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 0 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ 
+        where: { id: 0 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toBeNull();
     });
 
@@ -258,6 +271,7 @@ describe('AccountService', () => {
 
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: -1 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
       });
       expect(result).toBeNull();
     });
@@ -323,7 +337,10 @@ describe('AccountService', () => {
       const result = await service.update(1, updateAccountDto);
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updateAccountDto);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ 
+        where: { id: 1 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toEqual(updatedAccount);
     });
 
@@ -358,7 +375,10 @@ describe('AccountService', () => {
       );
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updateAccountDto);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ 
+        where: { id: 1 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
     });
 
     it('should handle undefined affected value', async () => {
@@ -378,94 +398,167 @@ describe('AccountService', () => {
       const result = await service.update(1, updateAccountDto);
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updateAccountDto);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ 
+        where: { id: 1 },
+        select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+      });
       expect(result).toEqual(updatedAccount);
     });
   });
 
   describe('remove', () => {
-    it('should remove account successfully', async () => {
-      const deleteResult: DeleteResult = {
+    it('should soft delete account successfully', async () => {
+      const updateResult: UpdateResult = {
         affected: 1,
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(1);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'deleted' });
       expect(result).toEqual({ deleted: true });
     });
 
     it('should return false when no rows are affected', async () => {
-      const deleteResult: DeleteResult = {
+      const updateResult: UpdateResult = {
         affected: 0,
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(999);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(999);
+      expect(mockRepository.update).toHaveBeenCalledWith(999, { status: 'deleted' });
       expect(result).toEqual({ deleted: false });
     });
 
     it('should handle undefined affected value', async () => {
-      const deleteResult: DeleteResult = {
+      const updateResult: UpdateResult = {
         affected: undefined,
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(1);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'deleted' });
       expect(result).toEqual({ deleted: false });
     });
 
     it('should handle null affected value', async () => {
-      const deleteResult: DeleteResult = {
-        affected: null,
+      const updateResult: UpdateResult = {
+        affected: undefined, // Changed from null to undefined since TypeScript expects number | undefined
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(1);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'deleted' });
       expect(result).toEqual({ deleted: false });
     });
 
     it('should handle zero id', async () => {
-      const deleteResult: DeleteResult = {
+      const updateResult: UpdateResult = {
         affected: 0,
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(0);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(0);
+      expect(mockRepository.update).toHaveBeenCalledWith(0, { status: 'deleted' });
       expect(result).toEqual({ deleted: false });
     });
 
     it('should handle negative id', async () => {
-      const deleteResult: DeleteResult = {
+      const updateResult: UpdateResult = {
         affected: 0,
+        generatedMaps: [],
         raw: {},
       };
 
-      mockRepository.delete.mockResolvedValue(deleteResult);
+      mockRepository.update.mockResolvedValue(updateResult);
 
       const result = await service.remove(-1);
 
-      expect(mockRepository.delete).toHaveBeenCalledWith(-1);
+      expect(mockRepository.update).toHaveBeenCalledWith(-1, { status: 'deleted' });
       expect(result).toEqual({ deleted: false });
+    });
+  });
+
+  describe('ban', () => {
+    it('should ban account successfully', async () => {
+      const updateResult: UpdateResult = {
+        affected: 1,
+        generatedMaps: [],
+        raw: {},
+      };
+
+      mockRepository.update.mockResolvedValue(updateResult);
+
+      const result = await service.ban(1);
+
+      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'banned' });
+      expect(result).toEqual({ banned: true });
+    });
+
+    it('should return false when no rows are affected', async () => {
+      const updateResult: UpdateResult = {
+        affected: 0,
+        generatedMaps: [],
+        raw: {},
+      };
+
+      mockRepository.update.mockResolvedValue(updateResult);
+
+      const result = await service.ban(999);
+
+      expect(mockRepository.update).toHaveBeenCalledWith(999, { status: 'banned' });
+      expect(result).toEqual({ banned: false });
+    });
+  });
+
+  describe('unban', () => {
+    it('should unban account successfully', async () => {
+      const updateResult: UpdateResult = {
+        affected: 1,
+        generatedMaps: [],
+        raw: {},
+      };
+
+      mockRepository.update.mockResolvedValue(updateResult);
+
+      const result = await service.unban(1);
+
+      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'active' });
+      expect(result).toEqual({ unbanned: true });
+    });
+
+    it('should return false when no rows are affected', async () => {
+      const updateResult: UpdateResult = {
+        affected: 0,
+        generatedMaps: [],
+        raw: {},
+      };
+
+      mockRepository.update.mockResolvedValue(updateResult);
+
+      const result = await service.unban(999);
+
+      expect(mockRepository.update).toHaveBeenCalledWith(999, { status: 'active' });
+      expect(result).toEqual({ unbanned: false });
     });
   });
 });
