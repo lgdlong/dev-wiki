@@ -3,6 +3,7 @@ packages:
   - packages/*
 
 ignoredBuiltDependencies:
+  - esbuild
   - sharp
   - unrs-resolver
 
@@ -10,3 +11,4 @@ onlyBuiltDependencies:
   - '@nestjs/core'
   - '@swc/core'
   - '@tailwindcss/oxide'
+  - bcrypt
