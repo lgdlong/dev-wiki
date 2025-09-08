@@ -36,22 +36,37 @@ export class AccountController {
 
   @Get()
   @Roles(AccountRole.ADMIN, AccountRole.MOD)
-  findAll() {
+  findAll(): Promise<Omit<Account, 'password'>[]> {
     return this.accountService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
+  findOne(@Param('id') id: string): Promise<Omit<Account, 'password'> | null> {
     return this.accountService.findOne(+id);
   }
 
   @Patch(':id')
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
   update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
     return this.accountService.update(+id, updateAccountDto);
   }
 
   @Delete(':id')
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
   remove(@Param('id') id: string) {
     return this.accountService.remove(+id);
+  }
+
+  @Patch(':id/ban')
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
+  ban(@Param('id') id: string) {
+    return this.accountService.ban(+id);
+  }
+
+  @Patch(':id/unban')
+  @Roles(AccountRole.ADMIN, AccountRole.MOD)
+  unban(@Param('id') id: string) {
+    return this.accountService.unban(+id);
   }
 }

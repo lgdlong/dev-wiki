@@ -7,6 +7,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
 import { DEFAULT_SALT_ROUNDS } from 'src/common/constants';
 import { ConfigService } from '@nestjs/config';
+import { AccountStatus } from 'src/common/enums/account-status.enum';
 
 @Injectable()
 export class AccountService {
@@ -49,12 +50,20 @@ export class AccountService {
     return this.repo.save(account);
   }
 
-  async findAll(): Promise<Account[]> {
-    return this.repo.find();
+  async findAll(): Promise<Omit<Account, 'password'>[]> {
+    const accounts = await this.repo.find({
+      where: { status: AccountStatus.ACTIVE },
+      select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+    });
+    return accounts;
   }
 
-  async findOne(id: number): Promise<Account | null> {
-    return this.repo.findOne({ where: { id } });
+  async findOne(id: number): Promise<Omit<Account, 'password'> | null> {
+    const account = await this.repo.findOne({ 
+      where: { id },
+      select: ['id', 'email', 'name', 'avatar_url', 'role', 'status', 'createdAt', 'updatedAt']
+    });
+    return account;
   }
 
   async findByEmail(email: string): Promise<Account | null> {
@@ -64,7 +73,7 @@ export class AccountService {
   async update(
     id: number,
     updateAccountDto: UpdateAccountDto,
-  ): Promise<Account | null> {
+  ): Promise<Omit<Account, 'password'> | null> {
     const result: UpdateResult = await this.repo.update(id, updateAccountDto);
     if (result.affected === 0) {
       return null;
@@ -77,7 +86,24 @@ export class AccountService {
   }
 
   async remove(id: number): Promise<{ deleted: boolean }> {
-    const result: DeleteResult = await this.repo.delete(id);
+    // Soft delete: mark account as DELETED instead of hard delete
+    const result: UpdateResult = await this.repo.update(id, { 
+      status: AccountStatus.DELETED 
+    });
     return { deleted: (result.affected ?? 0) > 0 };
+  }
+
+  async ban(id: number): Promise<{ banned: boolean }> {
+    const result: UpdateResult = await this.repo.update(id, { 
+      status: AccountStatus.BANNED 
+    });
+    return { banned: (result.affected ?? 0) > 0 };
+  }
+
+  async unban(id: number): Promise<{ unbanned: boolean }> {
+    const result: UpdateResult = await this.repo.update(id, { 
+      status: AccountStatus.ACTIVE 
+    });
+    return { unbanned: (result.affected ?? 0) > 0 };
   }
 }
