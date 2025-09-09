@@ -82,7 +82,7 @@ export default function ManageAccountsPage() {
   const columns: ColumnDef<Account>[] = useMemo(
     () =>
       makeAccountColumns({
-        onEdit: (id) => router.push(`/mod/accounts/${id}/edit`),
+        onEdit: (id) => router.push(`/admin/manage-accounts/${id}/edit/abc`), //sửa sau edit không cần nữa
         onView: (id) => router.push(`/mod/accounts/${id}`),
         onRequestDelete: (id) => {
           setPendingId(id);
