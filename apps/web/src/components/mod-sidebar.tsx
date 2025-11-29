@@ -52,10 +52,6 @@ const data = {
           title: "Manage videos",
           url: "/mod/youtube/manage-videos",
         },
-        // {
-        //   title: "Settings",
-        //   url: "#",
-        // },
       ],
     },
     {
@@ -85,23 +81,9 @@ const data = {
     },
     {
       title: "Tutorial",
-      url: "#",
+      url: "/tutorials",
       icon: BookText,
       isActive: true,
-      items: [
-        {
-          title: "New Tutorial",
-          url: "/mod/tutorials/new",
-        },
-        {
-          title: "Manage Tutorials",
-          url: "/mod/tutorials/manage-tutorials",
-        },
-        // {
-        //   title: "Settings",
-        //   url: "#",
-        // },
-      ],
     },
     // {
     //   title: "Models",
