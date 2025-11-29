@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api";
 import {
   Tutorial,
   CreateTutorialRequest,
@@ -13,7 +13,8 @@ import { getAuthHeaders } from "@/utils/auth";
  * GET /tutorials
  */
 export async function getAllTutorials(): Promise<Tutorial[]> {
-  return fetcher<Tutorial[]>("/tutorials", { method: "GET" });
+  const res = await api.get<Tutorial[]>("/tutorials");
+  return res.data;
 }
 
 /**
@@ -21,7 +22,8 @@ export async function getAllTutorials(): Promise<Tutorial[]> {
  * GET /tutorials/:id
  */
 export async function getTutorialById(id: number): Promise<Tutorial> {
-  return fetcher<Tutorial>(`/tutorials/${id}`, { method: "GET" });
+  const res = await api.get<Tutorial>(`/tutorials/${id}`);
+  return res.data;
 }
 
 /**
@@ -31,9 +33,8 @@ export async function getTutorialById(id: number): Promise<Tutorial> {
 export async function getTutorialsByAuthor(
   authorId: number,
 ): Promise<Tutorial[]> {
-  return fetcher<Tutorial[]>(`/tutorials/author/${authorId}`, {
-    method: "GET",
-  });
+  const res = await api.get<Tutorial[]>(`/tutorials/author/${authorId}`);
+  return res.data;
 }
 
 /**
@@ -41,7 +42,8 @@ export async function getTutorialsByAuthor(
  * GET /tutorials/slug/:slug
  */
 export async function getTutorialBySlug(slug: string): Promise<Tutorial> {
-  return fetcher<Tutorial>(`/tutorials/slug/${slug}`, { method: "GET" });
+  const res = await api.get<Tutorial>(`/tutorials/slug/${slug}`);
+  return res.data;
 }
 
 /**
@@ -49,15 +51,19 @@ export async function getTutorialBySlug(slug: string): Promise<Tutorial> {
  * GET /tutorials/:id/published
  */
 export async function getTutorialPublishedById(id: number): Promise<Tutorial> {
-  return fetcher<Tutorial>(`/tutorials/${id}/published`, { method: "GET" });
+  const res = await api.get<Tutorial>(`/tutorials/${id}/published`);
+  return res.data;
 }
 
 /**
  * Get a published tutorial by slug
  * GET /tutorials/slug/:slug/published
  */
-export async function getTutorialPublishedBySlug(slug: string): Promise<Tutorial> {
-  return fetcher<Tutorial>(`/tutorials/slug/${slug}/published`, { method: "GET" });
+export async function getTutorialPublishedBySlug(
+  slug: string,
+): Promise<Tutorial> {
+  const res = await api.get<Tutorial>(`/tutorials/slug/${slug}/published`);
+  return res.data;
 }
 
 // ========== POST, PATCH, DELETE API ==========
@@ -71,14 +77,9 @@ export async function createTutorial(
   const body = {
     title: data.title,
     content: data.content,
-    //lý do có JWT hỗ trợ nên không gửi về
   };
-
-  return fetcher<Tutorial>("/tutorials", {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: getAuthHeaders(),
-  });
+  const res = await api.post<Tutorial>("/tutorials", body);
+  return res.data;
 }
 
 /**
@@ -89,11 +90,8 @@ export async function updateTutorial(
   id: number,
   data: UpdateTutorialRequest,
 ): Promise<Tutorial> {
-  return fetcher<Tutorial>(`/tutorials/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-    headers: getAuthHeaders(),
-  });
+  const res = await api.patch<Tutorial>(`/tutorials/${id}`, data);
+  return res.data;
 }
 
 /**
@@ -101,10 +99,7 @@ export async function updateTutorial(
  * DELETE /tutorials/:id
  */
 export async function deleteTutorial(id: number): Promise<void> {
-  return fetcher<void>(`/tutorials/${id}`, {
-    method: "DELETE",
-    headers: getAuthHeaders(),
-  });
+  await api.delete(`/tutorials/${id}`);
 }
 
 /**
@@ -115,11 +110,11 @@ export async function upsertTutorialTags(
   tutorialId: number,
   tagIds: number[],
 ): Promise<{ success: boolean }> {
-  return fetcher<{ success: boolean }>(`/tutorial-tags/${tutorialId}/tags`, {
-    method: "PATCH",
-    body: JSON.stringify({ tagIds }),
-    headers: getAuthHeaders(),
-  });
+  const res = await api.patch<{ success: boolean }>(
+    `/tutorial-tags/${tutorialId}/tags`,
+    { tagIds },
+  );
+  return res.data;
 }
 
 /**
@@ -127,8 +122,6 @@ export async function upsertTutorialTags(
  * GET /tutorials/:id/tags
  */
 export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
-  return fetcher<Tag[]>(`/tutorial-tags/${tutorialId}/tags`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+  const res = await api.get<Tag[]>(`/tutorial-tags/${tutorialId}/tags`);
+  return res.data;
 }

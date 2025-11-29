@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api";
 import type {
   Product,
   CreateProductDTO,
@@ -17,12 +17,8 @@ import { getAccessToken, getAuthHeaders } from "@/utils/auth";
  * POST /products
  */
 export async function createProduct(data: CreateProductDTO): Promise<Product> {
-  const token = getAccessToken();
-  return fetcher<Product>("/products", {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
+  const res = await api.post<Product>("/products", data);
+  return res.data;
 }
 
 /**
@@ -30,9 +26,8 @@ export async function createProduct(data: CreateProductDTO): Promise<Product> {
  * GET /products
  */
 export async function getAllProducts(): Promise<Product[]> {
-  return fetcher<Product[]>("/products", {
-    method: "GET",
-  });
+  const res = await api.get<Product[]>("/products");
+  return res.data;
 }
 
 /**
@@ -40,9 +35,8 @@ export async function getAllProducts(): Promise<Product[]> {
  * GET /products/:id
  */
 export async function getProductById(id: number): Promise<Product> {
-  return fetcher<Product>(`/products/${id}`, {
-    method: "GET",
-  });
+  const res = await api.get<Product>(`/products/${id}`);
+  return res.data;
 }
 
 /**
@@ -52,9 +46,8 @@ export async function getProductById(id: number): Promise<Product> {
 export async function getProductsByCreator(
   creatorId: number,
 ): Promise<Product[]> {
-  return fetcher<Product[]>(`/products/creator/${creatorId}`, {
-    method: "GET",
-  });
+  const res = await api.get<Product[]>(`/products/creator/${creatorId}`);
+  return res.data;
 }
 
 /**
@@ -65,11 +58,8 @@ export async function updateProduct(
   id: number,
   data: UpdateProductDTO,
 ): Promise<Product> {
-  return fetcher<Product>(`/products/${id}`, {
-    method: "PATCH",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
+  const res = await api.patch<Product>(`/products/${id}`, data);
+  return res.data;
 }
 
 /**
@@ -77,10 +67,7 @@ export async function updateProduct(
  * DELETE /products/:id
  */
 export async function deleteProduct(id: number): Promise<void> {
-  return fetcher<void>(`/products/${id}`, {
-    method: "DELETE",
-    headers: getAuthHeaders(),
-  });
+  await api.delete(`/products/${id}`);
 }
 
 /**
@@ -94,15 +81,11 @@ export async function assignCategoriesToProduct(
   categoryIds: number[],
 ): Promise<AssignCategoriesResponse> {
   const requestData: AssignCategoriesRequest = { productId, categoryIds };
-
-  return fetcher<AssignCategoriesResponse>(
+  const res = await api.put<AssignCategoriesResponse>(
     "/product-categories/assign-multiple",
-    {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(requestData),
-    },
+    requestData,
   );
+  return res.data;
 }
 
 /**
@@ -116,12 +99,7 @@ export async function linkProductCategory(
   categoryId: number,
 ): Promise<void> {
   const requestData: CreateProductCategoryRequest = { productId, categoryId };
-
-  return fetcher<void>("/product-categories/link", {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(requestData),
-  });
+  await api.post("/product-categories/link", requestData);
 }
 
 /**
@@ -132,10 +110,8 @@ export async function linkProductCategory(
 export async function getProductCategories(
   productId: number,
 ): Promise<ProductCategory[]> {
-  return fetcher<ProductCategory[]>(
+  const res = await api.get<ProductCategory[]>(
     `/product-categories/product/${productId}/categories`,
-    {
-      method: "GET",
-    },
   );
+  return res.data;
 }

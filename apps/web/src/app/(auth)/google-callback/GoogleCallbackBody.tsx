@@ -21,9 +21,7 @@ export function GoogleCallbackBody() {
     // After Google OAuth, fetch /me to get the access_token and store it in localStorage
     async function fetchAndStoreToken() {
       try {
-        const res = await fetch(`${API_URL}/me`, {
-          credentials: "include",
-        });
+        const res = await fetch(`${API_URL}/me`, {});
         if (!res.ok) throw new Error("Failed to fetch user info");
         const data = await res.json();
         if (data.access_token) {
