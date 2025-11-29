@@ -62,7 +62,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 flex h-14 items-center">
         {/* Logo on the left */}
         <Link href="/" className="mr-6 flex items-center space-x-2">
@@ -88,54 +88,18 @@ export function Navbar() {
         <NavigationMenu className="flex-1 justify-center" viewport={false}>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Tutorials</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <li className="row-span-3">
-                    <NavigationMenuLink asChild>
-                      <Link
-                        className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        href="/"
-                      >
-                        <div className="mb-2 mt-4 text-lg font-medium">
-                          DevWiki
-                        </div>
-                        <p className="text-sm leading-tight text-muted-foreground">
-                          A comprehensive development wiki for developers.
-                        </p>
-                      </Link>
-                    </NavigationMenuLink>
-                  </li>
-                  <ListItem href="/docs" title="Introduction">
-                    Get started with DevWiki and learn the basics.
-                  </ListItem>
-                  <ListItem href="/docs/installation" title="Installation">
-                    How to install dependencies and structure your app.
-                  </ListItem>
-                  <ListItem
-                    href="/docs/primitives/typography"
-                    title="Typography"
-                  >
-                    Styles for headings, paragraphs, lists...etc
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
+              <NavigationMenuLink asChild>
+                <Link href="/tutorials" className="px-4 py-2 font-medium">
+                  Tutorials
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Videos</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-3 p-6 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                  {videoComponents.map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
+              <NavigationMenuLink asChild>
+                <Link href="/videos" className="px-4 py-2 font-medium">
+                  Videos
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Products</NavigationMenuTrigger>
@@ -170,7 +134,7 @@ export function Navbar() {
         ) : (
           <div className="ml-auto flex items-center space-x-4">
             <Button
-              className="flex items-center justify-center rounded-full px-5 py-3 text-base h-9 min-w-[100px]"
+              className="flex items-center justify-center rounded-full px-5 py-2 text-base h-9 min-w-[100px] font-semibold shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 transition"
               size="sm"
               asChild
             >
