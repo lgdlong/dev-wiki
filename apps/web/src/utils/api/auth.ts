@@ -1,5 +1,5 @@
 // apps/web/src/utils/api/auth.ts
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api";
 import { Account } from "@/types/account";
 import { LoginResponse } from "@/types/auth";
 import { isJwtExpired } from "@/utils/jwt";
@@ -19,12 +19,8 @@ export async function loginApi({
   email: string;
   password: string;
 }): Promise<LoginResponse> {
-  // Nếu dùng cookie/session:
-  return fetcher("/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-    credentials: "include",
-  });
+  const res = await api.post<LoginResponse>("/login", { email, password });
+  return res.data;
 }
 
 // Đăng ký
@@ -37,57 +33,49 @@ export async function signupApi({
   email: string;
   password: string;
 }) {
-  return fetcher("/register", {
-    method: "POST",
-    body: JSON.stringify({ name, email, password }),
-  });
+  const res = await api.post("/register", { name, email, password });
+  return res.data;
 }
 
-// Lấy thông tin user hiện tại (đã đăng nhập)
+// Lấy thông tin user hiện tại (dùng access_token truyền vào)
+export async function getCurrentUser(token: string): Promise<Account> {
+  if (isJwtExpired(token)) {
+    throw new Error("Token hết hạn");
+  }
+  const res = await api.get<MeApiResponse>("/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.data && res.data.user) {
+    return res.data.user as Account;
+  }
+  throw new Error("Không lấy được thông tin user");
+}
+
+// Lấy thông tin user hiện tại (dùng token trong localStorage)
 export async function meApi(): Promise<MeApiResponse> {
-  // Lấy token từ localStorage
+  // Lấy token từ localStorage và kiểm tra hết hạn (nếu có logic này)
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-
-  // If token exists in localStorage, use it as before
-  if (token) {
-    if (isJwtExpired(token)) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user");
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
-      throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+  if (token && isJwtExpired(token)) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
     }
-    return fetcher<MeApiResponse>("/me", {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
   }
-
-  // If no token in localStorage, try cookie-based auth
-  const res = await fetcher<MeApiResponse>("/me", {
-    method: "GET",
-    credentials: "include",
-  });
-
-  // If backend returns access_token, store it in localStorage
-  if (res && res.access_token) {
-    localStorage.setItem("access_token", res.access_token);
-    return res.user as Account;
+  const res = await api.get<MeApiResponse>("/me");
+  if (res.data && res.data.access_token) {
+    localStorage.setItem("access_token", res.data.access_token);
+    return res.data.user as Account;
   }
-
-  // If no user or token, throw error
   throw new Error("Chưa đăng nhập hoặc không tìm thấy token!");
 }
 
 // Logout API: calls backend to clear the role cookie
 export async function logoutApi(): Promise<{ message: string }> {
-  return fetcher("/logout", {
-    method: "POST",
-    credentials: "include",
-  });
+  const res = await api.post("/logout");
+  return res.data;
 }

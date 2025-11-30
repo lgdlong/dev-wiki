@@ -12,10 +12,21 @@ import {
 import { VideosService } from './videos.service';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { RequestCreateVideo } from './interfaces/request-create-video.interface';
+import { Video } from './entities/video.entity';
 
 @Controller('videos')
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
+  @Get('tag/:tagId')
+  findByTag(@Param('tagId') tagId: string): Promise<Video[]> {
+    return this.videosService.findByTag(+tagId);
+  }
+
+  // GET /videos/tag-name/:tagName
+  @Get('tag-name/:tagName')
+  getVideosByTagName(@Param('tagName') tagName: string): Promise<Video[]> {
+    return this.videosService.findByTagName(tagName);
+  }
 
   @Post()
   create(@Body() reqCreateVideo: RequestCreateVideo) {

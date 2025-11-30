@@ -19,7 +19,6 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
-  // Sử dụng react-hook-form với zod để validate form và hiển thị lỗi
   const {
     register,
     handleSubmit,
@@ -33,12 +32,10 @@ export default function SignupPage() {
     mutationFn: signupApi,
     onSuccess: (data) => {
       console.log("Signup successful:", data);
-      // Xử lý thành công, ví dụ: lưu user, token, redirect...
       router.push("/");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
-      // Nếu backend trả lỗi, bạn có thể dùng setError để hiện lỗi cho từng field hoặc chung
       setError("root", { message: err.message || "Đăng ký thất bại" });
     },
   });
@@ -52,10 +49,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-zinc-950">
+    // bg-zinc-950 -> bg-background
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-background">
       <div className="w-full max-w-sm">
         <div className={cn("flex flex-col gap-6")}>
-          <Card className="bg-zinc-950 border-0">
+          {/* bg-zinc-950 -> bg-card */}
+          <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-center text-3xl font-bold">
                 Create your account
@@ -64,7 +63,6 @@ export default function SignupPage() {
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-3">
-                  {/* Name */}
                   <div className="grid gap-3">
                     <Input
                       id="name"
@@ -76,12 +74,11 @@ export default function SignupPage() {
                       {...register("name")}
                     />
                     {errors.name && (
-                      <span className="text-red-500 text-sm">
+                      <span className="text-destructive text-sm">
                         {errors.name.message}
                       </span>
                     )}
                   </div>
-                  {/* Email */}
                   <div className="grid gap-3">
                     <Input
                       id="email"
@@ -93,12 +90,11 @@ export default function SignupPage() {
                       {...register("email")}
                     />
                     {errors.email && (
-                      <span className="text-red-500 text-sm">
+                      <span className="text-destructive text-sm">
                         {errors.email.message}
                       </span>
                     )}
                   </div>
-                  {/* Password */}
                   <div className="grid gap-3">
                     <div className="relative">
                       <Input
@@ -114,25 +110,18 @@ export default function SignupPage() {
                         type="button"
                         tabIndex={-1}
                         onClick={() => setShowPassword((v) => !v)}
-                        className="absolute inset-y-0 right-2 flex items-center p-1 text-zinc-400 hover:text-zinc-200"
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
+                        className="absolute inset-y-0 right-2 flex items-center p-1 text-muted-foreground hover:text-foreground"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                     {errors.password && (
-                      <span className="text-red-500 text-sm">
+                      <span className="text-destructive text-sm">
                         {errors.password.message}
                       </span>
                     )}
                   </div>
-                  {/* Confirm Password */}
                   <div className="grid gap-3">
                     <div className="relative">
                       <Input
@@ -148,16 +137,14 @@ export default function SignupPage() {
                         type="button"
                         tabIndex={-1}
                         onClick={() => setShowConfirm((v) => !v)}
-                        className="absolute inset-y-0 right-2 flex items-center p-1 text-zinc-400 hover:text-zinc-200"
-                        aria-label={
-                          showConfirm ? "Hide password" : "Show password"
-                        }
+                        className="absolute inset-y-0 right-2 flex items-center p-1 text-muted-foreground hover:text-foreground"
+                        aria-label={showConfirm ? "Hide password" : "Show password"}
                       >
                         {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                     {errors.confirm && (
-                      <span className="text-red-500 text-sm">
+                      <span className="text-destructive text-sm">
                         {errors.confirm.message}
                       </span>
                     )}
@@ -179,18 +166,17 @@ export default function SignupPage() {
                       Sign up with Google
                     </Button>
                   </div>
-                  {/* Hiện lỗi của mutation hoặc lỗi chung (vd: backend trả về) */}
                   {(errors.root?.message || mutation.isError) && (
-                    <div className="text-red-500 text-center mt-2">
+                    <div className="text-destructive text-center mt-2 text-sm">
                       {errors.root?.message ||
                         (mutation.error as Error)?.message ||
                         "Đăng ký thất bại"}
                     </div>
                   )}
                 </div>
-                <div className="mt-4 text-center text-sm">
+                <div className="mt-4 text-center text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <Link href="/login" className="underline underline-offset-4">
+                  <Link href="/login" className="underline underline-offset-4 text-foreground">
                     Log in
                   </Link>
                 </div>

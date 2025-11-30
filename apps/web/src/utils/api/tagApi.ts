@@ -1,5 +1,5 @@
 // Create a new tag
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api";
 import { CreateTagRequest, Tag } from "@/types/tag";
 
 const BASE = "/tags";
@@ -11,10 +11,8 @@ const BASE = "/tags";
  * @return Promise<Tag>
  */
 export async function createTag(data: CreateTagRequest): Promise<Tag> {
-  return fetcher<Tag>(BASE, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  const res = await api.post<Tag>(BASE, data);
+  return res.data;
 }
 
 /**
@@ -23,9 +21,8 @@ export async function createTag(data: CreateTagRequest): Promise<Tag> {
  * @return Promise<Tag[]>
  */
 export async function getAllTags(): Promise<Tag[]> {
-  return fetcher<Tag[]>(BASE, {
-    method: "GET",
-  });
+  const res = await api.get<Tag[]>(BASE);
+  return res.data;
 }
 
 export async function searchTags(
@@ -38,9 +35,10 @@ export async function searchTags(
 }> {
   const params = new URLSearchParams({ q, limit: String(limit) });
   if (cursor) params.set("cursor", cursor);
-  return fetcher<{ items: Tag[]; nextCursor: string | null }>(
+  const res = await api.get<{ items: Tag[]; nextCursor: string | null }>(
     `${BASE}/search?${params.toString()}`,
   );
+  return res.data;
 }
 
 /**
@@ -50,9 +48,8 @@ export async function searchTags(
  * @return Promise<Tag>
  */
 export async function getTagById(id: number): Promise<Tag> {
-  return fetcher<Tag>(`${BASE}/${id}`, {
-    method: "GET",
-  });
+  const res = await api.get<Tag>(`${BASE}/${id}`);
+  return res.data;
 }
 
 /**
@@ -62,9 +59,8 @@ export async function getTagById(id: number): Promise<Tag> {
  * @return Promise<Tag>
  */
 export async function getTagByName(name: string): Promise<Tag> {
-  return fetcher<Tag>(`${BASE}/name/${name}`, {
-    method: "GET",
-  });
+  const res = await api.get<Tag>(`${BASE}/name/${name}`);
+  return res.data;
 }
 
 /**
@@ -78,20 +74,15 @@ export async function updateTag(
   id: number,
   data: CreateTagRequest,
 ): Promise<Tag> {
-  return fetcher<Tag>(`${BASE}/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
+  const res = await api.patch<Tag>(`${BASE}/${id}`, data);
+  return res.data;
 }
 
 /**
- * Update a tag
- * PATCH /tags/:id
+ * Delete a tag
+ * DELETE /tags/:id
  * @param id
- * @param data
  */
 export async function deleteTag(id: number): Promise<void> {
-  return fetcher<void>(`${BASE}/${id}`, {
-    method: "DELETE",
-  });
+  await api.delete(`${BASE}/${id}`);
 }

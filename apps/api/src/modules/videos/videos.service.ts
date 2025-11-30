@@ -1,7 +1,14 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  NotFoundException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { google } from 'googleapis';
+import { VideoTagsService } from '../video-tags/video-tags.service';
 import { Video } from './entities/video.entity';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { RequestCreateVideo } from './interfaces/request-create-video.interface';
@@ -13,9 +20,41 @@ export class VideosService {
   constructor(
     @InjectRepository(Video)
     private videoRepository: Repository<Video>,
+    @Inject(forwardRef(() => VideoTagsService))
+    private videoTagsService: VideoTagsService,
   ) {}
 
   private YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
+
+  /**
+   * Lấy danh sách video theo tên tag (không dùng relation, dùng module video-tags)
+   */
+  async findByTagName(tagName: string): Promise<Video[]> {
+    // 1. Lấy tag theo tên
+    // 2. Lấy videoId từ videoTagsService
+    // 3. Truy vấn video theo id
+    const tag = await this.videoTagsService['tagRepo'].findOne({
+      where: { name: tagName },
+    });
+    if (!tag) return [];
+    const videoTags = await this.videoTagsService['videoTagRepo'].find({
+      where: { tag: { id: tag.id } },
+      relations: ['video'],
+    });
+    const videos = videoTags.map((vt) => vt.video).filter(Boolean);
+    // Sắp xếp theo createdAt DESC
+    return videos.sort((a, b) => (b.createdAt as any) - (a.createdAt as any));
+  }
+
+  async findByTag(tagId: number): Promise<Video[]> {
+    // Không dùng relation, dùng module video-tags
+    const videoTags = await this.videoTagsService['videoTagRepo'].find({
+      where: { tag: { id: tagId } },
+      relations: ['video'],
+    });
+    const videos = videoTags.map((vt) => vt.video).filter(Boolean);
+    return videos.sort((a, b) => (b.createdAt as any) - (a.createdAt as any));
+  }
 
   // Tạo videos, tự động lấy metadata từ Youtube
   async create(requestCreateVideo: RequestCreateVideo): Promise<Video> {

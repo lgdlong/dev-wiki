@@ -8,19 +8,21 @@ import {
   ParseIntPipe,
   Patch,
   Get,
-  UseGuards,
   Request,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { RolesGuard } from '../../core/guards/roles.guard';
+import { Roles } from '../../core/decorators/roles.decorator';
 import { VideoTagsService } from './video-tags.service';
 import { CreateVideoTagDto } from './dto/create-video-tag.dto';
 import { UpsertVideoTagsDto } from './dto/upsert-video-tag.dto';
 import { Tag } from '../tags/entities/tag.entity';
 import { AuthenticatedRequest } from '../../shared/types/authenticated-request.interface';
+import { AccountRole } from 'src/shared/enums/account-role.enum';
 
 @Controller()
-@UseGuards(JwtAuthGuard)
 export class VideoTagsController {
   constructor(private readonly service: VideoTagsService) {}
 
@@ -45,6 +47,8 @@ export class VideoTagsController {
 
   // Thay toàn bộ tag của video
   @Patch('videos/:id/tags')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
   upsertForVideo(
     @Param('id', ParseIntPipe) videoId: number,
     @Body() body: Pick<UpsertVideoTagsDto, 'tagIds'>,

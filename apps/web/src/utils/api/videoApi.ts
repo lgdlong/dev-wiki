@@ -1,134 +1,84 @@
-import { fetcher } from "@/lib/fetcher";
+import { api } from "@/lib/api";
 import { Video, UpdateVideoRequest, CreateVideoRequest } from "@/types/video";
-import { getAccessToken } from "@/utils/auth";
 import { Tag } from "@/types/tag";
 
-/**
- * Create a new videos
- * POST /videos
- * @param data
- * @returns Promise<Video>
- */
 export async function createVideo(data: CreateVideoRequest): Promise<Video> {
-  return fetcher<Video>("/videos", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  const res = await api.post<Video>("/videos", data);
+  return res.data;
 }
 
-/**
- * Get all videos
- * GET /videos
- * @return Promise<Video[]>
- */
 export async function getAllVideos(): Promise<Video[]> {
-  return fetcher<Video[]>("/videos", {
-    method: "GET",
-  });
+  const res = await api.get<Video[]>("/videos");
+  return res.data;
 }
 
-// Get a videos by ID
 export async function getVideoById(id: number): Promise<Video> {
-  return fetcher<Video>(`/videos/${id}`, {
-    method: "GET",
-  });
+  const res = await api.get<Video>(`/videos/${id}`);
+  return res.data;
 }
 
-// Get a videos by YouTube ID
 export async function getVideoByYoutubeId(youtubeId: string): Promise<Video> {
-  return fetcher<Video>(`/videos/youtube/${youtubeId}`, {
-    method: "GET",
-  });
+  const res = await api.get<Video>(`/videos/youtube/${youtubeId}`);
+  return res.data;
 }
 
-// Get videos by uploader
 export async function getVideosByUploader(
   uploaderId: number,
 ): Promise<Video[]> {
-  return fetcher<Video[]>(`/videos/uploader/${uploaderId}`, {
-    method: "GET",
-  });
+  const res = await api.get<Video[]>(`/videos/uploader/${uploaderId}`);
+  return res.data;
 }
 
-// Update a videos
 export async function updateVideo(
   id: number,
   data: UpdateVideoRequest,
 ): Promise<Video> {
-  return fetcher<Video>(`/videos/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
+  const res = await api.patch<Video>(`/videos/${id}`, data);
+  return res.data;
 }
 
-/**
- * Delete a videos
- * DELETE /videos/:id
- * @param id
- * @returns Promise<void>
- */
 export async function deleteVideo(id: number): Promise<void> {
-  return fetcher<void>(`/videos/${id}`, {
-    method: "DELETE",
-  });
+  await api.delete(`/videos/${id}`);
 }
 
 export async function upsertVideoTags(
   videoId: number,
   tagIds: number[],
 ): Promise<{ success: boolean }> {
-  const token = getAccessToken();
-  return fetcher<{ success: boolean }>(`/videos/${videoId}/tags`, {
-    method: "PATCH",
-    body: JSON.stringify({ tagIds }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+  const res = await api.patch<{ success: boolean }>(`/videos/${videoId}/tags`, {
+    tagIds,
   });
+  return res.data;
 }
 
-// @Get('videos/:id/tags')
 export async function getVideoTags(videoId: number): Promise<Tag[]> {
-  const token = getAccessToken();
-  return fetcher<Tag[]>(`/videos/${videoId}/tags`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await api.get<Tag[]>(`/videos/${videoId}/tags`);
+  return res.data;
 }
 
-/** ✅ Link one tag immediately (commit-ngay) */
 export async function linkVideoTag(
   videoId: number,
   tagId: number,
 ): Promise<Tag[]> {
-  const token = getAccessToken();
-  // BE: POST /videos/:id/tags body { tagId } → nên trả Tag[] linked hiện tại
-  return fetcher<Tag[]>(`/videos/${videoId}/tags`, {
-    method: "POST",
-    body: JSON.stringify({ tagId }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await api.post<Tag[]>(`/videos/${videoId}/tags`, { tagId });
+  return res.data;
 }
 
-/** ✅ Unlink one tag immediately (commit-ngay) */
 export async function unlinkVideoTag(
   videoId: number,
   tagId: number,
 ): Promise<void> {
-  const token = getAccessToken();
-  // BE: DELETE /videos/:id/tags/:tagId → 204
-  return fetcher<void>(`/videos/${videoId}/tags/${tagId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  await api.delete(`/videos/${videoId}/tags/${tagId}`);
+}
+
+export async function getVideosByTag(tagId: number): Promise<Video[]> {
+  const res = await api.get<Video[]>(`/videos/tag/${tagId}`);
+  return res.data;
+}
+
+export async function getVideosByTagName(tagName: string): Promise<Video[]> {
+  const res = await api.get<Video[]>(
+    `/videos/tag-name/${encodeURIComponent(tagName)}`,
+  );
+  return res.data;
 }

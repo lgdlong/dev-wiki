@@ -125,4 +125,17 @@ export class TutorialTagsService {
     // 4) trả về tags mới
     return tags;
   }
+
+  async getTutorialsByTagName(tagName: string): Promise<Tutorial[]> {
+    // 1. Find tag by name
+    const tag = await this.tagRepository.findOne({ where: { name: tagName } });
+    if (!tag) return [];
+    // 2. Find all tutorial-tag links for this tag
+    const tutorialTags = await this.tutorialTagRepository.find({
+      where: { tagId: tag.id },
+      relations: ['tutorial'],
+    });
+    // 3. Return array of tutorials
+    return tutorialTags.map((tt) => tt.tutorial).filter(Boolean);
+  }
 }

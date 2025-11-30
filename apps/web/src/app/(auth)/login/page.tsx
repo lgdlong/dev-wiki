@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation"; // ĐÚNG cho App Router
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { loginApi } from "@/utils/api/auth";
+import { loginApi, getCurrentUser } from "@/utils/api/auth";
 import { LoginResponse } from "@/types/auth";
 import { NEXT_PUBLIC_GOOGLE_AUTH_URL } from "@/config/constants";
 
@@ -15,28 +15,31 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  // React Query mutation
   const mutation = useMutation<
     LoginResponse,
     Error,
     { email: string; password: string }
   >({
     mutationFn: loginApi,
-    onSuccess: (data) => {
-      // data sẽ là kiểu LoginResponse, gợi ý đầy đủ
+    onSuccess: async (data) => {
       if (data.access_token) {
         localStorage.setItem("access_token", data.access_token);
-        console.log("[DEBUG] Token:", data.access_token);
-      }
-      console.log("[DEBUG] Login successful:", data.account);
+        try {
+          // Gọi API lấy user info với access_token vừa nhận
+          const user = await getCurrentUser(data.access_token);
 
-      // redirect mod, admin, user base on roles
-      if (data.account.role === "mod") {
-        router.push("/mod");
-      } else if (data.account.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/");
+          if (user.role === "mod") {
+            router.push("/mod");
+          } else if (user.role === "admin") {
+            router.push("/admin");
+          } else {
+            router.push("/");
+          }
+        } catch (err) {
+          // Nếu lỗi khi lấy user info, xóa token và báo lỗi
+          localStorage.removeItem("access_token");
+          alert("Login failed: Cannot fetch user info");
+        }
       }
     },
   });
@@ -47,9 +50,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-zinc-950">
+    // bg-zinc-950 -> bg-background
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-background">
       <div className="w-full max-w-sm">
-        <Card className="bg-zinc-950 border-0">
+        {/* Card tự động có bg-card theo theme, bỏ bg-zinc-950 */}
+        <Card className="border-border">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold">
               Log in to Dev Wiki
@@ -84,7 +89,7 @@ export default function LoginPage() {
                   <div className="flex items-center">
                     <a
                       href="#"
-                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-muted-foreground"
                     >
                       Forgot your password?
                     </a>
@@ -98,7 +103,10 @@ export default function LoginPage() {
                   >
                     {mutation.isPending ? "Logging in..." : "Login"}
                   </Button>
-                  <Link href={NEXT_PUBLIC_GOOGLE_AUTH_URL || "#"}>
+                  <Link
+                    href={NEXT_PUBLIC_GOOGLE_AUTH_URL || "#"}
+                    className="w-full"
+                  >
                     <Button
                       variant="outline"
                       className="w-full py-5"
@@ -109,14 +117,17 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 {mutation.isError && (
-                  <div className="text-red-500 text-center mt-2">
+                  <div className="text-destructive text-center mt-2 text-sm">
                     {(mutation.error as Error).message}
                   </div>
                 )}
               </div>
-              <div className="mt-4 text-center text-sm">
+              <div className="mt-4 text-center text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline underline-offset-4">
+                <Link
+                  href="/signup"
+                  className="underline underline-offset-4 text-foreground"
+                >
                   Sign up
                 </Link>
               </div>
