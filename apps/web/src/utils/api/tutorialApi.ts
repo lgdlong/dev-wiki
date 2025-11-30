@@ -78,3 +78,13 @@ export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
   const res = await api.get<Tag[]>(`/tutorial-tags/${tutorialId}/tags`);
   return res.data;
 }
+
+// Get all tutorials by tag name (calls /tutorial-tags/tag-name/:name/tutorials)
+export async function getTutorialsByTagName(
+  tagName: string,
+): Promise<Tutorial[]> {
+  const res = await api.get<Tutorial[]>(
+    `/tutorial-tags/tag-name/${encodeURIComponent(tagName)}/tutorials`,
+  );
+  return res.data;
+}
