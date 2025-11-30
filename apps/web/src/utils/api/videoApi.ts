@@ -1,6 +1,5 @@
 import { api } from "@/lib/api";
 import { Video, UpdateVideoRequest, CreateVideoRequest } from "@/types/video";
-import { getAccessToken } from "@/utils/auth";
 import { Tag } from "@/types/tag";
 
 export async function createVideo(data: CreateVideoRequest): Promise<Video> {
@@ -52,13 +51,11 @@ export async function upsertVideoTags(
   return res.data;
 }
 
-// @Get('videos/:id/tags')
 export async function getVideoTags(videoId: number): Promise<Tag[]> {
   const res = await api.get<Tag[]>(`/videos/${videoId}/tags`);
   return res.data;
 }
 
-/** ✅ Link one tag immediately (commit-ngay) */
 export async function linkVideoTag(
   videoId: number,
   tagId: number,
@@ -67,7 +64,6 @@ export async function linkVideoTag(
   return res.data;
 }
 
-/** ✅ Unlink one tag immediately (commit-ngay) */
 export async function unlinkVideoTag(
   videoId: number,
   tagId: number,
