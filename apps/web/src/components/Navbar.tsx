@@ -127,21 +127,26 @@ export function Navbar() {
               {account.data.email}
             </span>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-1" />
-              Sign Out
+              Đăng xuất
             </Button>
           </div>
         ) : (
-          <div className="ml-auto flex items-center space-x-4">
+          <div className="ml-auto flex items-center space-x-3">
             <Button
-              className="flex items-center justify-center rounded-full px-5 py-2 text-base h-9 min-w-[100px] font-semibold shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 transition"
-              size="sm"
+              variant="ghost"
+              size="lg"
+              className=" px-6 py-2 text-base font-medium"
               asChild
             >
-              <Link href="/login">
-                <LogIn className="h-5 w-5 mr-2" />
-                Sign in
-              </Link>
+              <Link href="/login">Đăng nhập</Link>
+            </Button>
+            <Button
+              variant="default"
+              size="lg"
+              className="rounded-md px-6 py-2 text-base font-semibold bg-primary text-primary-foreground shadow hover:bg-primary/90 transition"
+              asChild
+            >
+              <Link href="/signup">Đăng ký</Link>
             </Button>
           </div>
         )}
