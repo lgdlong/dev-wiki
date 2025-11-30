@@ -63,93 +63,82 @@ export function Navbar() {
 
   return (
     <header className="w-full border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-4 flex h-14 items-center">
-        {/* Logo on the left */}
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Image
-            src="/vercel.svg"
-            alt="DevWiki Logo"
-            width={24}
-            height={24}
-            className="h-6 w-6"
-          />
-          <span className="hidden font-bold sm:inline-block">DevWiki</span>
-        </Link>
-        {/* Search bar */}
-        <div className="relative flex-1 max-w-xs mr-6">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search ( ctrl + k )"
-            className="pl-9 pr-4 h-10 rounded-full bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-ring"
-          />
+      <div className="max-w-7xl mx-auto px-4 flex h-14 items-center justify-between">
+        {/* Logo (left) */}
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="/vercel.svg"
+              alt="DevWiki Logo"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+            <span className="hidden font-bold sm:inline-block">DevWiki</span>
+          </Link>
         </div>
-        {/* Navigation Menu in the center */}
-        <NavigationMenu className="flex-1 justify-center" viewport={false}>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link href="/tutorials" className="px-4 py-2 font-medium">
-                  Tutorials
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link href="/videos" className="px-4 py-2 font-medium">
-                  Videos
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[300px] gap-3 p-4">
-                  <ListItem href="/tutorials" title="Tutorials">
-                    Step-by-step tutorials and guides.
-                  </ListItem>
-                  <ListItem href="/examples" title="Examples">
-                    Code examples and demos.
-                  </ListItem>
-                  <ListItem href="/blog" title="Blog">
-                    Read our latest blog posts.
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
 
-        {/* Sign In/Sign Up Buttons or Account Email Display */}
-        {account && account.data?.email ? (
-          <div className="ml-auto flex items-center space-x-4">
-            <span className="text-sm font-medium text-primary text-right">
-              {account.data.email}
-            </span>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Đăng xuất
-            </Button>
-          </div>
-        ) : (
-          <div className="ml-auto flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="lg"
-              className=" px-6 py-2 text-base font-medium"
-              asChild
-            >
-              <Link href="/login">Đăng nhập</Link>
-            </Button>
-            <Button
-              variant="default"
-              size="lg"
-              className="rounded-md px-6 py-2 text-base font-semibold bg-primary text-primary-foreground shadow hover:bg-primary/90 transition"
-              asChild
-            >
-              <Link href="/signup">Đăng ký</Link>
-            </Button>
-          </div>
-        )}
+        {/* Nav items (center) */}
+        <div className="flex-1 flex justify-center">
+          <NavigationMenu className="" viewport={false}>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link href="/tutorials" className="px-4 py-2 font-medium">
+                    Tutorials
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link href="/videos" className="px-4 py-2 font-medium">
+                    Videos
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link href="/products" className="px-4 py-2 font-medium">
+                    Products
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+
+        {/* Auth buttons (right) */}
+        <div className="flex items-center">
+          {account && account.data?.email ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-primary text-right">
+                {account.data.email}
+              </span>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                Đăng xuất
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="px-6 py-2 text-base font-medium"
+                asChild
+              >
+                <Link href="/login">Đăng nhập</Link>
+              </Button>
+              <Button
+                variant="default"
+                size="lg"
+                className="rounded-md px-6 py-2 text-base font-semibold bg-primary text-primary-foreground shadow hover:bg-primary/90 transition"
+                asChild
+              >
+                <Link href="/signup">Đăng ký</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
