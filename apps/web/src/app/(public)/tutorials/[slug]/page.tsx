@@ -13,11 +13,12 @@ import { Clock } from "lucide-react";
 import HashScroll from "@/components/hash-scroll";
 import Link from "next/link";
 import { estimateReadTime, extractHeadings } from "@/utils/markdownHelpers";
+import { Badge } from "@/components/ui/badge";
 
 async function fetchTutorial(slug: string): Promise<Tutorial> {
   try {
     return await getTutorialBySlug(slug);
-  } catch(e) {
+  } catch (e) {
     console.error("Failed to fetch tutorial:", e);
     notFound();
   }
@@ -25,7 +26,9 @@ async function fetchTutorial(slug: string): Promise<Tutorial> {
 
 export default async function TutorialPage({
   params,
-}: { params: Promise<{ slug: string }> }) {
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
 
   let tutorial: Tutorial | null = await fetchTutorial(slug);
@@ -38,14 +41,21 @@ export default async function TutorialPage({
       ...defaultSchema.attributes,
       span: [...(defaultSchema.attributes?.span ?? []), ["className"]],
       code: [...(defaultSchema.attributes?.code ?? []), ["className"]],
-      pre:  [...(defaultSchema.attributes?.pre  ?? []), ["className"]],
+      pre: [...(defaultSchema.attributes?.pre ?? []), ["className"]],
       a: [
         ...(defaultSchema.attributes?.a ?? []),
-        ["href"], ["target"], ["rel"],
+        ["href"],
+        ["target"],
+        ["rel"],
       ],
       img: [
         ...(defaultSchema.attributes?.img ?? []),
-        ["src"], ["alt"], ["width"], ["height"], ["loading"], ["decoding"],
+        ["src"],
+        ["alt"],
+        ["width"],
+        ["height"],
+        ["loading"],
+        ["decoding"],
         ["referrerPolicy"],
       ],
       h1: [...(defaultSchema.attributes?.h1 ?? []), ["id"]],
@@ -90,7 +100,7 @@ export default async function TutorialPage({
                 // Placeholder avatar with initial
                 <div className="w-5 h-5 rounded-full bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center">
                   <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-                    {tutorial.authorName?.charAt(0).toUpperCase() || 'A'}
+                    {tutorial.authorName?.charAt(0).toUpperCase() || "A"}
                   </span>
                 </div>
               )}
@@ -120,26 +130,32 @@ export default async function TutorialPage({
           {tutorial.tags && tutorial.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
               {tutorial.tags.map((tag) => (
-                <span
+                <Badge
                   key={tag.id}
-                  className="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium border border-zinc-300 dark:border-zinc-700"
+                  variant="outline"
+                  className="text-xs font-medium px-3 py-1 rounded-full"
                 >
                   {tag.name}
-                </span>
+                </Badge>
               ))}
             </div>
           )}
         </header>
 
-
         {/* TOC */}
         {headings.length > 0 && (
           <div className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 mb-12">
-            <h2 className="text-lg font-semibold text-black dark:text-white mb-4">Table of Contents</h2>
+            <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
+              Table of Contents
+            </h2>
             <nav className="space-y-2">
               {headings.map((h, i) => {
                 const pad =
-                  h.level <= 2 ? "" : h.level === 3 ? "pl-4 text-sm" : "pl-6 text-sm";
+                  h.level <= 2
+                    ? ""
+                    : h.level === 3
+                      ? "pl-4 text-sm"
+                      : "pl-6 text-sm";
                 return (
                   <a
                     key={`${h.id}-${i}`}
@@ -170,29 +186,44 @@ export default async function TutorialPage({
               components={{
                 // Headings with sticky offset
                 h1: ({ children, ...props }) => (
-                  <h1 className="text-3xl md:text-4xl font-semibold mb-6 leading-tight scroll-mt-24" {...props}>
+                  <h1
+                    className="text-3xl md:text-4xl font-semibold mb-6 leading-tight scroll-mt-24"
+                    {...props}
+                  >
                     {children}
                   </h1>
                 ),
                 h2: ({ children, ...props }) => (
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-4 mt-12 scroll-mt-24" {...props}>
+                  <h2
+                    className="text-2xl md:text-3xl font-semibold mb-4 mt-12 scroll-mt-24"
+                    {...props}
+                  >
                     {children}
                   </h2>
                 ),
                 h3: ({ children, ...props }) => (
-                  <h3 className="text-xl md:text-2xl font-semibold mb-3 mt-8 scroll-mt-24" {...props}>
+                  <h3
+                    className="text-xl md:text-2xl font-semibold mb-3 mt-8 scroll-mt-24"
+                    {...props}
+                  >
                     {children}
                   </h3>
                 ),
                 h4: ({ children, ...props }) => (
-                  <h4 className="text-lg md:text-xl font-semibold mb-2 mt-6 scroll-mt-24" {...props}>
+                  <h4
+                    className="text-lg md:text-xl font-semibold mb-2 mt-6 scroll-mt-24"
+                    {...props}
+                  >
                     {children}
                   </h4>
                 ),
 
                 // Paragraphs
                 p: ({ children, ...props }) => (
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6" {...props}>
+                  <p
+                    className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6"
+                    {...props}
+                  >
                     {children}
                   </p>
                 ),
@@ -249,7 +280,12 @@ export default async function TutorialPage({
                     );
                   }
                   return (
-                    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      {...props}
+                    >
                       {children}
                     </a>
                   );
@@ -282,34 +318,52 @@ export default async function TutorialPage({
                 // Basic table styling kept
                 table: ({ children, ...props }) => (
                   <div className="overflow-x-auto my-6">
-                    <table className="min-w-full border-collapse border border-zinc-300 dark:border-zinc-600" {...props}>
+                    <table
+                      className="min-w-full border-collapse border border-zinc-300 dark:border-zinc-600"
+                      {...props}
+                    >
                       {children}
                     </table>
                   </div>
                 ),
                 th: ({ children, ...props }) => (
-                  <th className="border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 px-4 py-2 text-left font-semibold" {...props}>
+                  <th
+                    className="border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 px-4 py-2 text-left font-semibold"
+                    {...props}
+                  >
                     {children}
                   </th>
                 ),
                 td: ({ children, ...props }) => (
-                  <td className="border border-zinc-300 dark:border-zinc-600 px-4 py-2" {...props}>
+                  <td
+                    className="border border-zinc-300 dark:border-zinc-600 px-4 py-2"
+                    {...props}
+                  >
                     {children}
                   </td>
                 ),
                 blockquote: ({ children, ...props }) => (
-                  <blockquote className="border-l-4 border-zinc-300 dark:border-zinc-600 pl-6 italic text-zinc-600 dark:text-zinc-400 my-6" {...props}>
+                  <blockquote
+                    className="border-l-4 border-zinc-300 dark:border-zinc-600 pl-6 italic text-zinc-600 dark:text-zinc-400 my-6"
+                    {...props}
+                  >
                     {children}
                   </blockquote>
                 ),
                 ul: ({ children, ...props }) => (
-                  <ul className="space-y-2 my-6" {...props}>{children}</ul>
+                  <ul className="space-y-2 my-6" {...props}>
+                    {children}
+                  </ul>
                 ),
                 ol: ({ children, ...props }) => (
-                  <ol className="space-y-2 my-6" {...props}>{children}</ol>
+                  <ol className="space-y-2 my-6" {...props}>
+                    {children}
+                  </ol>
                 ),
                 li: ({ children, ...props }) => (
-                  <li className="leading-relaxed" {...props}>{children}</li>
+                  <li className="leading-relaxed" {...props}>
+                    {children}
+                  </li>
                 ),
               }}
             >
