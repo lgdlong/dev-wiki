@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "./globals.css";
 import { usePathname } from "next/navigation";
@@ -52,10 +53,10 @@ export default function RootLayout({
         antialiased`}
       >
         <QueryClientProvider client={queryClient}>
-          <Toaster richColors /> {/* 👈 THÊM DÒNG NÀY */}
+          <Toaster richColors />
           {showNavbar && <Navbar />}
           {children}
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </body>
     </html>
