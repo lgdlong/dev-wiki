@@ -62,7 +62,7 @@ export default function VideosPage() {
               <div className="flex justify-end p-2"></div>
               <div className="p-4 pt-2 flex flex-col gap-2">
                 <Input
-                  placeholder="Search tag..."
+                  placeholder="Tìm tag..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="mb-2"
