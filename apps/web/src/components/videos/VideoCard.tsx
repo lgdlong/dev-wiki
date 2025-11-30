@@ -107,7 +107,7 @@ export function VideoCard({ video, className }: VideoCardProps) {
             ) : (
               // Empty state: Nếu không có tag nào
               <span className="text-xs text-muted-foreground/50 italic">
-                No tags
+                Không có tag
               </span>
             )}
           </div>
@@ -129,7 +129,7 @@ export function VideoCard({ video, className }: VideoCardProps) {
             <a
             // href={`/videos/${video.id}`}
             >
-              {video.title || "Untitled Video"}
+              {video.title || "Video chưa có tiêu đề"}
             </a>
           </h3>
         </CardContent>
@@ -138,7 +138,7 @@ export function VideoCard({ video, className }: VideoCardProps) {
         <CardFooter className="flex items-center justify-between p-4 pt-0 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5 truncate">
             <span className="truncate hover:text-foreground">
-              {video.channelTitle || "Unknown Channel"}
+              {video.channelTitle || "Kênh không xác định"}
             </span>
           </div>
 

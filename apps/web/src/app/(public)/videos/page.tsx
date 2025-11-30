@@ -44,7 +44,7 @@ export default function VideosPage() {
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Videos Library
+              Thư viện Video
             </h1>
             <p className="mt-2 text-muted-foreground">
               Tuyển tập các video hướng dẫn lập trình chất lượng cao.
@@ -55,7 +55,7 @@ export default function VideosPage() {
             <DialogTrigger asChild>
               <Button variant="outline" className="h-9 gap-2">
                 <SlidersHorizontal className="h-4 w-4" />
-                Filter by Tag
+                Lọc theo Tag
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-xl p-0 top-1/3">
@@ -121,18 +121,18 @@ export default function VideosPage() {
             ))
           ) : isError ? (
             <div className="col-span-full py-12 text-center">
-              <p className="text-destructive">Failed to load videos.</p>
+              <p className="text-destructive">Không thể tải danh sách video.</p>
               <Button
                 variant="link"
                 onClick={() => window.location.reload()}
                 className="mt-2"
               >
-                Try again
+                Thử lại
               </Button>
             </div>
           ) : videos.length === 0 ? (
             <div className="col-span-full py-20 text-center text-muted-foreground">
-              No videos found. Check back later!
+              Không có video nào. Vui lòng quay lại sau!
             </div>
           ) : (
             // Real Data

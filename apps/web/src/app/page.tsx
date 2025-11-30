@@ -12,16 +12,20 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <main className="flex flex-col gap-6 items-center w-full max-w-md">
         <h1 className="text-4xl font-semibold text-foreground mb-2 text-center">
-          {isLoading && "Đang tải..."}
+          {isLoading && "Đang tải dữ liệu..."}
           {isError && "Bạn chưa đăng nhập"}
-          {account && <>Xin chào.</>}
+          {account && <>Xin chào, bạn đã đăng nhập!</>}
         </h1>
 
         {account && (
           // bg-zinc-900 -> bg-card, border-zinc-700 -> border-border
           <div className="w-full rounded-2xl bg-card border border-border p-6 shadow-sm flex flex-col items-center gap-2">
-            <div className="text-muted-foreground text-base">{account.email}</div>
-            <div className="text-muted-foreground text-base">{account.name}</div>
+            <div className="text-muted-foreground text-base">
+              {account.email}
+            </div>
+            <div className="text-muted-foreground text-base">
+              {account.name}
+            </div>
             <button
               onClick={handleLogout}
               disabled={isPending}
@@ -43,7 +47,7 @@ export default function Home() {
       </main>
 
       <footer className="absolute bottom-4 left-0 right-0 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Dev Wiki. Powered by Next.js + NestJS.
+        © {new Date().getFullYear()} Dev Wiki. Xây dựng với Next.js & NestJS.
       </footer>
     </div>
   );

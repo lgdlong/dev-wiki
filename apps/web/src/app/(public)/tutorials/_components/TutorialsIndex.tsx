@@ -9,9 +9,17 @@ import { getAllTutorials } from "@/utils/api/tutorialApi";
 import CardSkeleton from "./CardSkeleton";
 import { Search } from "lucide-react";
 
-const DATE_FMT: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "2-digit" };
+const DATE_FMT: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "2-digit",
+};
 function formatDate(d: string | number | Date) {
-  try { return new Date(d).toLocaleDateString(undefined, DATE_FMT); } catch { return ""; }
+  try {
+    return new Date(d).toLocaleDateString(undefined, DATE_FMT);
+  } catch {
+    return "";
+  }
 }
 function estimateReadTime(text?: string): string {
   if (!text) return "";
@@ -20,11 +28,19 @@ function estimateReadTime(text?: string): string {
   return `${minutes} min read`;
 }
 
-export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string }) {
+export default function TutorialsIndex({
+  initialQ = "",
+}: {
+  initialQ?: string;
+}) {
   const router = useRouter();
   const [q, setQ] = useState(initialQ);
 
-  const { data: tutorials = [], isLoading, isError } = useQuery<Tutorial[]>({
+  const {
+    data: tutorials = [],
+    isLoading,
+    isError,
+  } = useQuery<Tutorial[]>({
     queryKey: ["tutorials", { q }],
     queryFn: () => getAllTutorials(),
   });
@@ -42,7 +58,9 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
         {/* Header + search */}
         <div className="mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Tutorials</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+              Bài viết hướng dẫn
+            </h1>
             <p className="text-zinc-500 dark:text-zinc-400">
               Khám phá các bài viết kỹ thuật mới nhất.
             </p>
@@ -66,7 +84,7 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
             <input
               name="q"
               defaultValue={initialQ}
-              placeholder="Search tutorials..."
+              placeholder="Tìm kiếm bài viết..."
               className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-lg
                 bg-white dark:bg-zinc-900
                 border border-zinc-200 dark:border-zinc-800
@@ -90,7 +108,9 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
         {/* Error State */}
         {isError && (
           <div className="text-center py-12 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20">
-            <p className="text-red-600 dark:text-red-400">Error loading tutorials.</p>
+            <p className="text-red-600 dark:text-red-400">
+              Không thể tải danh sách bài viết.
+            </p>
           </div>
         )}
 
@@ -98,7 +118,7 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
         {!isLoading && !isError && filtered.length === 0 && (
           <div className="text-center py-16">
             <p className="text-zinc-500 dark:text-zinc-400 text-lg">
-              No tutorials found{q ? ` for “${q}”` : ""}.
+              Không tìm thấy bài viết nào{q ? ` cho “${q}”` : ""}.
             </p>
           </div>
         )}
@@ -110,7 +130,9 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
               const href = `/tutorials/${t.slug}`;
 
               // Tách riêng các phần subtitle để dễ style
-              const dateStr = t.createdAt ? formatDate(t.createdAt as any) : null;
+              const dateStr = t.createdAt
+                ? formatDate(t.createdAt as any)
+                : null;
               const viewsStr = t.views != null ? `${t.views} views` : null;
               const readTimeStr = estimateReadTime(t.content as any);
 
@@ -127,13 +149,19 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
                   >
                     <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3">
                       {dateStr && <span>{dateStr}</span>}
-                      {dateStr && readTimeStr && <span className="text-zinc-300 dark:text-zinc-700">•</span>}
+                      {dateStr && readTimeStr && (
+                        <span className="text-zinc-300 dark:text-zinc-700">
+                          •
+                        </span>
+                      )}
                       {readTimeStr && <span>{readTimeStr}</span>}
                     </div>
 
-                    <h2 className="text-xl font-bold leading-snug mb-3 line-clamp-2
+                    <h2
+                      className="text-xl font-bold leading-snug mb-3 line-clamp-2
                       text-zinc-900 dark:text-zinc-100
-                      group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                    >
                       {t.title}
                     </h2>
 
@@ -143,8 +171,18 @@ export default function TutorialsIndex({ initialQ = "" }: { initialQ?: string })
                       </span>
                       <span className="font-semibold text-zinc-900 dark:text-zinc-200 group-hover:translate-x-1 transition-transform inline-flex items-center">
                         Read more
-                        <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        <svg
+                          className="w-4 h-4 ml-1"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
                         </svg>
                       </span>
                     </div>
