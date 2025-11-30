@@ -1,19 +1,35 @@
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link"; // No longer needed
 import { useMemo, useState } from "react";
+// Removed: useTagQuery, Tag (now in TutorialCard)
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { Tutorial } from "@/types/tutorial";
-import { getAllTutorials } from "@/utils/api/tutorialApi";
+import { getAllTutorials, getTutorialTags } from "@/utils/api/tutorialApi";
 import CardSkeleton from "./CardSkeleton";
+import TutorialCard from "./TutorialCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SlidersHorizontal } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { getAllTags } from "@/utils/api/tagApi";
+import Link from "next/link";
 import { Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const DATE_FMT: Intl.DateTimeFormatOptions = {
   year: "numeric",
   month: "short",
   day: "2-digit",
 };
+
 function formatDate(d: string | number | Date) {
   try {
     return new Date(d).toLocaleDateString(undefined, DATE_FMT);
@@ -21,6 +37,7 @@ function formatDate(d: string | number | Date) {
     return "";
   }
 }
+
 function estimateReadTime(text?: string): string {
   if (!text) return "";
   const words: number = text.trim().split(/\s+/).length;
@@ -30,33 +47,54 @@ function estimateReadTime(text?: string): string {
 
 export default function TutorialsIndex({
   initialQ = "",
+  tagName = "",
 }: {
   initialQ?: string;
+  tagName?: string;
 }) {
   const router = useRouter();
-  const [q, setQ] = useState(initialQ);
+  const [showTagFilter, setShowTagFilter] = useState(false);
+  const [search, setSearch] = useState(""); // for tag search in dialog
+  const [tutorialSearch, setTutorialSearch] = useState(initialQ);
+  const [selectedTag, setSelectedTag] = useState(tagName);
 
   const {
     data: tutorials = [],
     isLoading,
     isError,
   } = useQuery<Tutorial[]>({
-    queryKey: ["tutorials", { q }],
+    queryKey: ["tutorials"],
     queryFn: () => getAllTutorials(),
   });
 
+  // Fetch all tags for filter
+  const { data: tags = [], isLoading: isLoadingTags } = useQuery({
+    queryKey: ["all-tags"],
+    queryFn: () => getAllTags(),
+  });
+
+  // Filter tutorials by search and tag
   const filtered: Tutorial[] = useMemo(() => {
-    if (!q) return tutorials;
-    const ql = q.toLowerCase();
-    return tutorials.filter((t) => t.title?.toLowerCase().includes(ql));
-  }, [tutorials, q]);
+    let result = tutorials;
+    if (selectedTag) {
+      result = result.filter((t) =>
+        Array.isArray(t.tags)
+          ? t.tags.some((tag) => tag.name === selectedTag)
+          : false,
+      );
+    }
+    if (tutorialSearch) {
+      const ql = tutorialSearch.toLowerCase();
+      result = result.filter((t) => t.title?.toLowerCase().includes(ql));
+    }
+    return result;
+  }, [tutorials, selectedTag, tutorialSearch]);
 
   return (
-    // Sử dụng min-h-screen và màu nền zinc-950 để bao phủ toàn bộ vùng nhìn
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
-      <main className="container mx-auto px-4 py-12 max-w-6xl">
-        {/* Header + search */}
-        <div className="mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div className="min-h-screen bg-white text-zinc-900 transition-colors duration-300">
+      <main className="container mx-auto px-4 py-12 max-w-7xl">
+        {/* Header + tag filter */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
               Bài viết hướng dẫn
@@ -66,40 +104,75 @@ export default function TutorialsIndex({
             </p>
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const fd = new FormData(e.currentTarget as HTMLFormElement);
-              const nextQ = String(fd.get("q") || "");
-              setQ(nextQ);
-              const usp = new URLSearchParams();
-              if (nextQ) usp.set("q", nextQ);
-              router.push(`?${usp.toString()}`);
-            }}
-            className="relative w-full md:w-auto group"
-          >
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-zinc-400" />
-            </div>
-            <input
-              name="q"
-              defaultValue={initialQ}
-              placeholder="Tìm kiếm bài viết..."
-              className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-lg
-                bg-white dark:bg-zinc-900
-                border border-zinc-200 dark:border-zinc-800
-                text-zinc-900 dark:text-zinc-100
-                placeholder:text-zinc-400 dark:placeholder:text-zinc-500
-                focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-600
-                transition-all"
-            />
-          </form>
+          <Dialog open={showTagFilter} onOpenChange={setShowTagFilter}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="h-9 gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Lọc theo Tag
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-xl p-0 top-1/3">
+              <div className="flex justify-end p-2"></div>
+              <div className="p-4 pt-2 flex flex-col gap-2">
+                <Input
+                  placeholder="Tìm tag..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="mb-2"
+                />
+                <div className="overflow-y-auto max-h-100">
+                  {isLoadingTags ? (
+                    <div className="text-center text-muted-foreground py-8">
+                      Loading tags...
+                    </div>
+                  ) : tags.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8">
+                      No tags found.
+                    </div>
+                  ) : (
+                    <ul className="space-y-1">
+                      {[...tags]
+                        .filter((tag) =>
+                          tag.name.toLowerCase().includes(search.toLowerCase()),
+                        )
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((tag) => (
+                          <li key={tag.id}>
+                            <button
+                              className={`block px-4 py-2 rounded w-full text-left hover:bg-zinc-100 transition ${selectedTag === tag.name ? "bg-zinc-200 font-bold" : ""}`}
+                              onClick={() => {
+                                setSelectedTag(tag.name);
+                                setShowTagFilter(false);
+                              }}
+                            >
+                              {tag.name}
+                            </button>
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
+
+        {/* Thanh tìm kiếm tutorial theo tiêu đề */}
+        <div className="mb-6 flex justify-start">
+          <Input
+            type="text"
+            placeholder="Tìm kiếm bài viết theo tiêu đề..."
+            value={tutorialSearch}
+            onChange={(e) => setTutorialSearch(e.target.value)}
+            className="w-full max-w-xs"
+          />
+        </div>
+
 
         {/* Loading State */}
         {isLoading && (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </ul>
@@ -118,78 +191,18 @@ export default function TutorialsIndex({
         {!isLoading && !isError && filtered.length === 0 && (
           <div className="text-center py-16">
             <p className="text-zinc-500 dark:text-zinc-400 text-lg">
-              Không tìm thấy bài viết nào{q ? ` cho “${q}”` : ""}.
+              Không tìm thấy bài viết nào
+              {tutorialSearch ? ` cho “${tutorialSearch}”` : ""}.
             </p>
           </div>
         )}
 
         {/* Content Grid */}
         {filtered.length > 0 && (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((t: Tutorial) => {
-              const href = `/tutorials/${t.slug}`;
-
-              // Tách riêng các phần subtitle để dễ style
-              const dateStr = t.createdAt
-                ? formatDate(t.createdAt as any)
-                : null;
-              const viewsStr = t.views != null ? `${t.views} views` : null;
-              const readTimeStr = estimateReadTime(t.content as any);
-
-              return (
-                <li key={t.id} className="h-full">
-                  <Link
-                    href={href}
-                    className="flex h-full flex-col p-6 rounded-xl border transition-all duration-200
-                      bg-white dark:bg-zinc-900/50
-                      border-zinc-200 dark:border-zinc-800
-                      hover:border-zinc-300 dark:hover:border-zinc-600
-                      hover:shadow-lg dark:hover:bg-zinc-900
-                      group"
-                  >
-                    <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-                      {dateStr && <span>{dateStr}</span>}
-                      {dateStr && readTimeStr && (
-                        <span className="text-zinc-300 dark:text-zinc-700">
-                          •
-                        </span>
-                      )}
-                      {readTimeStr && <span>{readTimeStr}</span>}
-                    </div>
-
-                    <h2
-                      className="text-xl font-bold leading-snug mb-3 line-clamp-2
-                      text-zinc-900 dark:text-zinc-100
-                      group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
-                    >
-                      {t.title}
-                    </h2>
-
-                    <div className="mt-auto pt-4 flex items-center justify-between text-sm">
-                      <span className="text-zinc-500 dark:text-zinc-500 font-medium">
-                        {viewsStr}
-                      </span>
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-200 group-hover:translate-x-1 transition-transform inline-flex items-center">
-                        Read more
-                        <svg
-                          className="w-4 h-4 ml-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                          />
-                        </svg>
-                      </span>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+            {filtered.map((t: Tutorial) => (
+              <TutorialCard key={t.id} tutorial={t} />
+            ))}
           </ul>
         )}
       </main>
