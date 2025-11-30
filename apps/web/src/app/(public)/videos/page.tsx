@@ -58,7 +58,7 @@ export default function VideosPage() {
                 Filter by Tag
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-xs p-0 top-1/3">
+            <DialogContent className="max-w-xl p-0 top-1/3">
               <div className="flex justify-end p-2"></div>
               <div className="p-4 pt-2 flex flex-col gap-2">
                 <Input
@@ -67,7 +67,7 @@ export default function VideosPage() {
                   onChange={(e) => setSearch(e.target.value)}
                   className="mb-2"
                 />
-                <div className="overflow-y-auto max-h-60">
+                <div className="overflow-y-auto max-h-100">
                   {isLoadingTags ? (
                     <div className="text-center text-muted-foreground py-8">
                       Loading tags...
