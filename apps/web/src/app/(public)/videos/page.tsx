@@ -22,6 +22,7 @@ import { getAllTags } from "@/utils/api/tagApi";
 export default function VideosPage() {
   const [showTagFilter, setShowTagFilter] = useState(false);
   const [search, setSearch] = useState("");
+  const [videoSearch, setVideoSearch] = useState("");
   const {
     data: videos = [],
     isLoading,
@@ -102,6 +103,17 @@ export default function VideosPage() {
           </Dialog>
         </div>
 
+        {/* Thanh tìm kiếm video theo tiêu đề */}
+        <div className="mb-6 flex justify-start">
+          <Input
+            type="text"
+            placeholder="Tìm kiếm video theo tiêu đề..."
+            value={videoSearch}
+            onChange={(e) => setVideoSearch(e.target.value)}
+            className="w-full max-w-xs"
+          />
+        </div>
+
         {/* Content Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
           {isLoading ? (
@@ -135,8 +147,21 @@ export default function VideosPage() {
               Không có video nào. Vui lòng quay lại sau!
             </div>
           ) : (
-            // Real Data
-            videos.map((video) => <VideoCard key={video.id} video={video} />)
+            // Lọc video theo tiêu đề
+            videos
+              .filter((video) =>
+                video.title
+                  ?.toLowerCase()
+                  .normalize("NFD")
+                  .replace(/\p{Diacritic}/gu, "")
+                  .includes(
+                    videoSearch
+                      .toLowerCase()
+                      .normalize("NFD")
+                      .replace(/\p{Diacritic}/gu, ""),
+                  ),
+              )
+              .map((video) => <VideoCard key={video.id} video={video} />)
           )}
         </div>
       </div>
