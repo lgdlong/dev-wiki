@@ -66,4 +66,8 @@ export class TutorialTagsController {
     return this.tutorialTagsService.upsertTags(id, dto.tagIds);
   }
 
+  @Get('tag-name/:name/tutorials')
+  async getTutorialsByTagName(@Param('name') name: string) {
+    return this.tutorialTagsService.getTutorialsByTagName(name);
+  }
 }
