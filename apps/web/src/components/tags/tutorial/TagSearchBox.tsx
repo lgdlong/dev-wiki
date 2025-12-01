@@ -40,7 +40,7 @@ export function TagSearchBox({
         }
       }}
       placeholder="Search or add a tag…"
-      className="h-9 w-full rounded-lg border border-white/10 bg-black text-sm placeholder-white/40 focus:ring-2 focus:ring-white/10"
+      className="h-9 w-full rounded-lg border border-zinc-300 bg-white text-sm placeholder-zinc-400 focus:ring-2 focus:ring-zinc-300"
     />
   );
 }

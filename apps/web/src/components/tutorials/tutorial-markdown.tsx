@@ -3,7 +3,6 @@
 import { useRef, useEffect } from "react";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
 
 type Props = {
   value: string;
@@ -27,7 +26,7 @@ export default function ToastEditor({
   return (
     <Editor
       ref={ref}
-      theme="dark"
+      theme="light"
       initialEditType="markdown"
       hideModeSwitch={true} // chỉ Markdown (không cho đổi sang WYSIWYG)
       previewStyle="vertical" // Markdown + Preview

@@ -12,7 +12,7 @@ export default async function EditTutorialPage({
 
   return (
     <div className="mx-auto w-full max-w-10xl p-4 sm:p-6 md:p-8">
-      <h1 className="mb-4 text-2xl font-semibold tracking-tight">
+      <h1 className="mb-4 text-2xl font-semibold tracking-tight text-zinc-900">
         Edit Tutorial
       </h1>
       <EditTutorialClient id={Number(id)} />

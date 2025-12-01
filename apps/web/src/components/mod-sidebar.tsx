@@ -60,9 +60,19 @@ const data = {
     },
     {
       title: "Tutorial",
-      url: "/tutorials",
+      url: "#",
       icon: BookText,
       isActive: true,
+      items: [
+        {
+          title: "New Tutorial",
+          url: "/mod/tutorials/new",
+        },
+        {
+          title: "Manage Tutorials",
+          url: "/mod/tutorials/manage-tutorials",
+        },
+      ],
     },
     // {
     //   title: "Models",
@@ -164,7 +174,7 @@ const data = {
 export function ModSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+      className="top-(--header-height) h-[calc(100svh-var(--header-height))]! bg-zinc-50 border-r border-zinc-200"
       {...props}
     >
       <SidebarHeader>
