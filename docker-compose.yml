@@ -67,7 +67,7 @@ services:
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       # Update Callback về domain HTTPS
-      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL:-https://api.devwiki.lgdlong.site/auth/google/callback}
+      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL:-https://devwiki-api.lgdlong.site/auth/google/callback}
     # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
     expose:
       - "3000"
@@ -90,7 +90,7 @@ services:
     environment:
       NODE_ENV: production
       # Frontend phải gọi API qua domain HTTPS công khai
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.devwiki.lgdlong.site}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://devwiki-api.lgdlong.site}
     # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
     expose:
       - "3000"
