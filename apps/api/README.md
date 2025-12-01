@@ -1,314 +1,711 @@
 # API - Dev Wiki Backend
 
-The backend API server for the Dev Wiki platform, built with NestJS and TypeScript. This application provides REST APIs for user authentication, account management, and tutorial content management in the monorepo.
+> Robust NestJS backend API providing authentication, content management, and community features for the Dev Wiki platform.
 
-## 🚀 Project Overview
+## Overview
 
-The **API** application serves as the core backend service for the Dev Wiki platform. It's responsible for:
+The **API** is the core backend service for Dev Wiki, built with NestJS and TypeScript. It provides a comprehensive REST API with JWT authentication, role-based access control, and full CRUD operations for all platform features.
 
-- **User Authentication & Authorization**: JWT-based authentication with Passport.js
-- **Account Management**: User registration, login, and profile management
-- **Tutorial Management**: CRUD operations for developer tutorials and documentation
-- **Data Persistence**: PostgreSQL database integration with TypeORM
+### Key Features
 
-### Role in Monorepo
+- ** Authentication**: JWT + Google OAuth with Passport.js
+- ** Role-Based Access Control**: User, Moderator, and Admin roles
+- ** Content Management**: Videos, tutorials, categories, and tags
+- ** Community Features**: Comments, voting, and user interactions
+- ** Product Reviews**: Product management and categorization
+- ** Security**: Guards, validation, and error handling
+- ** API Documentation**: Automatic Swagger/OpenAPI generation
 
-- Provides REST APIs consumed by the `web` and `docs` applications
-- Shares TypeScript configurations and ESLint rules from `@repo/` packages
-- Runs independently on port 8000 (configurable via environment)
-- Integrates with the Turborepo build system for efficient development and deployment
+### Tech Stack
 
-## 📋 Setup Instructions
+- **Framework**: NestJS (Node.js/Express)
+- **Database**: PostgreSQL with TypeORM
+- **Authentication**: JWT + Passport.js strategies
+- **Validation**: class-validator + class-transformer
+- **Documentation**: Swagger/OpenAPI
+- **Testing**: Jest + Supertest
+- **TypeScript**: Strict mode for type safety
+
+## Quick Start
 
 ### Prerequisites
 
-Ensure you have the following installed:
+- Node.js 18+
+- pnpm 9.0.0+
+- PostgreSQL database (Docker recommended)
 
-1. **Node.js** (version 18 or higher)
-2. **pnpm** (version 9.0.0 or higher) - Required package manager
-3. **PostgreSQL** (for database, or use external hosted database)
+### Development Setup
 
-### Installation
-
-1. **Install dependencies** from the root of the monorepo:
+1. **From monorepo root, install dependencies:**
 
    ```bash
-   # From monorepo root
    pnpm install
    ```
 
-2. **Environment Variables Setup**:
+2. **Start PostgreSQL database:**
 
-   Copy and configure the environment file:
+   ```bash
+   # From monorepo root
+   docker compose up -d
+   ```
+
+3. **Configure environment:**
 
    ```bash
    cd apps/api
-   cp .env.development .env
+   cp .env.example .env
    ```
 
-   **Required Environment Variables:**
+4. **Run database migrations:**
 
    ```bash
-   # Server Configuration
-   PORT=8000                    # API server port (default: 8000)
-
-   # Database Configuration (choose one approach)
-
-   # Option 1: Local PostgreSQL Database
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=dev_wiki_local
-   USERNAME=postgres
-   PASSWORD=postgres
-
-   # Option 2: External Database (for development/production)
-   DB_HOST=your-db-host.com
-   DB_PORT=5432
-   DB_NAME=dev_wiki
-   USERNAME=your_username
-   PASSWORD=your_password
+   # From apps/api directory
+   pnpm migration:run
    ```
 
-   **Optional Environment Variables:**
+5. **Start development server:**
 
    ```bash
-   # Database URL alternatives (if not using individual DB_ vars)
-   INTERNAL_DB_URL=postgresql://user:pass@host/db_name
-   EXTERNAL_DB_URL=postgresql://user:pass@external-host/db_name
+   # From monorepo root
+   pnpm dev --filter=api
+
+   # Or from apps/api directory
+   pnpm dev
    ```
 
-### Database Setup
+6. **Access the API:**
+   ```
+   API: http://localhost:8000
+   Swagger Docs: http://localhost:8000/api
+   ```
 
-**Option 1: Local PostgreSQL**
+### Environment Variables
 
-```bash
-# Create local database
-createdb dev_wiki_local
+Create `.env` in `apps/api/`:
 
-# Update .env with local database settings
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=dev_wiki_local
-USERNAME=postgres
-PASSWORD=postgres
+```env
+# Database Configuration
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=dev_wiki_user
+DATABASE_PASSWORD=dev_wiki_password
+DATABASE_NAME=dev_wiki
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=24h
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Application
+PORT=8000
+NODE_ENV=development
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:3000
 ```
 
-**Option 2: Use External Database**
+## Project Structure
 
-- Uncomment the external database configuration in `.env`
-- The application will automatically create tables using TypeORM synchronization
-
-## 🛠 Development Guide
-
-### Starting Development Server
-
-```bash
-# From monorepo root (recommended)
-pnpm dev --filter=api
-
-# Or from api directory
-cd apps/api
-pnpm dev
+```
+apps/api/
+├── src/
+│   ├── main.ts              # Application entry point
+│   ├── app.module.ts        # Root module
+│   ├── app.controller.ts    # Health check endpoint
+│   │
+│   ├── auth/                # Authentication module
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.module.ts
+│   │   ├── *.strategy.ts    # Passport strategies
+│   │   ├── dto/             # Data Transfer Objects
+│   │   └── entities/        # Database entities
+│   │
+│   ├── account/             # User account management
+│   ├── videos/              # Video content management
+│   ├── tutorial/            # Tutorial system
+│   ├── comments/            # Comment system
+│   ├── votes/               # Voting system
+│   ├── categories/          # Content categories
+│   ├── products/            # Product reviews
+│   ├── tags/                # Tagging system
+│   │
+│   ├── common/              # Shared utilities
+│   │   ├── constants.ts
+│   │   ├── decorators/      # Custom decorators
+│   │   ├── enums/           # Enum definitions
+│   │   └── guards/          # Auth & role guards
+│   │
+│   ├── mappers/             # Data transformation
+│   └── types/               # Type definitions
+│
+├── test/                    # E2E tests
+├── jest.config.ts           # Jest configuration
+└── package.json
 ```
 
-The API server will start at `http://localhost:8000` (or configured PORT).
+## Authentication & Authorization
 
-### Available Scripts
+### Authentication Architecture
 
-```bash
-# Development server with hot reload
-pnpm dev                    # or pnpm start:dev
-
-# Production build
-pnpm build
-
-# Start production server
-pnpm start                  # or pnpm start:prod
-
-# Debug mode
-pnpm start:debug
-
-# Code formatting
-pnpm format
-
-# Linting
-pnpm lint
-
-# Type checking (from monorepo root)
-pnpm check-types --filter=api
+```
+Login Request → Passport Strategy → JWT Token Generation
+                                 → Role Cookie Setting
+                                 → Response to Client
 ```
 
-### Testing
+### Passport Strategies
+
+```typescript
+// jwt.strategy.ts - JWT token validation
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_SECRET,
+    });
+  }
+
+  async validate(payload: any) {
+    return { userId: payload.sub, email: payload.email, role: payload.role };
+  }
+}
+
+// google.strategy.ts - Google OAuth
+@Injectable()
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+  constructor() {
+    super({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: '/auth/google/redirect',
+      scope: ['email', 'profile'],
+    });
+  }
+}
+```
+
+### Role-Based Access Control
+
+```typescript
+// guards/roles.guard.ts
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const roles = this.reflector.get<Role[]>('roles', context.getHandler());
+    if (!roles) return true;
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    return roles.some(role => user.role === role);
+  }
+}
+
+// Usage in controllers
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.MOD)
+@Post()
+async create(@Body() dto: CreateDto) {
+  // Only admins and mods can access
+}
+```
+
+### Authentication Endpoints
+
+```typescript
+// auth.controller.ts - Key endpoints
+@Controller('auth')
+export class AuthController {
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    // Local authentication
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Initiates Google OAuth flow
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleRedirect(@Req() req) {
+    // Handles Google OAuth callback
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getProfile(@Request() req) {
+    // Get current user profile
+  }
+}
+```
+
+## Database Design
+
+### TypeORM Configuration
+
+```typescript
+// app.module.ts - Database setup
+TypeOrmModule.forRoot({
+  type: 'postgres',
+  host: process.env.DATABASE_HOST,
+  port: parseInt(process.env.DATABASE_PORT),
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
+  entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  synchronize: process.env.NODE_ENV === 'development',
+  migrations: ['dist/migrations/*{.ts,.js}'],
+}),
+```
+
+### Entity Relationships
+
+```typescript
+// entities/videos.entity.ts
+@Entity()
+export class Video {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
+  youtubeId: string;
+
+  @ManyToOne(() => Account, (account) => account.videos)
+  uploader: Account;
+
+  @OneToMany(() => Comment, (comment) => comment.video)
+  @ApiHideProperty() // Prevents Swagger circular dependency
+  comments: Comment[];
+
+  @OneToMany(() => Vote, (vote) => vote.video)
+  @ApiHideProperty()
+  votes: Vote[];
+}
+```
+
+### Database Migrations
 
 ```bash
-# Run unit tests
+# Generate migration after entity changes
+pnpm migration:generate -- --name=MigrationName
+
+# Run pending migrations
+pnpm migration:run
+
+# Revert last migration
+pnpm migration:revert
+```
+
+## API Modules
+
+### Video Management
+
+```typescript
+// videos/videos.controller.ts
+@Controller('videos')
+@ApiTags('videos')
+export class VideosController {
+  @Get()
+  @ApiOperation({ summary: 'Get all videos' })
+  @ApiResponse({ status: 200, type: [Video] })
+  async findAll(): Promise<Video[]> {
+    return this.videosService.findAll();
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MOD, Role.ADMIN)
+  @ApiOperation({ summary: 'Create a new videos' })
+  async create(@Body() createVideoDto: CreateVideoDto): Promise<Video> {
+    return this.videosService.create(createVideoDto);
+  }
+}
+```
+
+### Data Transfer Objects (DTOs)
+
+```typescript
+// dto/create-videos.dto.ts
+export class CreateVideoDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'YouTube videos ID' })
+  youtubeId: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({ description: 'Video title', required: false })
+  title?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({ description: 'Uploader ID', required: false })
+  uploaderId?: number;
+}
+```
+
+### Service Layer
+
+```typescript
+// videos/videos.service.ts
+@Injectable()
+export class VideosService {
+  constructor(
+    @InjectRepository(Video)
+    private videoRepository: Repository<Video>,
+  ) {}
+
+  async findAll(): Promise<Video[]> {
+    return this.videoRepository.find({
+      relations: ['uploader', 'categories'],
+    });
+  }
+
+  async create(createVideoDto: CreateVideoDto): Promise<Video> {
+    const existingVideo = await this.videoRepository.findOne({
+      where: { youtubeId: createVideoDto.youtubeId },
+    });
+
+    if (existingVideo) {
+      throw new ConflictException('Video already exists');
+    }
+
+    const video = this.videoRepository.create(createVideoDto);
+    return this.videoRepository.save(video);
+  }
+}
+```
+
+## Security & Validation
+
+### Input Validation
+
+```typescript
+// Global validation pipe in main.ts
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }),
+);
+```
+
+### Error Handling
+
+```typescript
+// Custom exception filter
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: exception.message || 'Internal server error',
+    });
+  }
+}
+```
+
+### CORS Configuration
+
+```typescript
+// main.ts - CORS setup
+app.enableCors({
+  origin: [process.env.FRONTEND_URL],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+});
+```
+
+## API Documentation
+
+### Swagger Configuration
+
+```typescript
+// main.ts - Swagger setup
+const config = new DocumentBuilder()
+  .setTitle('Dev Wiki API')
+  .setDescription('Backend API for Dev Wiki platform')
+  .setVersion('1.0')
+  .addBearerAuth()
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api', app, document);
+```
+
+### API Documentation Features
+
+- **Interactive API Explorer**: Test endpoints directly
+- **Authentication**: Built-in Bearer token auth
+- **Schema Documentation**: Automatic DTO documentation
+- **Response Examples**: Real response samples
+
+### Access Documentation
+
+```
+Local: http://localhost:8000/api
+Production: https://your-domain.com/api
+```
+
+## Testing
+
+### Unit Tests
+
+```typescript
+// videos.service.spec.ts
+describe('VideosService', () => {
+  let service: VideosService;
+  let repository: Repository<Video>;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        VideosService,
+        {
+          provide: getRepositoryToken(Video),
+          useClass: Repository,
+        },
+      ],
+    }).compile();
+
+    service = module.get<VideosService>(VideosService);
+    repository = module.get<Repository<Video>>(getRepositoryToken(Video));
+  });
+
+  it('should create a videos', async () => {
+    const createVideoDto = { youtubeId: 'test123' };
+    jest.spyOn(repository, 'save').mockResolvedValue(createVideoDto as Video);
+
+    const result = await service.create(createVideoDto);
+    expect(result).toEqual(createVideoDto);
+  });
+});
+```
+
+### E2E Tests
+
+```typescript
+// test/app.e2e-spec.ts
+describe('AppController (e2e)', () => {
+  let app: INestApplication;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  it('/videos (GET)', () => {
+    return request(app.getHttpServer()).get('/videos').expect(200);
+  });
+});
+```
+
+### Testing Commands
+
+```bash
+# Unit tests
 pnpm test
 
-# Run tests in watch mode
+# Watch mode
 pnpm test:watch
 
-# Run end-to-end tests
+# E2E tests
 pnpm test:e2e
 
-# Generate test coverage report
+# Coverage report
 pnpm test:cov
-
-# Debug tests
-pnpm test:debug
 ```
 
-## 🏗 Build & Deploy
-
-### Building for Production
+## Development Commands
 
 ```bash
-# From monorepo root
-pnpm build --filter=api
+# Development
+pnpm dev              # Start development server
+pnpm build            # Build for production
+pnpm start:prod       # Start production server
+pnpm lint             # Lint code
+pnpm format           # Format code
 
-# Or from api directory
-cd apps/api
-pnpm build
+# Database
+pnpm migration:generate -- --name=MigrationName
+pnpm migration:run    # Apply migrations
+pnpm migration:revert # Revert last migration
+
+# Testing
+pnpm test             # Unit tests
+pnpm test:e2e         # End-to-end tests
+pnpm test:cov         # Coverage report
 ```
 
-This creates a `dist/` directory with compiled JavaScript files.
+## Performance & Optimization
 
-### Deployment Considerations
+### Database Optimization
 
-1. **Environment Variables**: Ensure production environment variables are properly configured
-2. **Database**: Use external PostgreSQL database for production
-3. **SSL**: Configure SSL for external database connections
-4. **Process Management**: Use PM2, Docker, or similar for process management
-5. **Logging**: Configure proper logging levels for production
-6. **Health Checks**: The application includes basic health endpoints
+```typescript
+// Add indexes for frequently queried fields
+@Entity()
+export class Video {
+  @Index()
+  @Column()
+  youtubeId: string;
 
-## 📏 Coding Standards & Contribution
+  @Index()
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
 
-### Shared Configurations
+### Caching Strategy
 
-The API application follows the monorepo's shared standards:
+```typescript
+// Redis caching (if implemented)
+@Injectable()
+export class VideosService {
+  @CacheKey('videos')
+  @CacheTTL(300) // 5 minutes
+  async findAll(): Promise<Video[]> {
+    return this.videoRepository.find();
+  }
+}
+```
 
-- **TypeScript Config**: Extends `@repo/typescript-config`
-- **ESLint Config**: Uses shared ESLint configurations with NestJS-specific rules
-- **Prettier**: Automatic code formatting on save
+### API Response Optimization
 
-### API-Specific Guidelines
+- **Pagination**: Implement for list endpoints
+- **Selective Loading**: Use `relations` judiciously
+- **Response Compression**: gzip enabled
+- **Rate Limiting**: Implement for production
 
-1. **Module Structure**: Follow NestJS module pattern
-   - Each feature should have its own module (e.g., `auth`, `account`, `tutorial`)
-   - Use proper separation between controllers, services, and entities
+## Troubleshooting
 
-2. **Database Entities**: Use TypeORM decorators and follow entity naming conventions
+### Common Issues
 
-3. **DTOs**: Use class-validator for request/response validation
-
-4. **Error Handling**: Use NestJS built-in exception filters
-
-5. **Authentication**: Follow JWT + Passport.js patterns already established
-
-### Code Quality
+**Database connection failed:**
 
 ```bash
-# Before committing, ensure code passes:
-pnpm lint --fix              # Fix linting issues
-pnpm format                  # Format code
-pnpm test                    # Run tests
-pnpm build                   # Verify build success
+# Check PostgreSQL status
+docker compose ps
+
+# Restart database
+docker compose restart postgres
+
+# Check environment variables
+cat .env
 ```
 
-## 🚨 Common Issues & Troubleshooting
-
-### Database Connection Issues
-
-**Problem**: `ENOTFOUND` or connection timeout errors
+**JWT authentication not working:**
 
 ```bash
-Error: getaddrinfo ENOTFOUND your-db-host
+# Verify JWT secret is set
+echo $JWT_SECRET
+
+# Check token format in requests
+curl -H "Authorization: Bearer <token>" http://localhost:8000/auth/me
 ```
 
-**Solutions**:
+**Swagger circular dependency:**
 
-1. Verify database host and credentials in `.env`
-2. Check if database is accessible from your network
-3. For external databases, ensure SSL configuration is correct
-4. Try using database URL format instead of individual parameters
+```typescript
+// Add @ApiHideProperty() to entity relationships
+@OneToMany(() => Comment, comment => comment.video)
+@ApiHideProperty()
+comments: Comment[];
+```
 
-### Port Already in Use
-
-**Problem**: `EADDRINUSE: address already in use :::8000`
-
-**Solution**:
+**Migration errors:**
 
 ```bash
-# Find and kill process on port 8000
-lsof -ti:8000 | xargs kill -9
+# Reset database (development only)
+docker compose down -v
+docker compose up -d
 
-# Or use a different port
-PORT=8001 pnpm dev
+# Generate fresh migration
+pnpm migration:generate -- --name=Initial
 ```
 
-### TypeORM Synchronization Issues
-
-**Problem**: Database schema sync errors
-
-**Solutions**:
-
-1. For development: Drop and recreate database
-2. Check entity definitions for syntax errors
-3. Disable synchronization and use migrations for production
-
-### Missing Dependencies
-
-**Problem**: Module not found errors
-
-**Solution**:
+### Debug Mode
 
 ```bash
-# Reinstall dependencies
-pnpm install
+# Start with debug logging
+DEBUG=nest:* pnpm dev
 
-# Clear cache if needed
-pnpm store prune
-rm -rf node_modules
-pnpm install
+# TypeORM query logging
+# Set in app.module.ts: logging: true
 ```
 
-### ESLint/TypeScript Errors
+## Additional Resources
 
-**Problem**: Linting or type checking failures
+### NestJS Documentation
 
-**Solutions**:
+- [Official Docs](https://docs.nestjs.com/)
+- [TypeORM Integration](https://docs.nestjs.com/techniques/database)
+- [Authentication](https://docs.nestjs.com/security/authentication)
+- [Swagger Module](https://docs.nestjs.com/openapi/introduction)
 
-```bash
-# Fix auto-fixable linting issues
-pnpm lint --fix
+### Database & ORM
 
-# Check TypeScript errors
-pnpm check-types --filter=api
+- [TypeORM Documentation](https://typeorm.io/)
+- [PostgreSQL Docs](https://www.postgresql.org/docs/)
+- [Database Migrations](https://typeorm.io/migrations)
 
-# Restart TypeScript server in VS Code
-# Cmd/Ctrl + Shift + P -> "TypeScript: Restart TS Server"
-```
+### Testing Resources
 
-### JWT Authentication Issues
+- [Jest Documentation](https://jestjs.io/docs/getting-started)
+- [NestJS Testing](https://docs.nestjs.com/fundamentals/testing)
+- [Supertest](https://github.com/visionmedia/supertest)
 
-**Problem**: Token validation failures
+## 🤝 Contributing
 
-**Solutions**:
+### Code Standards
 
-1. Verify JWT secret configuration
-2. Check token expiration settings
-3. Ensure proper token format in requests
-4. Verify Passport.js strategy configuration
+- Use TypeScript strict mode
+- Follow NestJS conventions
+- Write comprehensive tests
+- Document all public APIs
+- Use meaningful commit messages
 
-## 📚 References
+### API Design Guidelines
 
-- **Root README**: [../../README.md](../../README.md) - Complete monorepo setup and context
-- **NestJS Documentation**: [https://docs.nestjs.com](https://docs.nestjs.com)
-- **TypeORM Documentation**: [https://typeorm.io](https://typeorm.io)
-- **Turborepo Documentation**: [https://turborepo.com/docs](https://turborepo.com/docs)
-- **Shared Packages**:
-  - UI Components: `packages/ui/README.md`
-  - TypeScript Config: `packages/typescript-config`
-  - ESLint Config: `packages/eslint-config`
+1. **RESTful endpoints** with consistent naming
+2. **Proper HTTP status codes** for all responses
+3. **Comprehensive validation** on all inputs
+4. **Detailed error messages** for debugging
+5. **Swagger documentation** for all endpoints
 
-For questions about the overall project setup, deployment, or shared configurations, refer to the [root README](../../README.md).
+### Database Guidelines
+
+1. **Foreign key constraints** for data integrity
+2. **Indexes** on frequently queried fields
+3. **Migrations** for all schema changes
+4. **Soft deletes** where appropriate
+5. **Consistent naming** conventions
+
+---
+
+For more information, see the [main project README](../../README.md) and [Web App documentation](../web/README.md).

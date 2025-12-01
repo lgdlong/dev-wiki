@@ -10,6 +10,11 @@
     "password": "Abcd1234@"
   },
   {
+    "email": "mod@mod.com",
+    "name": "Moderator",
+    "password": "Abcd1234@"
+  },
+  {
     "email": "alice@gmail.com",
     "name": "Alice Nguyen",
     "password": "Alice123@"

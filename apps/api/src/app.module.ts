@@ -2,96 +2,85 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TutorialModule } from './tutorial/tutorial.module';
-import { AccountModule } from './account/account.module';
-import { ProductsModule } from './products/products.module';
-import { VideosModule } from './videos/videos.module';
-import { TagsModule } from './tags/tags.module';
-import { CategoriesModule } from './categories/categories.module';
-import { CommentsModule } from './comments/comments.module';
-import { VotesModule } from './votes/votes.module';
-import { ProductCategoriesModule } from './product-categories/product-categories.module';
-import { TutorialTagsModule } from './tutorial-tags/tutorial-tags.module';
+import { TutorialModule } from './modules/tutorials/tutorials.module';
+import { AccountModule } from './modules/account/account.module';
+import { VideosModule } from './modules/videos/videos.module';
+import { TagsModule } from './modules/tags/tags.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { CommentsModule } from './modules/comments/comments.module';
+import { VotesModule } from './modules/votes/votes.module';
+import { TutorialTagsModule } from './modules/tutorials-tags/tutorials-tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Account } from './account/entities/account.entity';
-import { Tutorial } from './tutorial/entities/tutorial.entity';
-import { Product } from './products/entities/product.entity';
-import { Video } from './videos/entities/video.entity';
-import { Tag } from './tags/entities/tag.entity';
-import { Category } from './categories/entities/category.entity';
-import { Comment } from './comments/entities/comment.entity';
-import { Vote } from './votes/entities/vote.entity';
-import { ProductCategory } from './product-categories/entities/product-category.entity';
-import { TutorialTag } from './tutorial-tags/entities/tutorial-tag.entity';
-import { AuthModule } from './auth/auth.module';
-import { GoogleStrategy } from './auth/google.strategy';
+import { AuthModule } from './modules/auth/auth.module';
+import { GoogleStrategy } from './modules/auth/google.strategy';
+import { VideoTagsModule } from './modules/video-tags/video-tags.module';
+import databaseConfig from './config/database.config';
+import { envValidationSchema } from './config/validation';
+import { Account } from './modules/account/entities/account.entity';
+import { Tutorial } from './modules/tutorials/entities/tutorials.entity';
+import { Video } from './modules/videos/entities/video.entity';
+import { Tag } from './modules/tags/entities/tag.entity';
+import { Category } from './modules/categories/entities/category.entity';
+import { Comment } from './modules/comments/entities/comment.entity';
+import { TutorialTag } from './modules/tutorials-tags/entities/tutorials-tag.entity';
+import { Vote } from './modules/votes/entities/vote.entity';
+import { VideoTag } from './modules/video-tags/entities/video-tag.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
+      load: [databaseConfig],
+      validationSchema: envValidationSchema,
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: Number(config.get('DB_PORT')),
-        username: config.get('USERNAME'),
-        password: config.get('PASSWORD'),
-        database: config.get('DB_NAME'),
-        entities: [
-          Account,
-          Tutorial,
-          Product,
-          Video,
-          Tag,
-          Category,
-          Comment,
-          Vote,
-          ProductCategory,
-          TutorialTag,
-        ],
-        synchronize: true,
-        ssl: {
-          rejectUnauthorized: false, // Required for Render.com hosted databases
-        },
-        // ssl:
-        //   process.env.NODE_ENV === 'production'
-        //     ? {
-        //         rejectUnauthorized: true,
-        //       }
-        //     : {
-        //         rejectUnauthorized: false,
-        //       }, // Only for development
-        connectTimeoutMS: 60000, // 60 seconds
-        acquireTimeoutMillis: 60000,
-        timeout: 60000,
-        retryAttempts: 5,
-        retryDelay: 3000,
-        // Connection pool settings for external database
-        extra: {
-          max: 10, // maximum number of connections in pool
-          min: 2, // minimum number of connections in pool
-          acquireTimeoutMillis: 60000, // timeout for acquiring connection
-          idleTimeoutMillis: 600000, // 10 minutes idle timeout
-          connectionTimeoutMillis: 60000,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const isDev = config.get<string>('NODE_ENV') === 'development';
+
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST'),
+          port: Number(config.get<number>('DB_PORT') ?? 5432),
+          username: config.get<string>('USERNAME'),
+          password: config.get<string>('PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+          entities: [
+            Account,
+            Tutorial,
+            Video,
+            Tag,
+            Category,
+            Comment,
+            Vote,
+            TutorialTag,
+            VideoTag,
+          ],
+          autoLoadEntities: true,
+          synchronize: isDev, // chỉ tự động đồng bộ hóa CSDL ở môi trường development
+          retryAttempts: 5,
+          retryDelay: 3000,
+          logging: isDev, // chỉ bật log ở môi trường development
+          extra: {
+            max: 10,
+            min: 2,
+            idleTimeoutMillis: 600_000,
+            connectionTimeoutMillis: 60_000,
+          },
+        };
+      },
     }),
     AccountModule,
     TutorialModule,
-    ProductsModule,
     VideosModule,
     TagsModule,
     CategoriesModule,
     CommentsModule,
     VotesModule,
-    ProductCategoriesModule,
     TutorialTagsModule,
     AuthModule,
+    VideoTagsModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy],

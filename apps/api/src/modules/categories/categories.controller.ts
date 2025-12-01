@@ -1,0 +1,67 @@
+// apps/api/src/modules/categories/categories.controller.ts
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Roles } from 'src/core/decorators/roles.decorator';
+import { AccountRole } from 'src/shared/enums/account-role.enum';
+import { RolesGuard } from '../../core/guards/roles.guard';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+
+@Controller('categories')
+export class CategoriesController {
+  constructor(private readonly categoriesService: CategoriesService) {}
+
+  // ========= Public (no auth) =========
+
+  @Get()
+  findAll() {
+    return this.categoriesService.findAll();
+  }
+
+  @Get('name/:name')
+  findByName(@Param('name') name: string) {
+    return this.categoriesService.findByName(name);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.findOne(id);
+  }
+
+  // ========= Protected (Role) =========
+
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.create(createCategoryDto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, updateCategoryDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AccountRole.MOD)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.remove(id);
+  }
+}

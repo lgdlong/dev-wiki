@@ -1,0 +1,44 @@
+version: '3.8'
+
+# services:
+#   postgres:
+#     image: postgres:17
+#     container_name: dev-wiki-postgres
+#     environment:
+#       POSTGRES_DB: ${DB_NAME}
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - ./apps/db:/docker-entrypoint-initdb.d
+#       - postgres_data:/var/lib/postgresql/data
+#     restart: unless-stopped
+
+# volumes:
+#   postgres_data: {}
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    image: dev-wiki-postgres:local
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    # Chỉ mount dump nếu muốn thay dump thường xuyên; tránh mount init.sh từ host
+    volumes:
+      - ./apps/db:/docker-entrypoint-initdb.d:ro
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+volumes:
+  postgres_data: {}
