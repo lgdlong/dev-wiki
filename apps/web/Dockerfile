@@ -17,8 +17,8 @@ COPY packages ./packages
 # Copy web package.json
 COPY apps/web/package.json ./apps/web/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies (ignore scripts to skip husky)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # ================================
 # Stage 2: Build

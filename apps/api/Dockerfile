@@ -17,8 +17,8 @@ COPY packages ./packages
 # Copy API source
 COPY apps/api ./apps/api
 
-# Install all dependencies
-RUN pnpm install --frozen-lockfile
+# Install all dependencies (ignore scripts to skip husky)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build API
 RUN pnpm --filter api build
@@ -42,8 +42,8 @@ COPY packages ./packages
 # Copy API package.json for production deps
 COPY apps/api/package.json ./apps/api/
 
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+# Install production dependencies only (ignore scripts to skip husky)
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Copy built output from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
