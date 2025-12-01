@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "./globals.css";
 import { usePathname } from "next/navigation";
-import { Navbar } from "@/components/Navbar";
+import { LandingNavbar } from "@/components/landing";
 import { Toaster } from "sonner";
 
 const roboto = Roboto({
@@ -54,7 +54,7 @@ export default function RootLayout({
       >
         <QueryClientProvider client={queryClient}>
           <Toaster richColors />
-          {showNavbar && <Navbar />}
+          {showNavbar && <LandingNavbar />}
           {children}
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

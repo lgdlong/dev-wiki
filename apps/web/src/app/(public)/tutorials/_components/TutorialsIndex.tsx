@@ -1,43 +1,23 @@
 "use client";
 
-// import Link from "next/link"; // No longer needed
 import { useMemo, useState } from "react";
-// Removed: useTagQuery, Tag (now in TutorialCard)
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import type { Tutorial } from "@/types/tutorial";
-import { getAllTutorials, getTutorialTags } from "@/utils/api/tutorialApi";
-import CardSkeleton from "./CardSkeleton";
-import TutorialCard from "./TutorialCard";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SlidersHorizontal } from "lucide-react";
-import TagFilterDialog from "@/components/TagFilterDialog";
-import { getAllTags } from "@/utils/api/tagApi";
-import Link from "next/link";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
-const DATE_FMT: Intl.DateTimeFormatOptions = {
-  year: "numeric",
-  month: "short",
-  day: "2-digit",
-};
-
-function formatDate(d: string | number | Date) {
-  try {
-    return new Date(d).toLocaleDateString(undefined, DATE_FMT);
-  } catch {
-    return "";
-  }
-}
-
-function estimateReadTime(text?: string): string {
-  if (!text) return "";
-  const words: number = text.trim().split(/\s+/).length;
-  const minutes: number = Math.max(1, Math.round(words / 200));
-  return `${minutes} min read`;
-}
+import type { Tutorial } from "@/types/tutorial";
+import {
+  getAllTutorials,
+  getTutorialsByTagName,
+} from "@/utils/api/tutorialApi";
+import { getAllTags } from "@/utils/api/tagApi";
+import { TutorialGrid } from "@/components/tutorials/tutorial-grid";
+import { Input } from "@/components/ui/input";
+import {
+  ContentWithSidebarLayout,
+  FilterSidebar,
+  MobileFilterSheet,
+  type FilterTag,
+} from "@/components/common";
 
 export default function TutorialsIndex({
   initialQ = "",
@@ -46,115 +26,175 @@ export default function TutorialsIndex({
   initialQ?: string;
   tagName?: string;
 }) {
-  const router = useRouter();
-  const [showTagFilter, setShowTagFilter] = useState(false);
-  const [search, setSearch] = useState(""); // for tag search in dialog
   const [tutorialSearch, setTutorialSearch] = useState(initialQ);
-  const [selectedTag, setSelectedTag] = useState(tagName);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    tagName ? [tagName] : [],
+  );
 
+  // Fetch all tutorials (when no tags selected)
   const {
-    data: tutorials = [],
-    isLoading,
-    isError,
+    data: allTutorials = [],
+    isLoading: isLoadingAll,
+    isError: isErrorAll,
   } = useQuery<Tutorial[]>({
     queryKey: ["tutorials"],
     queryFn: () => getAllTutorials(),
+    enabled: selectedTags.length === 0,
   });
 
-  // Fetch all tags for filter
-  const { data: tags = [], isLoading: isLoadingTags } = useQuery({
+  // Fetch tutorials for each selected tag
+  const tagQueries = useQueries({
+    queries: selectedTags.map((tag) => ({
+      queryKey: ["tutorials-by-tag", tag],
+      queryFn: () => getTutorialsByTagName(tag),
+      enabled: selectedTags.length > 0,
+    })),
+  });
+
+  // Combine tutorials from all selected tags (intersection for AND logic)
+  const tagFilteredTutorials = useMemo(() => {
+    if (selectedTags.length === 0) return [];
+
+    const allTagResults = tagQueries
+      .filter((q) => q.isSuccess && q.data)
+      .map((q) => q.data as Tutorial[]);
+
+    if (allTagResults.length === 0) return [];
+    if (allTagResults.length === 1) return allTagResults[0];
+
+    // Intersection: tutorials that appear in ALL tag results
+    const tutorialCounts = new Map<
+      number,
+      { tutorial: Tutorial; count: number }
+    >();
+
+    allTagResults.forEach((tutorials) => {
+      tutorials.forEach((tutorial) => {
+        const existing = tutorialCounts.get(tutorial.id);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          tutorialCounts.set(tutorial.id, { tutorial, count: 1 });
+        }
+      });
+    });
+
+    // Return tutorials that appear in all tag results
+    return Array.from(tutorialCounts.values())
+      .filter((item) => item.count === allTagResults.length)
+      .map((item) => item.tutorial);
+  }, [tagQueries, selectedTags.length]);
+
+  // Determine which tutorials to show
+  const baseTutorials =
+    selectedTags.length > 0 ? tagFilteredTutorials : allTutorials;
+
+  // Loading state
+  const isLoadingTags = tagQueries.some((q) => q.isLoading);
+  const isLoading = selectedTags.length > 0 ? isLoadingTags : isLoadingAll;
+  const isError =
+    selectedTags.length > 0 ? tagQueries.some((q) => q.isError) : isErrorAll;
+
+  // Fetch all tags for filter sidebar
+  const { data: rawTags = [], isLoading: isLoadingTagList } = useQuery({
     queryKey: ["all-tags"],
     queryFn: () => getAllTags(),
   });
 
-  // Filter tutorials by search and tag
+  // Transform tags to FilterTag format
+  const tags: FilterTag[] = useMemo(
+    () => rawTags.map((t) => ({ label: t.name, value: t.name })),
+    [rawTags],
+  );
+
+  // Handle tag toggle
+  const handleToggle = (value: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value],
+    );
+  };
+
+  // Clear all selected tags
+  const handleClear = () => setSelectedTags([]);
+
+  // Filter tutorials by search
   const filtered: Tutorial[] = useMemo(() => {
-    let result = tutorials;
-    if (selectedTag) {
-      result = result.filter((t) =>
-        Array.isArray(t.tags)
-          ? t.tags.some((tag) => tag.name === selectedTag)
-          : false,
-      );
-    }
-    if (tutorialSearch) {
-      const ql = tutorialSearch.toLowerCase();
-      result = result.filter((t) => t.title?.toLowerCase().includes(ql));
-    }
-    return result;
-  }, [tutorials, selectedTag, tutorialSearch]);
+    if (!tutorialSearch) return baseTutorials;
+
+    const ql = tutorialSearch.toLowerCase();
+    return baseTutorials.filter((t) => t.title?.toLowerCase().includes(ql));
+  }, [baseTutorials, tutorialSearch]);
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 transition-colors duration-300">
-      <main className="container mx-auto px-4 py-12 max-w-7xl">
-        {/* Header + tag filter */}
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <main className="container mx-auto max-w-7xl px-4 py-12">
+        {/* ─── Header + Mobile Filter ─── */}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+            <h1 className="mb-2 text-3xl font-bold tracking-tight md:text-4xl">
               Bài viết hướng dẫn
             </h1>
-            <p className="text-zinc-500 dark:text-zinc-400">
+            <p className="text-muted-foreground">
               Khám phá các bài viết kỹ thuật mới nhất.
             </p>
           </div>
 
-          <TagFilterDialog
-            tags={tags}
-            isLoading={isLoadingTags}
-            selectedTag={selectedTag}
-            onSelect={(tagName) => {
-              setSelectedTag(tagName);
-              window.location.href = `/tutorials/tag/${encodeURIComponent(tagName)}`;
-            }}
-          />
+          {/* Mobile Filter Trigger */}
+          <div className="lg:hidden">
+            <MobileFilterSheet
+              title="Lọc theo Tag"
+              tags={tags}
+              selectedTags={selectedTags}
+              onToggle={handleToggle}
+              onClear={handleClear}
+              isLoading={isLoadingTagList}
+            />
+          </div>
         </div>
 
-        {/* Thanh tìm kiếm tutorial theo tiêu đề */}
-        <div className="mb-6 flex justify-start">
-          <Input
-            type="text"
-            placeholder="Tìm kiếm bài viết theo tiêu đề..."
-            value={tutorialSearch}
-            onChange={(e) => setTutorialSearch(e.target.value)}
-            className="w-full max-w-xs"
-          />
+        {/* ─── Search Bar ─── */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Tìm kiếm bài viết..."
+              value={tutorialSearch}
+              onChange={(e) => setTutorialSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <CardSkeleton key={i} />
-            ))}
-          </ul>
-        )}
-
-        {/* Error State */}
+        {/* ─── Error State ─── */}
         {isError && (
-          <div className="text-center py-12 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20">
-            <p className="text-red-600 dark:text-red-400">
+          <div className="rounded-lg border border-destructive/20 bg-destructive/10 py-12 text-center">
+            <p className="text-destructive">
               Không thể tải danh sách bài viết.
             </p>
           </div>
         )}
 
-        {/* Empty State */}
-        {!isLoading && !isError && filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-zinc-500 dark:text-zinc-400 text-lg">
-              Không tìm thấy bài viết nào
-              {tutorialSearch ? ` cho “${tutorialSearch}”` : ""}.
-            </p>
-          </div>
-        )}
-
-        {/* Content Grid */}
-        {filtered.length > 0 && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
-            {filtered.map((t: Tutorial) => (
-              <TutorialCard key={t.id} tutorial={t} />
-            ))}
-          </ul>
+        {/* ─── Content with Sidebar Layout ─── */}
+        {!isError && (
+          <ContentWithSidebarLayout
+            sidebar={
+              <FilterSidebar
+                title="Lọc theo Tag"
+                tags={tags}
+                selectedTags={selectedTags}
+                onToggle={handleToggle}
+                onClear={handleClear}
+                isLoading={isLoadingTagList}
+              />
+            }
+          >
+            <TutorialGrid
+              tutorials={filtered}
+              isLoading={isLoading}
+              skeletonCount={6}
+            />
+          </ContentWithSidebarLayout>
         )}
       </main>
     </div>

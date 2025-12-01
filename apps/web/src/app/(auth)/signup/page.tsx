@@ -49,15 +49,13 @@ export default function SignupPage() {
   };
 
   return (
-    // bg-zinc-950 -> bg-background
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-background">
       <div className="w-full max-w-sm">
         <div className={cn("flex flex-col gap-6")}>
-          {/* bg-zinc-950 -> bg-card */}
           <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-center text-3xl font-bold">
-                Create your account
+                Tạo tài khoản mới
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -68,7 +66,7 @@ export default function SignupPage() {
                       id="name"
                       className="py-5"
                       type="text"
-                      placeholder="Full Name"
+                      placeholder="Họ và tên"
                       autoComplete="name"
                       disabled={mutation.isPending}
                       {...register("name")}
@@ -84,7 +82,7 @@ export default function SignupPage() {
                       id="email"
                       className="py-5"
                       type="email"
-                      placeholder="Email Address"
+                      placeholder="Địa chỉ email"
                       autoComplete="email"
                       disabled={mutation.isPending}
                       {...register("email")}
@@ -101,7 +99,7 @@ export default function SignupPage() {
                         id="password"
                         className="py-5 pr-12"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder="Mật khẩu"
                         autoComplete="new-password"
                         disabled={mutation.isPending}
                         {...register("password")}
@@ -111,9 +109,15 @@ export default function SignupPage() {
                         tabIndex={-1}
                         onClick={() => setShowPassword((v) => !v)}
                         className="absolute inset-y-0 right-2 flex items-center p-1 text-muted-foreground hover:text-foreground"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={
+                          showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                        }
                       >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
                       </button>
                     </div>
                     {errors.password && (
@@ -128,7 +132,7 @@ export default function SignupPage() {
                         id="confirm-password"
                         className="py-5 pr-12"
                         type={showConfirm ? "text" : "password"}
-                        placeholder="Confirm Password"
+                        placeholder="Nhập lại mật khẩu"
                         autoComplete="new-password"
                         disabled={mutation.isPending}
                         {...register("confirm")}
@@ -138,7 +142,9 @@ export default function SignupPage() {
                         tabIndex={-1}
                         onClick={() => setShowConfirm((v) => !v)}
                         className="absolute inset-y-0 right-2 flex items-center p-1 text-muted-foreground hover:text-foreground"
-                        aria-label={showConfirm ? "Hide password" : "Show password"}
+                        aria-label={
+                          showConfirm ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                        }
                       >
                         {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -155,15 +161,7 @@ export default function SignupPage() {
                       className="w-full py-5"
                       disabled={mutation.isPending}
                     >
-                      {mutation.isPending ? "Signing up..." : "Sign up"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full py-5"
-                      type="button"
-                      disabled={mutation.isPending}
-                    >
-                      Sign up with Google
+                      {mutation.isPending ? "Đang đăng ký..." : "Đăng ký"}
                     </Button>
                   </div>
                   {(errors.root?.message || mutation.isError) && (
@@ -175,9 +173,12 @@ export default function SignupPage() {
                   )}
                 </div>
                 <div className="mt-4 text-center text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link href="/login" className="underline underline-offset-4 text-foreground">
-                    Log in
+                  Đã có tài khoản?{" "}
+                  <Link
+                    href="/login"
+                    className="underline underline-offset-4 text-foreground"
+                  >
+                    Đăng nhập
                   </Link>
                 </div>
               </form>

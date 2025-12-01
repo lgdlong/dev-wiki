@@ -37,6 +37,7 @@ export class TutorialListItemDto {
   createdAt!: Date;
   updatedAt!: Date;
   authorName!: string;
+  authorAvatarUrl!: string;
 
   constructor(partial: Partial<TutorialListItemDto>) {
     Object.assign(this, partial);
@@ -44,7 +45,6 @@ export class TutorialListItemDto {
 }
 
 export class TutorialDetailDto extends TutorialListItemDto {
-  authorAvatarUrl!: string;
   content!: string;
   views!: number;
   isPublished!: boolean;

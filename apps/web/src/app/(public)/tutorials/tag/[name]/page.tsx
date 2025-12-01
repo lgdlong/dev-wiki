@@ -3,9 +3,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getTutorialsByTagName } from "@/utils/api/tutorialApi";
 import type { Tutorial } from "@/types/tutorial";
-import TutorialCard from "@/app/(public)/tutorials/_components/TutorialCard";
+import { TutorialGrid } from "@/components/tutorials/tutorial-grid";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Hash, ChevronLeft } from "lucide-react";
 
 export default function TagTutorialsPage() {
@@ -23,7 +22,7 @@ export default function TagTutorialsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* Breadcrumb / Back Navigation */}
         <div className="mb-6">
@@ -53,45 +52,26 @@ export default function TagTutorialsPage() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-          {isLoading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <Skeleton className="aspect-video w-full rounded-xl" />
-                <div className="space-y-2 p-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="flex items-center gap-2 pt-2">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : isError ? (
-            <div className="col-span-full py-12 text-center">
-              <p className="text-destructive">
-                Không thể tải bài viết cho tag "{tagName}".
-              </p>
-              <Button
-                variant="link"
-                onClick={() => window.location.reload()}
-                className="mt-2"
-              >
-                Thử lại
-              </Button>
-            </div>
-          ) : tutorials.length === 0 ? (
-            <div className="col-span-full py-20 text-center text-muted-foreground">
-              Không có bài viết nào cho tag{" "}
-              <span className="font-semibold">#{tagName}</span>.
-            </div>
-          ) : (
-            tutorials.map((tutorial) => (
-              <TutorialCard key={tutorial.id} tutorial={tutorial} />
-            ))
-          )}
-        </div>
+        {isError ? (
+          <div className="rounded-lg border border-destructive/20 bg-destructive/10 py-12 text-center">
+            <p className="text-destructive">
+              Không thể tải bài viết cho tag "{tagName}".
+            </p>
+            <Button
+              variant="link"
+              onClick={() => window.location.reload()}
+              className="mt-2"
+            >
+              Thử lại
+            </Button>
+          </div>
+        ) : (
+          <TutorialGrid
+            tutorials={tutorials}
+            isLoading={isLoading}
+            skeletonCount={6}
+          />
+        )}
       </div>
     </div>
   );
