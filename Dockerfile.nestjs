@@ -1,0 +1,51 @@
+# Stage 1: Build
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy root package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy packages
+COPY packages ./packages
+
+# Copy apps/api
+COPY apps/api ./apps/api
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build API
+RUN cd apps/api && pnpm build
+
+# Stage 2: Runtime
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy root package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy packages
+COPY packages ./packages
+
+# Copy apps/api package.json
+COPY apps/api/package.json ./apps/api/
+
+# Install production dependencies only
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built API from builder
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+
+WORKDIR /app/apps/api
+
+EXPOSE 3000
+
+CMD ["node", "dist/main.js"]

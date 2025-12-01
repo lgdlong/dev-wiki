@@ -1,44 +1,98 @@
 version: '3.8'
 
-# services:
-#   postgres:
-#     image: postgres:17
-#     container_name: dev-wiki-postgres
-#     environment:
-#       POSTGRES_DB: ${DB_NAME}
-#       POSTGRES_USER: ${DB_USER}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - ./apps/db:/docker-entrypoint-initdb.d
-#       - postgres_data:/var/lib/postgresql/data
-#     restart: unless-stopped
-
-# volumes:
-#   postgres_data: {}
-
 services:
   postgres:
     build:
       context: .
       dockerfile: Dockerfile.postgres
-    image: dev-wiki-postgres:local
+    image: dev-wiki-postgres:prod # Đổi thành prod cho đồng bộ
+    container_name: dev-wiki-postgres
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    # Chỉ mount dump nếu muốn thay dump thường xuyên; tránh mount init.sh từ host
+    # 🔒 BẢO MẬT: Đã đóng port 5432 lại.
+    # API và DBeaver sẽ kết nối qua mạng nội bộ Docker.
+    # Nếu bạn CẦN kết nối từ máy tính cá nhân, hãy dùng: "127.0.0.1:5432:5432"
+    # ports:
+    #   - "5432:5432"
     volumes:
       - ./apps/db:/docker-entrypoint-initdb.d:ro
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 2s
-      timeout: 2s
-      retries: 30
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+    # Tối ưu log
+    logging: &logging-config
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.nestjs
+    image: dev-wiki-api:prod
+    container_name: dev-wiki-api
+    environment:
+      # --- App ---
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      FRONTEND_URL: ${FRONTEND_URL}
+      DEFAULT_API_BASE_URL: ${DEFAULT_API_BASE_URL}
+      DEFAULT_FRONTEND_URL: ${DEFAULT_FRONTEND_URL}
+      # --- Database ---
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      USERNAME: ${DB_USER}
+      PASSWORD: ${DB_PASSWORD}
+      # --- Auth & Others ---
+      JWT_SECRET: ${JWT_SECRET}
+      HASH_SALT_ROUNDS: ${HASH_SALT_ROUNDS}
+      GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-${GOOGLE_CLIENT_ID}}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-${GOOGLE_CLIENT_SECRET}}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+    ports:
+      # ✅ Bảo mật: Chỉ mở port ở Localhost để Nginx hứng
+      - "127.0.0.1:3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    networks:
+      - app-network
+    logging: *logging-config # Tái sử dụng config log bên trên
+
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: dev-wiki-dbeaver
+    restart: unless-stopped
+    ports:
+      # ✅ Bảo mật: Chỉ mở ở Localhost, dùng SSH Tunnel để vào
+      - "127.0.0.1:8978:8978"
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    logging: *logging-config
+
+# Định nghĩa Volumes
 volumes:
   postgres_data: {}
+  cloudbeaver_data: {}
+
+# ⚠️ QUAN TRỌNG: Phải định nghĩa network ở đây thì ở trên mới dùng được
+networks:
+  app-network:
+    driver: bridge
