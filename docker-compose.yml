@@ -1,44 +1,110 @@
 version: '3.8'
 
-# services:
-#   postgres:
-#     image: postgres:17
-#     container_name: dev-wiki-postgres
-#     environment:
-#       POSTGRES_DB: ${DB_NAME}
-#       POSTGRES_USER: ${DB_USER}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - ./apps/db:/docker-entrypoint-initdb.d
-#       - postgres_data:/var/lib/postgresql/data
-#     restart: unless-stopped
-
-# volumes:
-#   postgres_data: {}
-
 services:
+  # ================================
+  # 1. NGINX PROXY MANAGER (Gateway)
+  # ================================
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'     # Cổng HTTP (để redirect sang HTTPS)
+      - '443:443'   # Cổng HTTPS (Web & API chạy qua đây)
+      - '81:81'     # Cổng trang quản trị Admin
+    volumes:
+      - ./npm-data:/data
+      - ./npm-letsencrypt:/etc/letsencrypt
+    networks:
+      - dev-wiki-network
+
+  # ================================
+  # 2. PostgreSQL Database
+  # ================================
   postgres:
     build:
       context: .
       dockerfile: Dockerfile.postgres
     image: dev-wiki-postgres:local
+    container_name: dev-wiki-postgres
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
+      # Vẫn mở port này để team connect DB tool từ xa
       - "5432:5432"
-    # Chỉ mount dump nếu muốn thay dump thường xuyên; tránh mount init.sh từ host
     volumes:
       - ./apps/db:/docker-entrypoint-initdb.d:ro
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 2s
-      timeout: 2s
-      retries: 30
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dev-wiki-network
+
+  # ================================
+  # 3. NestJS API Backend
+  # ================================
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: dev-wiki-api:local
+    container_name: dev-wiki-api
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      # Update Callback về domain HTTPS
+      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL:-https://api.devwiki.lgdlong.site/auth/google/callback}
+    # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
+    expose:
+      - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - dev-wiki-network
+
+  # ================================
+  # 4. Next.js Web Frontend
+  # ================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: dev-wiki-web:local
+    container_name: dev-wiki-web
+    environment:
+      NODE_ENV: production
+      # Frontend phải gọi API qua domain HTTPS công khai
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.devwiki.lgdlong.site}
+    # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
+    expose:
+      - "3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - dev-wiki-network
+
 volumes:
   postgres_data: {}
+  npm-data: {}
+  npm-letsencrypt: {}
+
+networks:
+  dev-wiki-network:
+    driver: bridge
