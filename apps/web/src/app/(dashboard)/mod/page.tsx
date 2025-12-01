@@ -1,9 +1,9 @@
 // app/(dashboard)/mod/page.tsx  (hoặc app/mod/page.tsx nếu bạn đang ở Windows không tạo được folder có ())
 // Skeleton: Moderator Dashboard (Next.js App Router + Tailwind + shadcn/ui + lucide-react)
-// - Quick Actions (New Post/Link/Product/Tag/Playlist)
+// - Quick Actions (New Post/Link/Tag/Playlist)
 // - Metrics cards (Totals, Views, Comments, Votes)
 // - Recent Activity list
-// - Latest Content tables (Posts/Links/Products) with Edit/Hide/Delete
+// - Latest Content tables (Posts/Links) with Edit/Hide/Delete
 // - Latest Comments glance
 // Lưu ý: Các URL dưới đây chỉ là placeholder; đổi theo route thật của bạn.
 
@@ -24,7 +24,6 @@ import {
   Plus,
   FileText,
   LinkIcon,
-  Box,
   Tag,
   ListPlus,
   RefreshCw,
@@ -39,7 +38,6 @@ import {
 type Metrics = {
   totalPosts: number;
   totalLinks: number;
-  totalProducts: number;
   totalViews: number;
   totalComments: number;
   totalVotes: number;
@@ -68,14 +66,13 @@ async function getModDashboardData() {
   const metrics: Metrics = {
     totalPosts: 42,
     totalLinks: 63,
-    totalProducts: 12,
     totalViews: 15240,
     totalComments: 318,
     totalVotes: 907,
   };
 
   const recentActivity: Array<{
-    type: "post" | "link" | "product";
+    type: "post" | "link";
     title: string;
     when: string;
   }> = [
@@ -89,7 +86,6 @@ async function getModDashboardData() {
       title: "Video: NestJS Guards & Interceptors",
       when: "2025-08-18T07:00:00Z",
     },
-    { type: "product", title: "Turborepo", when: "2025-08-17T10:00:00Z" },
   ];
 
   const posts: ContentItem[] = [
@@ -117,15 +113,6 @@ async function getModDashboardData() {
       status: "published",
     },
   ];
-  const products: ContentItem[] = [
-    {
-      id: "pr1",
-      title: "Vite",
-      author: "mod-team",
-      updatedAt: "2025-08-14T08:00:00Z",
-      status: "published",
-    },
-  ];
 
   const latestComments: CommentItem[] = [
     {
@@ -144,7 +131,7 @@ async function getModDashboardData() {
     },
   ];
 
-  return { metrics, recentActivity, posts, links, products, latestComments };
+  return { metrics, recentActivity, posts, links, latestComments };
 }
 
 function formatNumber(n: number) {
@@ -170,7 +157,7 @@ function timeAgo(iso: string) {
 // ---- Page ---------------------------------------------------------------
 
 export default async function ModPage() {
-  const { metrics, recentActivity, posts, links, products, latestComments } =
+  const { metrics, recentActivity, posts, links, latestComments } =
     await getModDashboardData();
 
   return (
@@ -198,7 +185,7 @@ export default async function ModPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Button asChild className="justify-start gap-2" variant="secondary">
           <Link href="/mod/tutorials/new">
             <FileText className="h-4 w-4" /> Bài viết mới
@@ -207,11 +194,6 @@ export default async function ModPage() {
         <Button asChild className="justify-start gap-2" variant="secondary">
           <Link href="/mod/links/new">
             <LinkIcon className="h-4 w-4" /> Thêm Link/Youtube
-          </Link>
-        </Button>
-        <Button asChild className="justify-start gap-2" variant="secondary">
-          <Link href="/mod/products/new">
-            <Box className="h-4 w-4" /> Thêm Sản phẩm
           </Link>
         </Button>
         <Button asChild className="justify-start gap-2" variant="secondary">
@@ -227,10 +209,9 @@ export default async function ModPage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         <StatCard title="Bài viết" value={metrics.totalPosts} />
         <StatCard title="Links" value={metrics.totalLinks} />
-        <StatCard title="Sản phẩm" value={metrics.totalProducts} />
         <StatCard title="Lượt xem" value={metrics.totalViews} />
         <StatCard title="Bình luận" value={metrics.totalComments} />
         <StatCard title="Votes" value={metrics.totalVotes} />
@@ -272,16 +253,12 @@ export default async function ModPage() {
         <TabsList>
           <TabsTrigger value="posts">Bài viết</TabsTrigger>
           <TabsTrigger value="links">Links / Youtube</TabsTrigger>
-          <TabsTrigger value="products">Sản phẩm</TabsTrigger>
         </TabsList>
         <TabsContent value="posts">
           <ContentTable items={posts} baseHref="/mod/posts" />
         </TabsContent>
         <TabsContent value="links">
           <ContentTable items={links} baseHref="/mod/links" />
-        </TabsContent>
-        <TabsContent value="products">
-          <ContentTable items={products} baseHref="/mod/products" />
         </TabsContent>
       </Tabs>
 

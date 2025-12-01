@@ -183,7 +183,7 @@ export default function ManageCategoriesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Categories</h1>
           <p className="text-sm text-muted-foreground">
-            Manage product categories and their descriptions
+            Manage categories and their descriptions
           </p>
         </div>
         <Button onClick={handleAdd}>

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ChartNoAxesGantt,
   Command,
   LifeBuoy,
   Send,
@@ -58,26 +57,6 @@ const data = {
       title: "Category",
       url: "/mod/categories",
       icon: LayoutGrid,
-    },
-    {
-      title: "Product",
-      url: "#",
-      icon: ChartNoAxesGantt,
-      isActive: true,
-      items: [
-        {
-          title: "New Product",
-          url: "/mod/products/new",
-        },
-        {
-          title: "Manage Products",
-          url: "/mod/products/manage-products",
-        },
-        // {
-        //   title: "Settings",
-        //   url: "#",
-        // },
-      ],
     },
     {
       title: "Tutorial",
