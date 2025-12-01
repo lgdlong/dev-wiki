@@ -2,18 +2,26 @@
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, ListFilter } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 
 import { getAllVideos } from "@/utils/api/videoApi";
 import { getAllTags } from "@/utils/api/tagApi";
 import { VideoGrid } from "@/components/videos/video-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import TagFilterDialog from "@/components/TagFilterDialog";
+import {
+  ContentWithSidebarLayout,
+  FilterSidebar,
+  MobileFilterSheet,
+  type FilterTag,
+} from "@/components/common";
 
 export default function VideosPage() {
-  const [selectedTag, setSelectedTag] = useState("");
+  const router = useRouter();
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [videoSearch, setVideoSearch] = useState("");
+
   const {
     data: videos = [],
     isLoading,
@@ -24,14 +32,30 @@ export default function VideosPage() {
   });
 
   // Fetch all tags for filter
-  const { data: tags = [], isLoading: isLoadingTags } = useQuery({
+  const { data: rawTags = [], isLoading: isLoadingTags } = useQuery({
     queryKey: ["all-tags"],
     queryFn: () => getAllTags(),
   });
 
-  // Filter videos by search query
+  // Transform tags to FilterTag format
+  const tags: FilterTag[] = useMemo(
+    () => rawTags.map((t) => ({ label: t.name, value: t.name })),
+    [rawTags],
+  );
+
+  // Handle tag toggle - navigate to tag page for single-select
+  const handleToggle = (value: string) => {
+    // Navigate to tag-specific page
+    router.push(`/videos/tag/${encodeURIComponent(value)}`);
+  };
+
+  // Clear all selected tags
+  const handleClear = () => setSelectedTags([]);
+
+  // Filter videos by search query only (tags filter via navigation)
   const filteredVideos = useMemo(() => {
     if (!videoSearch) return videos;
+
     const normalizedSearch = videoSearch
       .toLowerCase()
       .normalize("NFD")
@@ -59,15 +83,17 @@ export default function VideosPage() {
             </p>
           </div>
 
-          <TagFilterDialog
-            tags={tags}
-            isLoading={isLoadingTags}
-            selectedTag={selectedTag}
-            onSelect={(tagName) => {
-              setSelectedTag(tagName);
-              window.location.href = `/videos/tag/${encodeURIComponent(tagName)}`;
-            }}
-          />
+          {/* Mobile Filter Trigger */}
+          <div className="lg:hidden">
+            <MobileFilterSheet
+              title="Lọc theo Tag"
+              tags={tags}
+              selectedTags={selectedTags}
+              onToggle={handleToggle}
+              onClear={handleClear}
+              isLoading={isLoadingTags}
+            />
+          </div>
         </div>
 
         {/* ─── Search Bar with Icon ─── */}
@@ -98,13 +124,26 @@ export default function VideosPage() {
           </div>
         )}
 
-        {/* ─── Video Grid (handles loading, empty, and content states) ─── */}
+        {/* ─── Content with Sidebar Layout ─── */}
         {!isError && (
-          <VideoGrid
-            videos={filteredVideos}
-            isLoading={isLoading}
-            skeletonCount={8}
-          />
+          <ContentWithSidebarLayout
+            sidebar={
+              <FilterSidebar
+                title="Lọc theo Tag"
+                tags={tags}
+                selectedTags={selectedTags}
+                onToggle={handleToggle}
+                onClear={handleClear}
+                isLoading={isLoadingTags}
+              />
+            }
+          >
+            <VideoGrid
+              videos={filteredVideos}
+              isLoading={isLoading}
+              skeletonCount={8}
+            />
+          </ContentWithSidebarLayout>
         )}
       </div>
     </div>
