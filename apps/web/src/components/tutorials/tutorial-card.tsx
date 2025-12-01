@@ -203,7 +203,7 @@ export function TutorialCard({ tutorial, className }: TutorialCardProps) {
       <div className="mt-auto flex items-center gap-2 border-t border-border pt-4">
         <Avatar className="h-6 w-6">
           <AvatarImage
-            src={tutorial.authorAvatarUrl}
+            src={tutorial.authorAvatarUrl || undefined}
             alt={tutorial.authorName || "Author"}
           />
           <AvatarFallback className="text-[10px] font-medium">

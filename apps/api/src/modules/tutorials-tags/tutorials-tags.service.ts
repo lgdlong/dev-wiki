@@ -10,6 +10,12 @@ import { TutorialTag } from './entities/tutorials-tag.entity';
 import { CreateTutorialTagDto } from './dto/create-tutorials-tag.dto';
 import { Tutorial } from '../tutorials/entities/tutorials.entity';
 import { Tag } from '../tags/entities/tag.entity';
+import { TutorialListItemDto } from '../tutorials/dto/tutorials.dto';
+import { Account } from '../account/entities/account.entity';
+import {
+  DEFAULT_AUTHOR_NAME,
+  DEFAULT_AVATAR_URL,
+} from '../../shared/constants';
 
 @Injectable()
 export class TutorialTagsService {
@@ -22,6 +28,9 @@ export class TutorialTagsService {
 
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
+
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -126,7 +135,7 @@ export class TutorialTagsService {
     return tags;
   }
 
-  async getTutorialsByTagName(tagName: string): Promise<Tutorial[]> {
+  async getTutorialsByTagName(tagName: string): Promise<TutorialListItemDto[]> {
     // 1. Find tag by name
     const tag = await this.tagRepository.findOne({ where: { name: tagName } });
     if (!tag) return [];
@@ -135,7 +144,38 @@ export class TutorialTagsService {
       where: { tagId: tag.id },
       relations: ['tutorial'],
     });
-    // 3. Return array of tutorials
-    return tutorialTags.map((tt) => tt.tutorial).filter(Boolean);
+    // 3. Map tutorials to DTO with author info
+    const tutorials = tutorialTags.map((tt) => tt.tutorial).filter(Boolean);
+
+    // 4. Fetch author details and map to DTO
+    const dtos = await Promise.all(
+      tutorials.map(async (tutorial) => {
+        let authorName = DEFAULT_AUTHOR_NAME;
+        let authorAvatarUrl = DEFAULT_AVATAR_URL;
+
+        if (tutorial.authorId) {
+          const author = await this.accountRepository.findOne({
+            where: { id: tutorial.authorId },
+            select: ['name', 'avatar_url'],
+          });
+          if (author) {
+            authorName = author.name;
+            authorAvatarUrl = author.avatar_url || DEFAULT_AVATAR_URL;
+          }
+        }
+
+        return new TutorialListItemDto({
+          id: tutorial.id,
+          title: tutorial.title,
+          slug: tutorial.slug,
+          createdAt: tutorial.createdAt,
+          updatedAt: tutorial.updatedAt,
+          authorName,
+          authorAvatarUrl,
+        });
+      }),
+    );
+
+    return dtos;
   }
 }
