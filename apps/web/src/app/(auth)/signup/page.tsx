@@ -30,8 +30,7 @@ export default function SignupPage() {
 
   const mutation = useMutation({
     mutationFn: signupApi,
-    onSuccess: (data) => {
-      console.log("Signup successful:", data);
+    onSuccess: () => {
       router.push("/");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

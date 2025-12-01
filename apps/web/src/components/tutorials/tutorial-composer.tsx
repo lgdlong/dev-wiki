@@ -63,11 +63,9 @@ export default function TutorialComposer() {
         title: title.trim(),
         content: content.trim(),
       });
-      console.log(created);
 
       // 2) Upsert tags nếu có
       const tagIds = Array.from(new Set(tags.map((t) => t.id))); // unique
-      console.log(tagIds);
 
       if (tagIds.length > 0 || tags.length === 0) {
         // nếu cho phép clear tag khi rỗng, cứ gọi luôn (BE replace-all)

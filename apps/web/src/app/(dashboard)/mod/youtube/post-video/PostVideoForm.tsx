@@ -64,9 +64,7 @@ export function PostVideoForm() {
 
     try {
       // Call API to create videos
-      console.log("[DEBUG] Uploader:", currentUser);
       const uploaderId = currentUser?.id || 0;
-      console.log("[DEBUG] ID: ", uploaderId);
       const video = await createVideo({
         youtubeId: extractedYoutubeId,
         uploaderId,

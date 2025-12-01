@@ -65,8 +65,7 @@ export function VideoCard({ video, className }: VideoCardProps) {
             className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 hover:text-primary transition-colors"
             onClick={(e) => {
               e.preventDefault();
-              // Logic bookmark có thể thêm sau
-              console.log("Bookmark", video.id);
+              // TODO: Logic bookmark có thể thêm sau
             }}
           >
             <Bookmark className="h-4 w-4" />
