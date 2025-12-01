@@ -43,7 +43,7 @@ COPY packages ./packages
 COPY apps/api/package.json ./apps/api/
 
 # Install production dependencies only (ignore scripts to skip husky)
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy built output from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
