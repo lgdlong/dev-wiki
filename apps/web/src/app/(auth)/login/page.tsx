@@ -50,14 +50,12 @@ export default function LoginPage() {
   };
 
   return (
-    // bg-zinc-950 -> bg-background
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-background">
       <div className="w-full max-w-sm">
-        {/* Card tự động có bg-card theo theme, bỏ bg-zinc-950 */}
         <Card className="border-border">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold">
-              Log in to Dev Wiki
+              Đăng nhập Dev Wiki
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -68,7 +66,7 @@ export default function LoginPage() {
                     id="email"
                     className="py-5"
                     type="email"
-                    placeholder="Email Address"
+                    placeholder="Địa chỉ email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -80,7 +78,7 @@ export default function LoginPage() {
                     id="password"
                     className="py-5"
                     type="password"
-                    placeholder="Password"
+                    placeholder="Mật khẩu"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -91,7 +89,7 @@ export default function LoginPage() {
                       href="#"
                       className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-muted-foreground"
                     >
-                      Forgot your password?
+                      Quên mật khẩu?
                     </a>
                   </div>
                 </div>
@@ -101,7 +99,7 @@ export default function LoginPage() {
                     className="w-full py-5"
                     disabled={mutation.isPending}
                   >
-                    {mutation.isPending ? "Logging in..." : "Login"}
+                    {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
                   </Button>
                   <Link
                     href={NEXT_PUBLIC_GOOGLE_AUTH_URL || "#"}
@@ -112,7 +110,7 @@ export default function LoginPage() {
                       className="w-full py-5"
                       type="button"
                     >
-                      Login with Google
+                      Đăng nhập với Google
                     </Button>
                   </Link>
                 </div>
@@ -123,12 +121,12 @@ export default function LoginPage() {
                 )}
               </div>
               <div className="mt-4 text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
+                Bạn chưa có tài khoản?{" "}
                 <Link
                   href="/signup"
                   className="underline underline-offset-4 text-foreground"
                 >
-                  Sign up
+                  Đăng ký
                 </Link>
               </div>
             </form>

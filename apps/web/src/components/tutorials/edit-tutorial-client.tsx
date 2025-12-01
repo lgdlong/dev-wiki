@@ -17,7 +17,7 @@ const ToastEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] rounded-2xl border border-white/10 bg-white/5 animate-pulse" />
+      <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] rounded-2xl border border-zinc-200 bg-zinc-100 animate-pulse" />
     ),
   },
 );
@@ -132,7 +132,8 @@ export default function EditTutorialClient({ id }: { id: number }) {
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (dirty) {
-        const message = "You have unsaved changes. Are you sure you want to leave?";
+        const message =
+          "You have unsaved changes. Are you sure you want to leave?";
         e.preventDefault();
         e.returnValue = message;
         return message;
@@ -146,8 +147,8 @@ export default function EditTutorialClient({ id }: { id: number }) {
 
   return (
     <div className="space-y-4">
-      {/* Tabs (đen/trắng) */}
-      <div className="border-b border-white/10">
+      {/* Tabs */}
+      <div className="border-b border-zinc-200">
         <div className="flex gap-4">
           {TABS.map((t) => (
             <button
@@ -155,8 +156,8 @@ export default function EditTutorialClient({ id }: { id: number }) {
               onClick={() => setTab(t.key)}
               className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition ${
                 tab === t.key
-                  ? "border-white text-white"
-                  : "border-transparent text-white/60 hover:text-white"
+                  ? "border-zinc-900 text-zinc-900"
+                  : "border-transparent text-zinc-500 hover:text-zinc-700"
               }`}
             >
               {t.label}
@@ -165,22 +166,22 @@ export default function EditTutorialClient({ id }: { id: number }) {
         </div>
       </div>
 
-      {/* Khung soạn: nền đen chữ trắng */}
-      <div className="rounded-2xl border border-white/10 text-white sm:p-5">
+      {/* Main editor container */}
+      <div className="rounded-2xl border border-zinc-200 bg-white text-zinc-900 sm:p-5">
         {/* Title */}
         <div className="relative mb-4">
           {loading ? (
-            <div className="h-11 w-full rounded-xl bg-white/5 animate-pulse" />
+            <div className="h-11 w-full rounded-xl bg-zinc-100 animate-pulse" />
           ) : (
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
               placeholder="Title"
-              className="w-full h-8 rounded-xl border border-white/15 bg-black p-4 text-lg text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/15"
+              className="w-full h-8 rounded-xl border border-zinc-300 bg-white p-4 text-lg text-zinc-900 placeholder-zinc-400 outline-none focus:ring-2 focus:ring-zinc-300"
             />
           )}
           {!loading && (
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-white/50">
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-zinc-500">
               {title.length}/{TITLE_MAX}
             </span>
           )}
@@ -194,7 +195,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
               {tags.map((t) => (
                 <span
                   key={t.id}
-                  className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
+                  className="flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-sm text-zinc-700"
                 >
                   #{t.name}
                   <button
@@ -202,7 +203,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
                     onClick={() =>
                       setTags((prev) => prev.filter((x) => x.id !== t.id))
                     }
-                    className="text-white/70 hover:text-white"
+                    className="text-zinc-500 hover:text-zinc-700"
                     aria-label={`remove ${t.name}`}
                   >
                     ×
@@ -219,7 +220,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
         {/* Editor */}
         {tab === "text" ? (
           loading ? (
-            <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] w-full rounded-2xl bg-white/5 animate-pulse" />
+            <div className="h-[60dvh] md:h-[70vh] xl:h-[75vh] w-full rounded-2xl bg-zinc-100 animate-pulse" />
           ) : (
             <div className="w-full h-[60dvh] md:h-[70vh] xl:h-[75vh]">
               <ToastEditor
@@ -230,7 +231,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
             </div>
           )
         ) : (
-          <div className="rounded-xl border border-white/10 p-6 text-white/60">
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-zinc-500">
             {`"${TABS.find((x) => x.key === tab)?.label}"`} editor coming soon…
           </div>
         )}
@@ -241,7 +242,7 @@ export default function EditTutorialClient({ id }: { id: number }) {
         <button
           disabled={!canUpdate || saving || !dirty}
           onClick={onUpdate}
-          className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-2xl bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {saving ? "Updating…" : dirty ? "Update" : "No changes"}
         </button>

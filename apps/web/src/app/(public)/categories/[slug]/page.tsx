@@ -1,6 +1,6 @@
 import CategoryDetail from "@/components/categories/CategoryDetail";
 
-export default async function ProductCategoryPage({
+export default async function CategoryPage({
   params,
 }: {
   params: Promise<{ slug: string }>;

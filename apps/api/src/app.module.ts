@@ -4,13 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TutorialModule } from './modules/tutorials/tutorials.module';
 import { AccountModule } from './modules/account/account.module';
-import { ProductsModule } from './modules/products/products.module';
 import { VideosModule } from './modules/videos/videos.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { VotesModule } from './modules/votes/votes.module';
-import { ProductCategoriesModule } from './modules/product-categories/product-categories.module';
 import { TutorialTagsModule } from './modules/tutorials-tags/tutorials-tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,14 +18,12 @@ import databaseConfig from './config/database.config';
 import { envValidationSchema } from './config/validation';
 import { Account } from './modules/account/entities/account.entity';
 import { Tutorial } from './modules/tutorials/entities/tutorials.entity';
-import { Product } from './modules/products/entities/product.entity';
 import { Video } from './modules/videos/entities/video.entity';
 import { Tag } from './modules/tags/entities/tag.entity';
 import { Category } from './modules/categories/entities/category.entity';
 import { Comment } from './modules/comments/entities/comment.entity';
 import { TutorialTag } from './modules/tutorials-tags/entities/tutorials-tag.entity';
 import { Vote } from './modules/votes/entities/vote.entity';
-import { ProductCategory } from './modules/product-categories/entities/product-category.entity';
 import { VideoTag } from './modules/video-tags/entities/video-tag.entity';
 
 @Module({
@@ -53,13 +49,11 @@ import { VideoTag } from './modules/video-tags/entities/video-tag.entity';
           entities: [
             Account,
             Tutorial,
-            Product,
             Video,
             Tag,
             Category,
             Comment,
             Vote,
-            ProductCategory,
             TutorialTag,
             VideoTag,
           ],
@@ -79,13 +73,11 @@ import { VideoTag } from './modules/video-tags/entities/video-tag.entity';
     }),
     AccountModule,
     TutorialModule,
-    ProductsModule,
     VideosModule,
     TagsModule,
     CategoriesModule,
     CommentsModule,
     VotesModule,
-    ProductCategoriesModule,
     TutorialTagsModule,
     AuthModule,
     VideoTagsModule,

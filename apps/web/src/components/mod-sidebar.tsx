@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ChartNoAxesGantt,
   Command,
   LifeBuoy,
   Send,
@@ -60,30 +59,20 @@ const data = {
       icon: LayoutGrid,
     },
     {
-      title: "Product",
+      title: "Tutorial",
       url: "#",
-      icon: ChartNoAxesGantt,
+      icon: BookText,
       isActive: true,
       items: [
         {
-          title: "New Product",
-          url: "/mod/products/new",
+          title: "New Tutorial",
+          url: "/mod/tutorials/new",
         },
         {
-          title: "Manage Products",
-          url: "/mod/products/manage-products",
+          title: "Manage Tutorials",
+          url: "/mod/tutorials/manage-tutorials",
         },
-        // {
-        //   title: "Settings",
-        //   url: "#",
-        // },
       ],
-    },
-    {
-      title: "Tutorial",
-      url: "/tutorials",
-      icon: BookText,
-      isActive: true,
     },
     // {
     //   title: "Models",
@@ -185,7 +174,7 @@ const data = {
 export function ModSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+      className="top-(--header-height) h-[calc(100svh-var(--header-height))]! bg-zinc-50 border-r border-zinc-200"
       {...props}
     >
       <SidebarHeader>

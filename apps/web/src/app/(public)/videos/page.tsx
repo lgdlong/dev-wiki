@@ -1,20 +1,26 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { getAllVideos, getVideoTags } from "@/utils/api/videoApi";
-import { VideoCard } from "@/components/videos/VideoCard";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SlidersHorizontal, X } from "lucide-react";
-import TagFilterDialog from "@/components/TagFilterDialog";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
+
+import { getAllVideos } from "@/utils/api/videoApi";
 import { getAllTags } from "@/utils/api/tagApi";
+import { VideoGrid } from "@/components/videos/video-grid";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  ContentWithSidebarLayout,
+  NavigationFilterSidebar,
+  MobileNavigationFilterSheet,
+  type NavigationTag,
+} from "@/components/common";
 
 export default function VideosPage() {
-  const [selectedTag, setSelectedTag] = useState("");
+  const router = useRouter();
   const [videoSearch, setVideoSearch] = useState("");
+
   const {
     data: videos = [],
     isLoading,
@@ -25,18 +31,46 @@ export default function VideosPage() {
   });
 
   // Fetch all tags for filter
-  const { data: tags = [], isLoading: isLoadingTags } = useQuery({
+  const { data: rawTags = [], isLoading: isLoadingTags } = useQuery({
     queryKey: ["all-tags"],
     queryFn: () => getAllTags(),
   });
 
+  // Transform tags to NavigationTag format
+  const tags: NavigationTag[] = useMemo(
+    () => rawTags.map((t) => ({ label: t.name, value: t.name })),
+    [rawTags],
+  );
+
+  // Handle tag select - navigate to tag page
+  const handleSelect = (value: string) => {
+    router.push(`/videos/tag/${encodeURIComponent(value)}`);
+  };
+
+  // Filter videos by search query only (tags filter via navigation)
+  const filteredVideos = useMemo(() => {
+    if (!videoSearch) return videos;
+
+    const normalizedSearch = videoSearch
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
+    return videos.filter((video) =>
+      video.title
+        ?.toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .includes(normalizedSearch),
+    );
+  }, [videos, videoSearch]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
-        {/* Header Section */}
+        {/* ─── Header Section ─── */}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
               Thư viện Video
             </h1>
             <p className="mt-2 text-muted-foreground">
@@ -44,79 +78,64 @@ export default function VideosPage() {
             </p>
           </div>
 
-          <TagFilterDialog
-            tags={tags}
-            isLoading={isLoadingTags}
-            selectedTag={selectedTag}
-            onSelect={(tagName) => {
-              setSelectedTag(tagName);
-              // Optional: navigate to tag page or filter locally
-              window.location.href = `/videos/tag/${encodeURIComponent(tagName)}`;
-            }}
-          />
+          {/* Mobile Filter Trigger */}
+          <div className="lg:hidden">
+            <MobileNavigationFilterSheet
+              title="Chọn Tag"
+              tags={tags}
+              onSelect={handleSelect}
+              isLoading={isLoadingTags}
+            />
+          </div>
         </div>
 
-        {/* Thanh tìm kiếm video theo tiêu đề */}
-        <div className="mb-6 flex justify-start">
-          <Input
-            type="text"
-            placeholder="Tìm kiếm video theo tiêu đề..."
-            value={videoSearch}
-            onChange={(e) => setVideoSearch(e.target.value)}
-            className="w-full max-w-xs"
-          />
+        {/* ─── Search Bar with Icon ─── */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Tìm kiếm video..."
+              value={videoSearch}
+              onChange={(e) => setVideoSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-          {isLoading ? (
-            // Loading Skeletons
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <Skeleton className="aspect-video w-full rounded-xl" />
-                <div className="space-y-2 p-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="flex items-center gap-2 pt-2">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : isError ? (
-            <div className="col-span-full py-12 text-center">
-              <p className="text-destructive">Không thể tải danh sách video.</p>
-              <Button
-                variant="link"
-                onClick={() => window.location.reload()}
-                className="mt-2"
-              >
-                Thử lại
-              </Button>
-            </div>
-          ) : videos.length === 0 ? (
-            <div className="col-span-full py-20 text-center text-muted-foreground">
-              Không có video nào. Vui lòng quay lại sau!
-            </div>
-          ) : (
-            // Lọc video theo tiêu đề
-            videos
-              .filter((video) =>
-                video.title
-                  ?.toLowerCase()
-                  .normalize("NFD")
-                  .replace(/\p{Diacritic}/gu, "")
-                  .includes(
-                    videoSearch
-                      .toLowerCase()
-                      .normalize("NFD")
-                      .replace(/\p{Diacritic}/gu, ""),
-                  ),
-              )
-              .map((video) => <VideoCard key={video.id} video={video} />)
-          )}
-        </div>
+        {/* ─── Error State ─── */}
+        {isError && (
+          <div className="rounded-lg border border-destructive/20 bg-destructive/10 py-12 text-center">
+            <p className="text-destructive">Không thể tải danh sách video.</p>
+            <Button
+              variant="link"
+              onClick={() => window.location.reload()}
+              className="mt-2"
+            >
+              Thử lại
+            </Button>
+          </div>
+        )}
+
+        {/* ─── Content with Sidebar Layout ─── */}
+        {!isError && (
+          <ContentWithSidebarLayout
+            sidebar={
+              <NavigationFilterSidebar
+                title="Chọn Tag"
+                tags={tags}
+                onSelect={handleSelect}
+                isLoading={isLoadingTags}
+              />
+            }
+          >
+            <VideoGrid
+              videos={filteredVideos}
+              isLoading={isLoading}
+              skeletonCount={8}
+            />
+          </ContentWithSidebarLayout>
+        )}
       </div>
     </div>
   );

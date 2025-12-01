@@ -95,7 +95,7 @@ export default function TagPicker({
           Add tags
           <ChevronDown className="ml-1 h-4 w-4 opacity-80" />
           {value.length > 0 && (
-            <span className="ml-2 rounded-full bg-black/60 px-2 py-0.5 text-xs">
+            <span className="ml-2 rounded-full bg-zinc-200 px-2 py-0.5 text-xs text-zinc-700">
               {value.length}
             </span>
           )}
@@ -105,7 +105,7 @@ export default function TagPicker({
       <PopoverContent
         align="start"
         side="bottom"
-        className="p-0 border-white/10 bg-neutral-900 text-white"
+        className="p-0 border-zinc-200 bg-white text-zinc-900"
         style={{ width }}
       >
         {/* Search */}
@@ -121,15 +121,15 @@ export default function TagPicker({
 
         {/* Suggestions */}
         <div className="px-2">
-          <Card className="border-white/10 bg-neutral-900">
+          <Card className="border-zinc-200 bg-white">
             <div
               className="w-full overflow-auto"
               style={{ maxHeight: listMaxHeight }}
             >
               {loading ? (
                 <div className="space-y-2 p-3">
-                  <div className="h-6 w-32 animate-pulse rounded bg-white/10" />
-                  <div className="h-6 w-40 animate-pulse rounded bg-white/10" />
+                  <div className="h-6 w-32 animate-pulse rounded bg-zinc-200" />
+                  <div className="h-6 w-40 animate-pulse rounded bg-zinc-200" />
                 </div>
               ) : (
                 <TagSuggestionList
@@ -147,7 +147,7 @@ export default function TagPicker({
           <Button
             type="button"
             variant="outline"
-            className="h-8 rounded-xl border-white/15 bg-transparent text-white/80 hover:bg-white/5"
+            className="h-8 rounded-xl border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
             onClick={() => setOpen(false)}
           >
             Close

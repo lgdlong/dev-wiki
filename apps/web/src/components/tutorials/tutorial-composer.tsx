@@ -14,7 +14,7 @@ const ToastEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[400px] rounded-xl border border-white/10 bg-white/5 animate-pulse" />
+      <div className="h-[400px] rounded-xl border border-zinc-200 bg-zinc-100 animate-pulse" />
     ),
   },
 );
@@ -107,14 +107,14 @@ export default function TutorialComposer() {
   return (
     <div className="space-y-4">
       {/* Tabs (đen/trắng) */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-zinc-200">
         <div className="flex gap-4">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`-mb-px border-b-2 px-2 py-2 text-sm font-medium transition
-                ${tab === t.key ? "border-white text-white" : "border-transparent text-white/60 hover:text-white"}`}
+                ${tab === t.key ? "border-zinc-900 text-zinc-900" : "border-transparent text-zinc-500 hover:text-zinc-700"}`}
             >
               {t.label}
             </button>
@@ -123,17 +123,17 @@ export default function TutorialComposer() {
       </div>
 
       {/* Khung soạn: nền đen chữ trắng */}
-      <div className="rounded-2xl border border-white/10 text-white sm:p-5">
+      <div className="rounded-2xl border border-zinc-200 bg-white text-zinc-900 sm:p-5">
         {/* Title */}
         <div className="relative mb-4">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
             placeholder="Title"
-            className="w-full h-8 rounded-xl border border-white/15 bg-black p-4 text-lg text-white placeholder-white/40 outline-none focus:ring-2 focus:ring-white/15"
+            className="w-full h-8 rounded-xl border border-zinc-300 bg-white p-4 text-lg text-zinc-900 placeholder-zinc-400 outline-none focus:ring-2 focus:ring-zinc-300"
           />
           {/* giữ comment: counter bên phải */}
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-white/50">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs text-zinc-500">
             {title.length}/{TITLE_MAX}
           </span>
         </div>
@@ -150,7 +150,7 @@ export default function TutorialComposer() {
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.6, opacity: 0, y: -6 }} // 👉 pop-out khi remove
                   transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                  className="flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm"
+                  className="flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 text-sm text-zinc-700"
                 >
                   #{t.name}
                   <button
@@ -158,7 +158,7 @@ export default function TutorialComposer() {
                     onClick={() =>
                       setTags((prev) => prev.filter((x) => x.id !== t.id))
                     }
-                    className="text-white/70 hover:text-white"
+                    className="text-zinc-500 hover:text-zinc-700"
                     aria-label={`remove ${t.name}`}
                   >
                     ×
@@ -180,7 +180,7 @@ export default function TutorialComposer() {
             <ToastEditor value={content} onChange={setContent} height="100%" />
           </div>
         ) : (
-          <div className="rounded-xl border border-white/10 p-6 text-white/60">
+          <div className="rounded-xl border border-zinc-200 p-6 text-zinc-500">
             {`"${TABS.find((x) => x.key === tab)?.label}"`} editor coming soon…
           </div>
         )}
@@ -190,14 +190,14 @@ export default function TutorialComposer() {
       <div className="flex items-center justify-end gap-3">
         <button
           onClick={onSaveDraft}
-          className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-white hover:bg-white/15"
+          className="rounded-2xl border border-zinc-300 bg-white px-4 py-2 text-zinc-900 hover:bg-zinc-50"
         >
           Save Draft
         </button>
         <button
           disabled={!canPost || submitting} // <-- KHOÁ KHI SUBMITTING
           onClick={onPost}
-          className="rounded-2xl bg-white px-4 py-2 font-medium text-black hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-2xl bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {submitting ? "Posting…" : "Post"} {/* <-- UX nhỏ */}
         </button>
