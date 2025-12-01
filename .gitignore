@@ -54,7 +54,6 @@ ehthumbs.db
 Desktop.ini
 
 # Package manager lock files (nếu cần)
-pnpm-lock.yaml
 bun.lockb
 
 # Log/temp folders
