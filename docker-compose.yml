@@ -32,9 +32,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # Vẫn giữ volume data để không mất dữ liệu cũ
       - postgres_data:/var/lib/postgresql/data
-      # Có thể bỏ dòng mount initdb nếu image đã có sẵn, nhưng giữ lại cũng không sao
       - ./apps/db:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
     healthcheck:
@@ -50,7 +48,7 @@ services:
   # ================================
   api:
     # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
-    image: lgdlong/dev-wiki-api:latest
+    image: lgdlong/dev-wiki-api:v2.2
     container_name: dev-wiki-api
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -61,11 +59,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
-      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
-      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL}
-      # API Base URL
-      API_BASE_URL: ${API_BASE_URL}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_CLIENT_ID} # Dùng CLIENT_ID/SECRET từ .env
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_CALLBACK_URL} # Lấy từ biến đã set trong .env
+      API_BASE_URL: ${API_BASE_URL} # Lấy từ biến đã set trong .env
       FRONTEND_URL: ${FRONTEND_URL}
     expose:
       - "3000"
