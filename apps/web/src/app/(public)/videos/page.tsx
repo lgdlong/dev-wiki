@@ -12,14 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ContentWithSidebarLayout,
-  FilterSidebar,
-  MobileFilterSheet,
-  type FilterTag,
+  NavigationFilterSidebar,
+  MobileNavigationFilterSheet,
+  type NavigationTag,
 } from "@/components/common";
 
 export default function VideosPage() {
   const router = useRouter();
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [videoSearch, setVideoSearch] = useState("");
 
   const {
@@ -37,20 +36,16 @@ export default function VideosPage() {
     queryFn: () => getAllTags(),
   });
 
-  // Transform tags to FilterTag format
-  const tags: FilterTag[] = useMemo(
+  // Transform tags to NavigationTag format
+  const tags: NavigationTag[] = useMemo(
     () => rawTags.map((t) => ({ label: t.name, value: t.name })),
     [rawTags],
   );
 
-  // Handle tag toggle - navigate to tag page for single-select
-  const handleToggle = (value: string) => {
-    // Navigate to tag-specific page
+  // Handle tag select - navigate to tag page
+  const handleSelect = (value: string) => {
     router.push(`/videos/tag/${encodeURIComponent(value)}`);
   };
-
-  // Clear all selected tags
-  const handleClear = () => setSelectedTags([]);
 
   // Filter videos by search query only (tags filter via navigation)
   const filteredVideos = useMemo(() => {
@@ -85,12 +80,10 @@ export default function VideosPage() {
 
           {/* Mobile Filter Trigger */}
           <div className="lg:hidden">
-            <MobileFilterSheet
-              title="Lọc theo Tag"
+            <MobileNavigationFilterSheet
+              title="Chọn Tag"
               tags={tags}
-              selectedTags={selectedTags}
-              onToggle={handleToggle}
-              onClear={handleClear}
+              onSelect={handleSelect}
               isLoading={isLoadingTags}
             />
           </div>
@@ -128,12 +121,10 @@ export default function VideosPage() {
         {!isError && (
           <ContentWithSidebarLayout
             sidebar={
-              <FilterSidebar
-                title="Lọc theo Tag"
+              <NavigationFilterSidebar
+                title="Chọn Tag"
                 tags={tags}
-                selectedTags={selectedTags}
-                onToggle={handleToggle}
-                onClear={handleClear}
+                onSelect={handleSelect}
                 isLoading={isLoadingTags}
               />
             }

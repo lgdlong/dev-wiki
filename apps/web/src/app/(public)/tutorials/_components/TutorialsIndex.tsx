@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
 import type { Tutorial } from "@/types/tutorial";
-import { getAllTutorials } from "@/utils/api/tutorialApi";
+import {
+  getAllTutorials,
+  getTutorialsByTagName,
+} from "@/utils/api/tutorialApi";
 import { getAllTags } from "@/utils/api/tagApi";
 import { TutorialGrid } from "@/components/tutorials/tutorial-grid";
 import { Input } from "@/components/ui/input";
@@ -28,17 +31,72 @@ export default function TutorialsIndex({
     tagName ? [tagName] : [],
   );
 
+  // Fetch all tutorials (when no tags selected)
   const {
-    data: tutorials = [],
-    isLoading,
-    isError,
+    data: allTutorials = [],
+    isLoading: isLoadingAll,
+    isError: isErrorAll,
   } = useQuery<Tutorial[]>({
     queryKey: ["tutorials"],
     queryFn: () => getAllTutorials(),
+    enabled: selectedTags.length === 0,
   });
 
-  // Fetch all tags for filter
-  const { data: rawTags = [], isLoading: isLoadingTags } = useQuery({
+  // Fetch tutorials for each selected tag
+  const tagQueries = useQueries({
+    queries: selectedTags.map((tag) => ({
+      queryKey: ["tutorials-by-tag", tag],
+      queryFn: () => getTutorialsByTagName(tag),
+      enabled: selectedTags.length > 0,
+    })),
+  });
+
+  // Combine tutorials from all selected tags (intersection for AND logic)
+  const tagFilteredTutorials = useMemo(() => {
+    if (selectedTags.length === 0) return [];
+
+    const allTagResults = tagQueries
+      .filter((q) => q.isSuccess && q.data)
+      .map((q) => q.data as Tutorial[]);
+
+    if (allTagResults.length === 0) return [];
+    if (allTagResults.length === 1) return allTagResults[0];
+
+    // Intersection: tutorials that appear in ALL tag results
+    const tutorialCounts = new Map<
+      number,
+      { tutorial: Tutorial; count: number }
+    >();
+
+    allTagResults.forEach((tutorials) => {
+      tutorials.forEach((tutorial) => {
+        const existing = tutorialCounts.get(tutorial.id);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          tutorialCounts.set(tutorial.id, { tutorial, count: 1 });
+        }
+      });
+    });
+
+    // Return tutorials that appear in all tag results
+    return Array.from(tutorialCounts.values())
+      .filter((item) => item.count === allTagResults.length)
+      .map((item) => item.tutorial);
+  }, [tagQueries, selectedTags.length]);
+
+  // Determine which tutorials to show
+  const baseTutorials =
+    selectedTags.length > 0 ? tagFilteredTutorials : allTutorials;
+
+  // Loading state
+  const isLoadingTags = tagQueries.some((q) => q.isLoading);
+  const isLoading = selectedTags.length > 0 ? isLoadingTags : isLoadingAll;
+  const isError =
+    selectedTags.length > 0 ? tagQueries.some((q) => q.isError) : isErrorAll;
+
+  // Fetch all tags for filter sidebar
+  const { data: rawTags = [], isLoading: isLoadingTagList } = useQuery({
     queryKey: ["all-tags"],
     queryFn: () => getAllTags(),
   });
@@ -59,27 +117,13 @@ export default function TutorialsIndex({
   // Clear all selected tags
   const handleClear = () => setSelectedTags([]);
 
-  // Filter tutorials by search and tags
+  // Filter tutorials by search
   const filtered: Tutorial[] = useMemo(() => {
-    let result = tutorials;
+    if (!tutorialSearch) return baseTutorials;
 
-    // Filter by selected tags
-    if (selectedTags.length > 0) {
-      result = result.filter((t) =>
-        Array.isArray(t.tags)
-          ? t.tags.some((tag) => selectedTags.includes(tag.name))
-          : false,
-      );
-    }
-
-    // Filter by search
-    if (tutorialSearch) {
-      const ql = tutorialSearch.toLowerCase();
-      result = result.filter((t) => t.title?.toLowerCase().includes(ql));
-    }
-
-    return result;
-  }, [tutorials, selectedTags, tutorialSearch]);
+    const ql = tutorialSearch.toLowerCase();
+    return baseTutorials.filter((t) => t.title?.toLowerCase().includes(ql));
+  }, [baseTutorials, tutorialSearch]);
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -103,7 +147,7 @@ export default function TutorialsIndex({
               selectedTags={selectedTags}
               onToggle={handleToggle}
               onClear={handleClear}
-              isLoading={isLoadingTags}
+              isLoading={isLoadingTagList}
             />
           </div>
         </div>
@@ -141,7 +185,7 @@ export default function TutorialsIndex({
                 selectedTags={selectedTags}
                 onToggle={handleToggle}
                 onClear={handleClear}
-                isLoading={isLoadingTags}
+                isLoading={isLoadingTagList}
               />
             }
           >
