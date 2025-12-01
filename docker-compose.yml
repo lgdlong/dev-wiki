@@ -9,9 +9,9 @@ services:
     container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
-      - '80:80'     # Cổng HTTP (để redirect sang HTTPS)
-      - '443:443'   # Cổng HTTPS (Web & API chạy qua đây)
-      - '81:81'     # Cổng trang quản trị Admin
+      - '80:80'
+      - '443:443'
+      - '81:81'
     volumes:
       - ./npm-data:/data
       - ./npm-letsencrypt:/etc/letsencrypt
@@ -22,21 +22,20 @@ services:
   # 2. PostgreSQL Database
   # ================================
   postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
-    image: dev-wiki-postgres:local
+    # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
+    image: lgdlong/dev-wiki-postgres:latest
     container_name: dev-wiki-postgres
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      # Vẫn mở port này để team connect DB tool từ xa
       - "5432:5432"
     volumes:
-      - ./apps/db:/docker-entrypoint-initdb.d:ro
+      # Vẫn giữ volume data để không mất dữ liệu cũ
       - postgres_data:/var/lib/postgresql/data
+      # Có thể bỏ dòng mount initdb nếu image đã có sẵn, nhưng giữ lại cũng không sao
+      - ./apps/db:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
@@ -50,10 +49,8 @@ services:
   # 3. NestJS API Backend
   # ================================
   api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    image: dev-wiki-api:local
+    # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
+    image: lgdlong/dev-wiki-api:latest
     container_name: dev-wiki-api
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -66,9 +63,10 @@ services:
       JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-      # Update Callback về domain HTTPS
-      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL:-https://devwiki-api.lgdlong.site/auth/google/callback}
-    # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
+      GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_OAUTH_CALLBACK_URL}
+      # API Base URL
+      API_BASE_URL: ${API_BASE_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
     expose:
       - "3000"
     depends_on:
@@ -82,16 +80,13 @@ services:
   # 4. Next.js Web Frontend
   # ================================
   web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    image: dev-wiki-web:local
+    # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
+    image: lgdlong/dev-wiki-web:latest
     container_name: dev-wiki-web
     environment:
       NODE_ENV: production
-      # Frontend phải gọi API qua domain HTTPS công khai
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://devwiki-api.lgdlong.site}
-    # KHÔNG dùng ports public nữa, chỉ expose cho Nginx thấy
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_GOOGLE_AUTH_URL: ${NEXT_PUBLIC_GOOGLE_AUTH_URL}
     expose:
       - "3000"
     depends_on:
