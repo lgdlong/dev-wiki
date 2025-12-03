@@ -2,126 +2,92 @@ version: '3.8'
 
 services:
   # ================================
-  # 1. NGINX PROXY MANAGER (Gateway)
+  # 1. NGINX PROXY MANAGER
   # ================================
-  # npm:
-  #   image: 'jc21/nginx-proxy-manager:latest'
-  #   container_name: nginx-proxy-manager
-  #   restart: unless-stopped
-  #   ports:
-  #     - '80:80'
-  #     - '443:443'
-  #     - '81:81'
-  #   volumes:
-  #     - ./npm-data:/data
-  #     - ./npm-letsencrypt:/etc/letsencrypt
-  #   networks:
-  #     - dev-wiki-network
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    volumes:
+      - ./npm-data:/data
+      - ./npm-letsencrypt:/etc/letsencrypt
+    networks:
+      - dev-wiki-network
 
   # ================================
   # 2. PostgreSQL Database
   # ================================
   postgres:
-    # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
     image: lgdlong/dev-wiki-postgres:latest
     container_name: dev-wiki-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
+      # Map biến của Docker Image <= Biến từ file .env (PROD)
+      POSTGRES_DB: ${PROD_DB_NAME}
+      POSTGRES_USER: ${PROD_DB_USER}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./apps/db:/docker-entrypoint-initdb.d:ro
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - ./db:/docker-entrypoint-initdb.d:ro
     networks:
       - dev-wiki-network
+    healthcheck:
+      # Dùng đúng user/db từ env để check
+      test: ["CMD-SHELL", "pg_isready -U ${PROD_DB_USER} -d ${PROD_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # ================================
-  # 3. NestJS API Backend
+  # 3. Go API Backend
   # ================================
-    # api:
-    #   # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
-    #   image: lgdlong/dev-wiki-api:v2.2
-    #   container_name: dev-wiki-api
-    #   environment:
-    #     NODE_ENV: ${NODE_ENV:-production}
-    #     DB_HOST: postgres
-    #     DB_PORT: 5432
-    #     DB_NAME: ${DB_NAME}
-    #     DB_USER: ${DB_USER}
-    #     DB_PASSWORD: ${DB_PASSWORD}
-    #     JWT_SECRET: ${JWT_SECRET}
-    #     JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
-    #     GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_CLIENT_ID} # Dùng CLIENT_ID/SECRET từ .env
-    #     GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-    #     GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_CALLBACK_URL} # Lấy từ biến đã set trong .env
-    #     API_BASE_URL: ${API_BASE_URL} # Lấy từ biến đã set trong .env
-    #     FRONTEND_URL: ${FRONTEND_URL}
-    #   expose:
-    #     - "3000"
-    #   depends_on:
-    #     postgres:
-    #       condition: service_healthy
-    #   restart: unless-stopped
-    #   networks:
-    #     - dev-wiki-network
+  api_go:
+    build:
+      context: ./api_go
+      dockerfile: Dockerfile
+    container_name: dev-wiki-api-go
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    # Map Port: Lấy PROD_PORT (3000) ở host map vào port 8080 của container
+    expose:
+      - "${PROD_PORT}" 
+      - "8080"
 
-    # ================================
-    # 3. Go API Backend
-    # ================================
-    # api_go:
-    #   build:
-    #     context: ./apps/api_go
-    #     dockerfile: Dockerfile
-    #   container_name: dev-wiki-api-go
-    #   environment:
-    #     NODE_ENV: ${NODE_ENV:-production}
-    #     DB_HOST: postgres
-    #     DB_PORT: 5432
-    #     DB_NAME: ${DB_NAME}
-    #     DB_USER: ${DB_USER}
-    #     DB_PASSWORD: ${DB_PASSWORD}
-    #     JWT_SECRET: ${JWT_SECRET}
-    #     JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
-    #     GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-    #     GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-    #     GOOGLE_OAUTH_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
-    #     API_BASE_URL: ${API_BASE_URL}
-    #     FRONTEND_URL: ${FRONTEND_URL}
-    #   expose:
-    #     - "3000"
-    #   depends_on:
-    #     postgres:
-    #       condition: service_healthy
-    #   restart: unless-stopped
-    #   networks:
-    #     - dev-wiki-network
+    environment:
+      # --- Cấu hình chung ---
+      NODE_ENV: ${NODE_ENV}
+      PORT: 8080 # Port nội bộ container, Go nên listen port này
 
-  # ================================
-  # 4. Next.js Web Frontend
-  # ================================
-  # web:
-  #   # KHÔNG BUILD NỮA -> Dùng Image từ Docker Hub
-  #   image: lgdlong/dev-wiki-web:latest
-  #   container_name: dev-wiki-web
-  #   environment:
-  #     NODE_ENV: production
-  #     NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-  #     NEXT_PUBLIC_GOOGLE_AUTH_URL: ${NEXT_PUBLIC_GOOGLE_AUTH_URL}
-  #   expose:
-  #     - "3000"
-  #   depends_on:
-  #     - api
-  #   restart: unless-stopped
-  #   networks:
-  #     - dev-wiki-network
+      # --- Database Connection (Lấy từ PROD variables) ---
+      # Go App cần biến tên là DB_HOST, ta gán giá trị PROD_DB_HOST vào
+      DB_HOST: ${PROD_DB_HOST} 
+      DB_PORT: ${PROD_DB_PORT}
+      DB_NAME: ${PROD_DB_NAME}
+      DB_USER: ${PROD_DB_USER}
+      DB_PASSWORD: ${PROD_DB_PASSWORD}
+      DB_SCHEMA: ${PROD_DB_SCHEMA}
+
+      # --- App Configuration ---
+      API_BASE_URL: ${PROD_API_BASE_URL}
+      FRONTEND_URL: ${PROD_FRONTEND_URL}
+      GOOGLE_CALLBACK_URL: ${PROD_GOOGLE_CALLBACK_URL}
+
+      # --- Shared Secrets (Dùng chung DEV/PROD) ---
+      JWT_SECRET: ${JWT_SECRET}
+      HASH_SALT_ROUNDS: ${HASH_SALT_ROUNDS}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+
+    networks:
+      - dev-wiki-network
 
 volumes:
   postgres_data: {}
