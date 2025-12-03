@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  productionBrowserSourceMaps: false,
+  // Disable Next.js Development Toolbar in production
+  devIndicators: {
+    buildActivity: process.env.NODE_ENV === "development",
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },

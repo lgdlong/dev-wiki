@@ -8,6 +8,7 @@ import { Toast } from "../ui/announce-success-toast";
 import TagPicker from "@/components/tags/tutorial/TagPicker";
 import type { Tag } from "@/types/tag";
 import { AnimatePresence, motion } from "framer-motion";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 // Dynamic import with no SSR to prevent Element undefined error
 const ToastEditor = dynamic(
   () => import("@/components/tutorials/tutorial-markdown"),
@@ -32,6 +33,7 @@ const TITLE_MAX = 100;
 
 export default function TutorialComposer() {
   const router = useRouter();
+  const { data: currentUser } = useCurrentUser();
   const [tab, setTab] = useState<TabKey>("text");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState(""); // Markdown từ ToastEditor
@@ -47,22 +49,26 @@ export default function TutorialComposer() {
       tab === "text" &&
       Boolean(title.trim()) &&
       title.trim().length <= TITLE_MAX &&
-      Boolean(content.trim()),
-    [tab, title, content],
+      Boolean(content.trim()) &&
+      Boolean(currentUser?.id),
+    [tab, title, content, currentUser?.id],
   );
 
   // Viết chức năng của nút bấm (handle button)
   const onSaveDraft = () => alert("Draft saved (mock)");
   const onPost = async () => {
-    if (!canPost || submitting) return;
+    if (!canPost || submitting || !currentUser?.id) return;
     setSubmitting(true);
 
     try {
-      const created = await createTutorial({
-        // POST /tutorials
-        title: title.trim(),
-        content: content.trim(),
-      });
+      const created = await createTutorial(
+        {
+          // POST /tutorials
+          title: title.trim(),
+          content: content.trim(),
+        },
+        currentUser.id,
+      );
 
       // 2) Upsert tags nếu có
       const tagIds = Array.from(new Set(tags.map((t) => t.id))); // unique

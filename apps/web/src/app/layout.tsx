@@ -45,6 +45,9 @@ export default function RootLayout({
 
   const showNavbar = !hideNavbar;
 
+  // Chỉ hiển thị ReactQueryDevtools nếu không phải production
+  const isDev = process.env.NODE_ENV !== "production";
+
   return (
     <html lang="en">
       <body
@@ -56,7 +59,7 @@ export default function RootLayout({
           <Toaster richColors />
           {showNavbar && <LandingNavbar />}
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
+          {isDev && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
       </body>
     </html>

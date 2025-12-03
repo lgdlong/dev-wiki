@@ -1,6 +1,6 @@
 "use client";
 
-import type { Tutorial } from "@/types/tutorial";
+import type { TutorialListItem } from "@/types/tutorial";
 import { TutorialCard } from "./tutorial-card";
 import { TutorialSkeleton } from "./tutorial-skeleton";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface TutorialGridProps {
-  tutorials: Tutorial[];
+  tutorials: TutorialListItem[];
   isLoading?: boolean;
   skeletonCount?: number;
   className?: string;
@@ -87,7 +87,7 @@ export function TutorialGrid({
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface FeaturedTutorialCardProps {
-  tutorial: Tutorial;
+  tutorial: TutorialListItem;
   className?: string;
 }
 

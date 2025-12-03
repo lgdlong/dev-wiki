@@ -2,7 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getTutorialsByTagName } from "@/utils/api/tutorialApi";
-import type { Tutorial } from "@/types/tutorial";
+import type { TutorialListItem } from "@/types/tutorial";
 import { TutorialGrid } from "@/components/tutorials/tutorial-grid";
 import { Button } from "@/components/ui/button";
 import { Hash, ChevronLeft } from "lucide-react";
@@ -15,7 +15,7 @@ export default function TagTutorialsPage() {
     data: tutorials = [],
     isLoading,
     isError,
-  } = useQuery<Tutorial[]>({
+  } = useQuery<TutorialListItem[]>({
     queryKey: ["tutorials-by-tag", tagName],
     queryFn: () => getTutorialsByTagName(tagName),
     enabled: !!tagName,

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
-import type { Tutorial } from "@/types/tutorial";
+import type { TutorialListItem } from "@/types/tutorial";
 import {
   getAllTutorials,
   getTutorialsByTagName,
@@ -36,7 +36,7 @@ export default function TutorialsIndex({
     data: allTutorials = [],
     isLoading: isLoadingAll,
     isError: isErrorAll,
-  } = useQuery<Tutorial[]>({
+  } = useQuery<TutorialListItem[]>({
     queryKey: ["tutorials"],
     queryFn: () => getAllTutorials(),
     enabled: selectedTags.length === 0,
@@ -57,7 +57,7 @@ export default function TutorialsIndex({
 
     const allTagResults = tagQueries
       .filter((q) => q.isSuccess && q.data)
-      .map((q) => q.data as Tutorial[]);
+      .map((q) => q.data as TutorialListItem[]);
 
     if (allTagResults.length === 0) return [];
     if (allTagResults.length === 1) return allTagResults[0];
@@ -65,7 +65,7 @@ export default function TutorialsIndex({
     // Intersection: tutorials that appear in ALL tag results
     const tutorialCounts = new Map<
       number,
-      { tutorial: Tutorial; count: number }
+      { tutorial: TutorialListItem; count: number }
     >();
 
     allTagResults.forEach((tutorials) => {
@@ -118,7 +118,7 @@ export default function TutorialsIndex({
   const handleClear = () => setSelectedTags([]);
 
   // Filter tutorials by search
-  const filtered: Tutorial[] = useMemo(() => {
+  const filtered: TutorialListItem[] = useMemo(() => {
     if (!tutorialSearch) return baseTutorials;
 
     const ql = tutorialSearch.toLowerCase();

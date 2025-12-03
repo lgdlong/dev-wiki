@@ -2,9 +2,8 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Eye, Loader2 } from "lucide-react";
-import type { Tutorial } from "@/types/tutorial";
+import { Edit, Trash2, Loader2 } from "lucide-react";
+import type { TutorialListItem } from "@/types/tutorial";
 import Link from "next/link";
 
 // --- Helpers ---
@@ -30,7 +29,7 @@ export function makeTutorialColumns({
   onEdit: (id: number) => void;
   onRequestDelete: (id: number) => void;
   deletingIds: Set<number>;
-}): ColumnDef<Tutorial>[] {
+}): ColumnDef<TutorialListItem>[] {
   return [
     {
       accessorKey: "title",
@@ -40,12 +39,12 @@ export function makeTutorialColumns({
         return (
           <div className="max-w-[520px] truncate">
             <div className="font-medium">
-            <Link 
-              href={`/mod/tutorials/${t.id}/edit`} 
-              className="hover:underline text-white-500"
-            >
-              {t.title || "(Untitled)"}
-            </Link>
+              <Link
+                href={`/mod/tutorials/${t.id}/edit`}
+                className="hover:underline text-white-500"
+              >
+                {t.title || "(Untitled)"}
+              </Link>
             </div>
             {/* subtitle: author / id */}
             <div className="text-xs text-muted-foreground">
@@ -54,20 +53,6 @@ export function makeTutorialColumns({
           </div>
         );
       },
-    },
-    {
-      accessorKey: "views",
-      header: "Views",
-      cell: ({ row }) => {
-        const v = row.original.views ?? 0;
-        return (
-          <div className="inline-flex items-center gap-1 text-sm">
-            <Eye className="h-4 w-4 opacity-70" />
-            <span>{v.toLocaleString()}</span>
-          </div>
-        );
-      },
-      size: 110,
     },
     {
       accessorKey: "createdAt",

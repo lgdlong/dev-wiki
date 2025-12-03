@@ -1,14 +1,17 @@
-// Create a new tag
+// apps/web/src/utils/api/tagApi.ts
 import { api } from "@/lib/api";
-import { CreateTagRequest, Tag } from "@/types/tag";
+import {
+  Tag,
+  CreateTagRequest,
+  UpdateTagRequest,
+  TagSearchResult,
+} from "@/types/tag";
 
 const BASE = "/tags";
 
 /**
  * Create a new tag
  * POST /tags
- * @param data
- * @return Promise<Tag>
  */
 export async function createTag(data: CreateTagRequest): Promise<Tag> {
   const res = await api.post<Tag>(BASE, data);
@@ -18,24 +21,26 @@ export async function createTag(data: CreateTagRequest): Promise<Tag> {
 /**
  * Get all tags
  * GET /tags
- * @return Promise<Tag[]>
  */
 export async function getAllTags(): Promise<Tag[]> {
   const res = await api.get<Tag[]>(BASE);
   return res.data;
 }
 
+/**
+ * Search tags by prefix
+ * GET /tags/search?q=&limit=&cursor=&minChars=
+ */
 export async function searchTags(
   q: string,
   limit = 10,
   cursor?: string,
-): Promise<{
-  items: Tag[];
-  nextCursor: string | null;
-}> {
+  minChars?: number,
+): Promise<TagSearchResult> {
   const params = new URLSearchParams({ q, limit: String(limit) });
   if (cursor) params.set("cursor", cursor);
-  const res = await api.get<{ items: Tag[]; nextCursor: string | null }>(
+  if (minChars) params.set("minChars", String(minChars));
+  const res = await api.get<TagSearchResult>(
     `${BASE}/search?${params.toString()}`,
   );
   return res.data;
@@ -44,8 +49,6 @@ export async function searchTags(
 /**
  * Get a tag by ID
  * GET /tags/:id
- * @param id
- * @return Promise<Tag>
  */
 export async function getTagById(id: number): Promise<Tag> {
   const res = await api.get<Tag>(`${BASE}/${id}`);
@@ -55,24 +58,19 @@ export async function getTagById(id: number): Promise<Tag> {
 /**
  * Get a tag by name
  * GET /tags/name/:name
- * @param name
- * @return Promise<Tag>
  */
 export async function getTagByName(name: string): Promise<Tag> {
-  const res = await api.get<Tag>(`${BASE}/name/${name}`);
+  const res = await api.get<Tag>(`${BASE}/name/${encodeURIComponent(name)}`);
   return res.data;
 }
 
 /**
  * Update a tag
  * PATCH /tags/:id
- * @param id
- * @param data
- * @return Promise<Tag>
  */
 export async function updateTag(
   id: number,
-  data: CreateTagRequest,
+  data: UpdateTagRequest,
 ): Promise<Tag> {
   const res = await api.patch<Tag>(`${BASE}/${id}`, data);
   return res.data;
@@ -81,7 +79,6 @@ export async function updateTag(
 /**
  * Delete a tag
  * DELETE /tags/:id
- * @param id
  */
 export async function deleteTag(id: number): Promise<void> {
   await api.delete(`${BASE}/${id}`);
