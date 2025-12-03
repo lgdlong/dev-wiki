@@ -47,7 +47,7 @@ services:
   # ================================
   api_go:
     build:
-      context: ./api_go
+      context: ./apps/api_go
       dockerfile: Dockerfile
     container_name: dev-wiki-api-go
     restart: unless-stopped
