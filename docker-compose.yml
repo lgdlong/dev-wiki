@@ -89,8 +89,30 @@ services:
     networks:
       - dev-wiki-network
 
+  # ================================
+  # 4. CloudBeaver (Web-based Database Manager)
+  # ================================
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: dev-wiki-cloudbeaver
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8978:8978' # CloudBeaver web UI port
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+    environment:
+      CB_SERVER_NAME: Dev Wiki Database
+      CB_ADMIN_NAME: ${CB_ADMIN_NAME:-cbadmin}
+      CB_ADMIN_PASSWORD: ${CB_ADMIN_PASSWORD:-cbadmin123}
+    networks:
+      - dev-wiki-network
+
 volumes:
   postgres_data: {}
+  cloudbeaver_data: {}
   npm-data: {}
   npm-letsencrypt: {}
 
