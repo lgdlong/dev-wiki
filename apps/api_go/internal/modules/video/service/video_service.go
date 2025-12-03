@@ -1,7 +1,9 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"strconv"
 
 	"api_go/internal/domain"
 )
@@ -9,13 +11,15 @@ import (
 type videoService struct {
 	repo        domain.VideoRepository
 	videoTagSvc domain.VideoTagService
+	youtubeSvc  domain.YouTubeService
 }
 
 // NewVideoService creates a new VideoService instance
-func NewVideoService(repo domain.VideoRepository, videoTagSvc domain.VideoTagService) domain.VideoService {
+func NewVideoService(repo domain.VideoRepository, videoTagSvc domain.VideoTagService, youtubeSvc domain.YouTubeService) domain.VideoService {
 	return &videoService{
 		repo:        repo,
 		videoTagSvc: videoTagSvc,
+		youtubeSvc:  youtubeSvc,
 	}
 }
 
@@ -58,8 +62,33 @@ func (s *videoService) Create(dto domain.CreateVideoDTO) (*domain.VideoResponseD
 		return nil, errors.New("video with this YouTube ID already exists")
 	}
 
-	// 2. Create entity (YouTube metadata can be fetched externally)
-	video := &domain.Video{
+	// 2. Fetch YouTube metadata if YouTubeService is available
+	var video *domain.Video
+	if s.youtubeSvc != nil {
+		metadata, err := s.youtubeSvc.GetVideoMetadata(dto.YoutubeID)
+		if err != nil {
+			// Log error but don't fail - use provided data or defaults
+			video = s.createVideoFromDTO(dto)
+		} else {
+			// Use YouTube metadata
+			video = s.createVideoFromYouTubeMetadata(dto, metadata)
+		}
+	} else {
+		// No YouTube service, use provided data
+		video = s.createVideoFromDTO(dto)
+	}
+
+	// 3. Save
+	if err := s.repo.Create(video); err != nil {
+		return nil, err
+	}
+
+	return toResponseDTO(video), nil
+}
+
+// createVideoFromDTO creates a Video entity from DTO (without YouTube metadata)
+func (s *videoService) createVideoFromDTO(dto domain.CreateVideoDTO) *domain.Video {
+	return &domain.Video{
 		YoutubeID:    dto.YoutubeID,
 		Title:        dto.Title,
 		Description:  dto.Description,
@@ -69,13 +98,58 @@ func (s *videoService) Create(dto domain.CreateVideoDTO) (*domain.VideoResponseD
 		ChannelTitle: dto.ChannelTitle,
 		Metadata:     dto.Metadata,
 	}
+}
 
-	// 3. Save
-	if err := s.repo.Create(video); err != nil {
-		return nil, err
+// createVideoFromYouTubeMetadata creates a Video entity from YouTube metadata
+func (s *videoService) createVideoFromYouTubeMetadata(dto domain.CreateVideoDTO, metadata *domain.YouTubeMetadata) *domain.Video {
+	// Parse duration from ISO 8601 format (PT#M#S) to seconds
+	duration := parseDuration(metadata.Duration)
+
+	// Use provided uploaderID if available
+	uploaderID := dto.UploaderID
+
+	// Build metadata JSON
+	metadataJSON, _ := json.Marshal(metadata.Metadata)
+
+	return &domain.Video{
+		YoutubeID:    dto.YoutubeID,
+		Title:        metadata.Title,
+		Description:  &metadata.Description,
+		ThumbnailURL: &metadata.ThumbnailURL,
+		Duration:     &duration,
+		UploaderID:   uploaderID,
+		ChannelTitle: &metadata.ChannelTitle,
+		Metadata:     metadataJSON,
+	}
+}
+
+// parseDuration converts ISO 8601 duration (PT#M#S) to seconds
+func parseDuration(isoDuration string) int64 {
+	// Simple parser for YouTube duration format: PT#H#M#S
+	// Examples: PT1H2M3S, PT5M30S, PT45S
+	if len(isoDuration) < 3 || isoDuration[:2] != "PT" {
+		return 0
 	}
 
-	return toResponseDTO(video), nil
+	var hours, minutes, seconds int64
+	current := ""
+	for _, char := range isoDuration[2:] {
+		switch char {
+		case 'H':
+			hours, _ = strconv.ParseInt(current, 10, 64)
+			current = ""
+		case 'M':
+			minutes, _ = strconv.ParseInt(current, 10, 64)
+			current = ""
+		case 'S':
+			seconds, _ = strconv.ParseInt(current, 10, 64)
+			current = ""
+		default:
+			current += string(char)
+		}
+	}
+
+	return hours*3600 + minutes*60 + seconds
 }
 
 // FindAll retrieves all videos

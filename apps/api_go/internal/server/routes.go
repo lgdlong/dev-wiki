@@ -47,6 +47,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	api := r.Group("")
 
+	// Register auth routes (at root level: /login, /register, /me, /google, etc.)
+	s.authController.RegisterRoutes(api)
+
 	// Register module routes at root level
 	s.accountController.RegisterRoutes(api)
 	s.tagController.RegisterRoutes(api)

@@ -36,6 +36,8 @@ import (
 	account_controller "api_go/internal/modules/account/controller"
 	account_repo "api_go/internal/modules/account/repo"
 	account_service "api_go/internal/modules/account/service"
+	auth_controller "api_go/internal/modules/auth/controller"
+	auth_service "api_go/internal/modules/auth/service"
 	comment_controller "api_go/internal/modules/comment/controller"
 	comment_repo "api_go/internal/modules/comment/repo"
 	comment_service "api_go/internal/modules/comment/service"
@@ -54,6 +56,7 @@ import (
 	vote_controller "api_go/internal/modules/vote/controller"
 	vote_repo "api_go/internal/modules/vote/repo"
 	vote_service "api_go/internal/modules/vote/service"
+	"api_go/internal/modules/youtube"
 	"api_go/internal/server"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -87,6 +90,7 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 // AppModules holds all controllers/services for DI
 type AppModules struct {
 	AccountController  *account_controller.AccountController
+	AuthController     *auth_controller.AuthController
 	TagController      *tag_controller.TagController
 	TutorialController *tutorial_controller.TutorialController
 	VideoController    *video_controller.VideoController
@@ -96,11 +100,15 @@ type AppModules struct {
 }
 
 // initModules initializes all dependencies (repo, service, controller)
-func initModules(db *gorm.DB) *AppModules {
+func initModules(db *gorm.DB, cfg *config.Config) *AppModules {
 	// Account module
 	accountRepo := account_repo.NewAccountRepository(db)
 	accountService := account_service.NewAccountService(accountRepo)
 	accountController := account_controller.NewAccountController(accountService)
+
+	// Auth module (depends on account)
+	authService := auth_service.NewAuthService(cfg, accountService, accountRepo)
+	authController := auth_controller.NewAuthController(cfg, authService)
 
 	// Tag module
 	tagRepo := tag_repo.NewTagRepository(db)
@@ -118,8 +126,11 @@ func initModules(db *gorm.DB) *AppModules {
 	videoTagService := video_tag_service.NewVideoTagService(videoTagRepo, videoRepo, tagRepo)
 	videoTagController := video_tag_controller.NewVideoTagController(videoTagService)
 
-	// Video module (needs videoTagService)
-	videoService := video_service.NewVideoService(videoRepo, videoTagService)
+	// YouTube service (for fetching video metadata)
+	youtubeSvc := youtube.NewYouTubeService(cfg)
+
+	// Video module (needs videoTagService and youtubeService)
+	videoService := video_service.NewVideoService(videoRepo, videoTagService, youtubeSvc)
 	videoController := video_controller.NewVideoController(videoService)
 
 	// Comment module
@@ -134,6 +145,7 @@ func initModules(db *gorm.DB) *AppModules {
 
 	return &AppModules{
 		AccountController:  accountController,
+		AuthController:     authController,
 		TagController:      tagController,
 		TutorialController: tutorialController,
 		VideoController:    videoController,
@@ -152,12 +164,13 @@ func main() {
 	db := database.NewGormDB(cfg)
 
 	// Khởi tạo dependencies cho các module
-	modules := initModules(db)
+	modules := initModules(db, cfg)
 
 	// Truyền controller vào server.NewServer
 	srv := server.NewServer(
 		cfg,
 		modules.AccountController,
+		modules.AuthController,
 		modules.TagController,
 		modules.TutorialController,
 		modules.VideoController,

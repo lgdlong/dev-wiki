@@ -7,6 +7,7 @@ import (
 
 	"api_go/internal/config"
 	account_controller "api_go/internal/modules/account/controller"
+	auth_controller "api_go/internal/modules/auth/controller"
 	comment_controller "api_go/internal/modules/comment/controller"
 	tag_controller "api_go/internal/modules/tag/controller"
 	tutorial_controller "api_go/internal/modules/tutorial/controller"
@@ -18,6 +19,7 @@ import (
 type Server struct {
 	config             *config.Config
 	accountController  *account_controller.AccountController
+	authController     *auth_controller.AuthController
 	tagController      *tag_controller.TagController
 	tutorialController *tutorial_controller.TutorialController
 	videoController    *video_controller.VideoController
@@ -29,6 +31,7 @@ type Server struct {
 func NewServer(
 	cfg *config.Config,
 	accountCtrl *account_controller.AccountController,
+	authCtrl *auth_controller.AuthController,
 	tagCtrl *tag_controller.TagController,
 	tutorialCtrl *tutorial_controller.TutorialController,
 	videoCtrl *video_controller.VideoController,
@@ -39,6 +42,7 @@ func NewServer(
 	s := &Server{
 		config:             cfg,
 		accountController:  accountCtrl,
+		authController:     authCtrl,
 		tagController:      tagCtrl,
 		tutorialController: tutorialCtrl,
 		videoController:    videoCtrl,
