@@ -214,3 +214,18 @@ func (s *videoTagService) FindVideosByTag(tagID uint) ([]domain.VideoResponseDTO
 	}
 	return result, nil
 }
+
+// FindVideosByTagName returns all videos for a tag by tag name
+func (s *videoTagService) FindVideosByTagName(tagName string) ([]domain.VideoResponseDTO, error) {
+	// Find tag by name
+	tag, err := s.tagRepo.FindByName(tagName)
+	if err != nil {
+		return nil, err
+	}
+	if tag == nil {
+		return []domain.VideoResponseDTO{}, nil
+	}
+
+	// Reuse existing FindVideosByTag method
+	return s.FindVideosByTag(tag.ID)
+}

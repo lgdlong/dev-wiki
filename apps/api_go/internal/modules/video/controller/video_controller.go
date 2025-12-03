@@ -27,6 +27,7 @@ func (ctrl *VideoController) RegisterRoutes(r *gin.RouterGroup) {
 		videos.GET("/youtube/:youtubeId", ctrl.FindByYoutubeID)
 		videos.GET("/uploader/:uploaderId", ctrl.FindByUploaderID)
 		videos.GET("/tag/:tagId", ctrl.FindByTag)
+		videos.GET("/tag-name/:tagName", ctrl.FindByTagName)
 		videos.GET("/:id", ctrl.FindOne)
 		videos.PATCH("/:id", ctrl.Update)
 		videos.DELETE("/:id", ctrl.Remove)
@@ -179,6 +180,27 @@ func (ctrl *VideoController) FindByTag(c *gin.Context) {
 	}
 
 	videos, err := ctrl.service.FindByTagID(uint(tagID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, videos)
+}
+
+// FindByTagName handles GET /videos/tag-name/:tagName
+// @Summary Get videos by tag name
+// @Description Retrieve all videos with a specific tag by tag name
+// @Tags videos
+// @Produce json
+// @Param tagName path string true "Tag Name"
+// @Success 200 {array} domain.VideoResponseDTO
+// @Failure 500 {object} map[string]string
+// @Router /videos/tag-name/{tagName} [get]
+func (ctrl *VideoController) FindByTagName(c *gin.Context) {
+	tagName := c.Param("tagName")
+
+	videos, err := ctrl.service.FindByTagName(tagName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

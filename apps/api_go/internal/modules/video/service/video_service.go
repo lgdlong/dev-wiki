@@ -188,7 +188,8 @@ func (s *videoService) FindByTagID(tagID uint) ([]domain.VideoResponseDTO, error
 
 // FindByTagName retrieves videos by tag name
 func (s *videoService) FindByTagName(tagName string) ([]domain.VideoResponseDTO, error) {
-	// This would require querying tag first then video_tags
-	// For simplicity, return not implemented
-	return nil, errors.New("not implemented - use FindByTagID instead")
+	if s.videoTagSvc == nil {
+		return nil, errors.New("video tag service not available")
+	}
+	return s.videoTagSvc.FindVideosByTagName(tagName)
 }

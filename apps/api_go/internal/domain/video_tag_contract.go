@@ -7,6 +7,7 @@ type VideoTagService interface {
 	UpsertForVideo(dto UpsertVideoTagsDTO, createdBy *uint) ([]TagResponseDTO, error)
 	FindTagsByVideo(videoID uint) ([]TagResponseDTO, error)
 	FindVideosByTag(tagID uint) ([]VideoResponseDTO, error)
+	FindVideosByTagName(tagName string) ([]VideoResponseDTO, error)
 }
 
 // VideoTagRepository interface
