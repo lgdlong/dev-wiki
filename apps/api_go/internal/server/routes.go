@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,16 +28,26 @@ func (s *Server) RegisterRoutes() http.Handler {
 			"http://localhost:5173",
 			"http://127.0.0.1:3000",
 			"http://127.0.0.1:5173",
+			"https://dev-wiki.vercel.app", // Domain Vercel của bạn
+			"https://devwiki.lgdlong.site",
 		}
 	} else {
-		allowOrigins = []string{s.config.FrontendURL}
+		allowOrigins = []string{
+			s.config.FrontendURL, // Biến này phải đúng là https://...
+			"https://dev-wiki.vercel.app",
+			"https://devwiki.lgdlong.site",
+		}
 	}
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     allowOrigins,
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowOrigins: allowOrigins,
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		// QUAN TRỌNG: Phải thêm "X-User-ID" vì frontend của bạn dùng nó
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-User-ID", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		// MaxAge giúp browser cache kết quả pre-flight request, đỡ gọi OPTIONS liên tục
+		MaxAge: 12 * time.Hour,
 	}))
 
 	r.GET("/", s.HelloWorldHandler)
@@ -47,10 +58,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	api := r.Group("")
 
-	// Register auth routes (at root level: /login, /register, /me, /google, etc.)
+	// Register auth routes
 	s.authController.RegisterRoutes(api)
 
-	// Register module routes at root level
+	// Register module routes
 	s.accountController.RegisterRoutes(api)
 	s.tagController.RegisterRoutes(api)
 	s.tutorialController.RegisterRoutes(api)
