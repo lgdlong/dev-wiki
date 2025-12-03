@@ -1,0 +1,1963 @@
+basePath: /
+definitions:
+  api_go_internal_domain.AccountResponseDTO:
+    properties:
+      avatar_url:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  api_go_internal_domain.CommentResponseDTO:
+    properties:
+      authorId:
+        type: integer
+      authorName:
+        type: string
+      content:
+        type: string
+      createdAt:
+        type: string
+      entityId:
+        type: integer
+      entityType:
+        $ref: '#/definitions/api_go_internal_domain.EntityType'
+      id:
+        type: integer
+      parentId:
+        type: integer
+      replies:
+        items:
+          $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        type: array
+      updatedAt:
+        type: string
+      upvotes:
+        type: integer
+    type: object
+  api_go_internal_domain.CreateAccountDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  api_go_internal_domain.CreateCommentDTO:
+    properties:
+      authorId:
+        type: integer
+      content:
+        type: string
+      entityId:
+        type: integer
+      entityType:
+        $ref: '#/definitions/api_go_internal_domain.EntityType'
+      parentId:
+        type: integer
+    required:
+    - authorId
+    - content
+    - entityId
+    - entityType
+    type: object
+  api_go_internal_domain.CreateTagDTO:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  api_go_internal_domain.CreateTutorialDTO:
+    properties:
+      content:
+        type: string
+      title:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  api_go_internal_domain.CreateVideoDTO:
+    properties:
+      channelTitle:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      metadata:
+        items:
+          type: integer
+        type: array
+      thumbnailUrl:
+        type: string
+      title:
+        type: string
+      uploaderId:
+        type: integer
+      youtubeId:
+        type: string
+    required:
+    - youtubeId
+    type: object
+  api_go_internal_domain.CreateVideoTagDTO:
+    properties:
+      tagId:
+        type: integer
+      videoId:
+        type: integer
+    required:
+    - tagId
+    - videoId
+    type: object
+  api_go_internal_domain.CreateVoteDTO:
+    properties:
+      entityId:
+        type: integer
+      entityType:
+        $ref: '#/definitions/api_go_internal_domain.EntityType'
+      userId:
+        type: integer
+      voteType:
+        $ref: '#/definitions/api_go_internal_domain.VoteType'
+    required:
+    - entityId
+    - entityType
+    - userId
+    - voteType
+    type: object
+  api_go_internal_domain.EntityType:
+    enum:
+    - tutorial
+    - video
+    - product
+    type: string
+    x-enum-varnames:
+    - EntityTypeTutorial
+    - EntityTypeVideo
+    - EntityTypeProduct
+  api_go_internal_domain.TagResponseDTO:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  api_go_internal_domain.TagSearchResultDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        type: array
+      nextCursor:
+        type: string
+    type: object
+  api_go_internal_domain.TutorialDetailDTO:
+    properties:
+      authorAvatarUrl:
+        type: string
+      authorName:
+        type: string
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      isPublished:
+        type: boolean
+      slug:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        type: array
+      title:
+        type: string
+      updatedAt:
+        type: string
+      views:
+        type: integer
+    type: object
+  api_go_internal_domain.TutorialListItemDTO:
+    properties:
+      authorAvatarUrl:
+        type: string
+      authorName:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  api_go_internal_domain.UpdateAccountDTO:
+    properties:
+      avatar_url:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  api_go_internal_domain.UpdateCommentDTO:
+    properties:
+      content:
+        type: string
+      upvotes:
+        type: integer
+    type: object
+  api_go_internal_domain.UpdateTagDTO:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    type: object
+  api_go_internal_domain.UpdateTutorialDTO:
+    properties:
+      content:
+        minLength: 1
+        type: string
+      title:
+        maxLength: 100
+        minLength: 1
+        type: string
+    type: object
+  api_go_internal_domain.UpdateVideoDTO:
+    properties:
+      channelTitle:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      metadata:
+        items:
+          type: integer
+        type: array
+      thumbnailUrl:
+        type: string
+      title:
+        type: string
+      uploaderId:
+        type: integer
+      youtubeId:
+        type: string
+    type: object
+  api_go_internal_domain.UpdateVoteDTO:
+    properties:
+      entityId:
+        type: integer
+      entityType:
+        $ref: '#/definitions/api_go_internal_domain.EntityType'
+      userId:
+        type: integer
+      voteType:
+        $ref: '#/definitions/api_go_internal_domain.VoteType'
+    type: object
+  api_go_internal_domain.VideoResponseDTO:
+    properties:
+      channelTitle:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      metadata:
+        items:
+          type: integer
+        type: array
+      thumbnailUrl:
+        type: string
+      title:
+        type: string
+      uploaderId:
+        type: integer
+      youtubeId:
+        type: string
+    type: object
+  api_go_internal_domain.VideoTagResponseDTO:
+    properties:
+      createdAt:
+        type: string
+      createdBy:
+        type: integer
+      id:
+        type: integer
+      tagId:
+        type: integer
+      videoId:
+        type: integer
+    type: object
+  api_go_internal_domain.VoteResponseDTO:
+    properties:
+      entityId:
+        type: integer
+      entityType:
+        $ref: '#/definitions/api_go_internal_domain.EntityType'
+      id:
+        type: integer
+      userId:
+        type: integer
+      voteType:
+        $ref: '#/definitions/api_go_internal_domain.VoteType'
+    type: object
+  api_go_internal_domain.VoteType:
+    enum:
+    - up
+    - down
+    type: string
+    x-enum-varnames:
+    - VoteTypeUp
+    - VoteTypeDown
+host: localhost:8080
+info:
+  contact:
+    email: support@devwiki.io
+    name: Dev Wiki Support
+    url: https://github.com/lgdlong/dev-wiki
+  description: API documentation for Dev Wiki - Developer Knowledge Sharing Platform
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Dev Wiki API
+  version: "1.0"
+paths:
+  /accounts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.AccountResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create Account DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateAccountDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.AccountResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new account
+      tags:
+      - accounts
+  /accounts/{id}:
+    delete:
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an account
+      tags:
+      - accounts
+    get:
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.AccountResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an account by ID
+      tags:
+      - accounts
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Account DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateAccountDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.AccountResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an account
+      tags:
+      - accounts
+  /comments:
+    get:
+      description: Retrieve all comments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all comments
+      tags:
+      - comments
+    post:
+      consumes:
+      - application/json
+      description: Create a new comment on an entity
+      parameters:
+      - description: Create Comment DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateCommentDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new comment
+      tags:
+      - comments
+  /comments/{id}:
+    delete:
+      description: Delete a comment by ID
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a comment
+      tags:
+      - comments
+    get:
+      description: Retrieve a single comment by its ID
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a comment by ID
+      tags:
+      - comments
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Comment DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateCommentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a comment
+      tags:
+      - comments
+  /comments/{id}/downvote:
+    patch:
+      description: Decrement the upvote count of a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Downvote a comment
+      tags:
+      - comments
+  /comments/{id}/upvote:
+    patch:
+      description: Increment the upvote count of a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upvote a comment
+      tags:
+      - comments
+  /comments/author/{authorId}:
+    get:
+      description: Retrieve all comments by a specific author
+      parameters:
+      - description: Author User ID
+        in: path
+        name: authorId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get comments by author
+      tags:
+      - comments
+  /comments/entity/{entityType}/{entityId}:
+    get:
+      description: Retrieve all comments for a specific entity (video, tutorial, etc.)
+      parameters:
+      - description: Entity Type (video, tutorial)
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get comments by entity
+      tags:
+      - comments
+  /comments/replies/{parentId}:
+    get:
+      description: Retrieve all replies to a specific comment
+      parameters:
+      - description: Parent Comment ID
+        in: path
+        name: parentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.CommentResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get comment replies
+      tags:
+      - comments
+  /tags:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all tags
+      tags:
+      - tags
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create Tag DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateTagDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tag
+      tags:
+      - tags
+  /tags/{id}:
+    delete:
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a tag
+      tags:
+      - tags
+    get:
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a tag by ID
+      tags:
+      - tags
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Tag DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateTagDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a tag
+      tags:
+      - tags
+  /tags/{id}/videos:
+    get:
+      description: Retrieve all videos associated with a specific tag
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all videos for a tag
+      tags:
+      - video-tags
+  /tags/name/{name}:
+    get:
+      parameters:
+      - description: Tag name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a tag by name
+      tags:
+      - tags
+  /tags/search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: Limit results (default 10, max 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - description: Minimum characters to start search (default 2)
+        in: query
+        name: minChars
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TagSearchResultDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search tags by prefix
+      tags:
+      - tags
+  /tutorials:
+    get:
+      description: Retrieve all tutorials list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.TutorialListItemDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all tutorials
+      tags:
+      - tutorials
+    post:
+      consumes:
+      - application/json
+      description: Create a new tutorial article
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User-ID
+        required: true
+        type: integer
+      - description: Create Tutorial DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateTutorialDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TutorialDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tutorial
+      tags:
+      - tutorials
+  /tutorials/{id}:
+    delete:
+      description: Delete a tutorial by ID
+      parameters:
+      - description: Tutorial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: header
+        name: X-User-ID
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a tutorial
+      tags:
+      - tutorials
+    get:
+      description: Retrieve a single tutorial by its ID
+      parameters:
+      - description: Tutorial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TutorialDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a tutorial by ID
+      tags:
+      - tutorials
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing tutorial
+      parameters:
+      - description: Tutorial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: header
+        name: X-User-ID
+        type: integer
+      - description: Update Tutorial DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateTutorialDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TutorialDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a tutorial
+      tags:
+      - tutorials
+  /tutorials/slug/{slug}:
+    get:
+      description: Retrieve a tutorial by its URL slug
+      parameters:
+      - description: Tutorial Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.TutorialDetailDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a tutorial by slug
+      tags:
+      - tutorials
+  /video-tags:
+    post:
+      consumes:
+      - application/json
+      description: Create a new video-tag mapping
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User-ID
+        type: integer
+      - description: Create VideoTag DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateVideoTagDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VideoTagResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Attach a tag to a video
+      tags:
+      - video-tags
+  /video-tags/{videoId}/{tagId}:
+    delete:
+      description: Remove a video-tag mapping
+      parameters:
+      - description: Video ID
+        in: path
+        name: videoId
+        required: true
+        type: integer
+      - description: Tag ID
+        in: path
+        name: tagId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Detach a tag from a video
+      tags:
+      - video-tags
+  /videos:
+    get:
+      description: Retrieve all videos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all videos
+      tags:
+      - videos
+    post:
+      consumes:
+      - application/json
+      description: Create a new video entry with YouTube ID
+      parameters:
+      - description: Create Video DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateVideoDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new video
+      tags:
+      - videos
+  /videos/{id}:
+    delete:
+      description: Delete a video by ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a video
+      tags:
+      - videos
+    get:
+      description: Retrieve a single video by its ID
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a video by ID
+      tags:
+      - videos
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing video
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Video DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateVideoDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a video
+      tags:
+      - videos
+  /videos/{id}/tags:
+    get:
+      description: Retrieve all tags associated with a specific video
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all tags for a video
+      tags:
+      - video-tags
+    patch:
+      consumes:
+      - application/json
+      description: Replace all tags for a video with new set
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: header
+        name: X-User-ID
+        type: integer
+      - description: Tag IDs
+        in: body
+        name: body
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.TagResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update all tags for a video
+      tags:
+      - video-tags
+  /videos/tag/{tagId}:
+    get:
+      description: Retrieve all videos with a specific tag
+      parameters:
+      - description: Tag ID
+        in: path
+        name: tagId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get videos by tag
+      tags:
+      - videos
+  /videos/uploader/{uploaderId}:
+    get:
+      description: Retrieve all videos uploaded by a specific user
+      parameters:
+      - description: Uploader User ID
+        in: path
+        name: uploaderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get videos by uploader
+      tags:
+      - videos
+  /videos/youtube/{youtubeId}:
+    get:
+      description: Retrieve a video by its YouTube video ID
+      parameters:
+      - description: YouTube Video ID
+        in: path
+        name: youtubeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a video by YouTube ID
+      tags:
+      - videos
+  /votes:
+    get:
+      description: Retrieve all votes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all votes
+      tags:
+      - votes
+    post:
+      consumes:
+      - application/json
+      description: Create a new vote on an entity
+      parameters:
+      - description: Create Vote DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateVoteDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new vote
+      tags:
+      - votes
+  /votes/{id}:
+    delete:
+      description: Delete a vote by ID
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a vote
+      tags:
+      - votes
+    get:
+      description: Retrieve a single vote by its ID
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a vote by ID
+      tags:
+      - votes
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing vote
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Vote DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.UpdateVoteDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a vote
+      tags:
+      - votes
+  /votes/change:
+    post:
+      consumes:
+      - application/json
+      description: Change vote type or remove if same type
+      parameters:
+      - description: Vote DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.CreateVoteDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+      summary: Change or toggle vote
+      tags:
+      - votes
+  /votes/entity/{entityType}/{entityId}:
+    get:
+      description: Retrieve all votes for a specific entity
+      parameters:
+      - description: Entity Type (video, tutorial, comment)
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by entity
+      tags:
+      - votes
+  /votes/entity/{entityType}/{entityId}/count:
+    get:
+      description: Get upvote and downvote counts for a specific entity
+      parameters:
+      - description: Entity Type (video, tutorial, comment)
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              format: int64
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get vote counts for entity
+      tags:
+      - votes
+  /votes/user/{userId}:
+    get:
+      description: Retrieve all votes made by a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by user
+      tags:
+      - votes
+  /votes/user/{userId}/entity/{entityType}/{entityId}:
+    delete:
+      description: Remove a user's vote on a specific entity
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Entity Type (video, tutorial, comment)
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove user's vote on entity
+      tags:
+      - votes
+    get:
+      description: Retrieve a user's vote on a specific entity
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Entity Type (video, tutorial, comment)
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.VoteResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user's vote on entity
+      tags:
+      - votes
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
