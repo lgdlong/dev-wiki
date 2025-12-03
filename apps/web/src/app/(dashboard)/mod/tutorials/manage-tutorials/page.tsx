@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "./data-table";
 import { makeTutorialColumns } from "./columns";
-import type { Tutorial } from "@/types/tutorial";
+import type { TutorialListItem } from "@/types/tutorial";
 import { getAllTutorials, deleteTutorial } from "@/utils/api/tutorialApi";
 import { Plus, RefreshCw } from "lucide-react";
 import type { SortingState, ColumnDef } from "@tanstack/react-table";
@@ -22,7 +22,7 @@ export default function ManageTutorialPage() {
   const router = useRouter();
 
   // 2) STATE
-  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [tutorials, setTutorials] = useState<TutorialListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -63,14 +63,14 @@ export default function ManageTutorialPage() {
     if (!q) return tutorials;
     const k = q.toLowerCase();
     return tutorials.filter((t) => {
-      const haystack = [t.title, t.content, String(t.authorId)]
+      const haystack = [t.title, t.authorName]
         .filter(Boolean)
         .map((x) => String(x).toLowerCase());
       return haystack.some((s) => s.includes(k));
     });
   }, [tutorials, q]);
 
-  const columns: ColumnDef<Tutorial>[] = useMemo(
+  const columns: ColumnDef<TutorialListItem>[] = useMemo(
     () =>
       makeTutorialColumns({
         onEdit: (id: number) => router.push(`/mod/tutorials/${id}/edit`),
