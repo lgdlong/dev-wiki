@@ -31,6 +31,7 @@ func toResponseDTO(account *domain.Account) *domain.AccountResponseDTO {
 		ID:        account.ID,
 		Email:     account.Email,
 		Name:      account.Name,
+		Role:      account.Role,
 		AvatarURL: account.AvatarURL,
 	}
 }
@@ -43,6 +44,7 @@ func toResponseDTOList(accounts []domain.Account) []domain.AccountResponseDTO {
 			ID:        account.ID,
 			Email:     account.Email,
 			Name:      account.Name,
+			Role:      account.Role,
 			AvatarURL: account.AvatarURL,
 		}
 	}

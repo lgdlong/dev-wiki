@@ -4,6 +4,7 @@ type AccountResponseDTO struct {
 	ID        uint    `json:"id"`
 	Email     string  `json:"email"`
 	Name      string  `json:"name"`
+	Role      string  `json:"role,omitempty"`
 	AvatarURL *string `json:"avatar_url,omitempty"`
 }
 

@@ -5,6 +5,7 @@ export interface Account {
   id: number;
   email: string;
   name: string;
+  role?: AccountRole;
   avatar_url?: string;
 }
 
