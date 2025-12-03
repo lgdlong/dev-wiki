@@ -10,6 +10,28 @@ definitions:
         type: integer
       name:
         type: string
+      role:
+        type: string
+    type: object
+  api_go_internal_domain.AuthAccountResponse:
+    properties:
+      avatar_url:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  api_go_internal_domain.AuthResponseDTO:
+    properties:
+      access_token:
+        type: string
+      account:
+        $ref: '#/definitions/api_go_internal_domain.AuthAccountResponse'
     type: object
   api_go_internal_domain.CommentResponseDTO:
     properties:
@@ -149,6 +171,38 @@ definitions:
     - EntityTypeTutorial
     - EntityTypeVideo
     - EntityTypeProduct
+  api_go_internal_domain.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  api_go_internal_domain.MeResponseDTO:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/api_go_internal_domain.AccountResponseDTO'
+    type: object
+  api_go_internal_domain.RegisterDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   api_go_internal_domain.TagResponseDTO:
     properties:
       description:
@@ -798,6 +852,141 @@ paths:
       summary: Get comment replies
       tags:
       - comments
+  /google:
+    get:
+      description: Redirect to Google OAuth login page
+      responses:
+        "302":
+          description: Found
+      summary: Start Google OAuth
+      tags:
+      - auth
+  /google-redirect:
+    get:
+      description: Handle Google OAuth callback and authenticate user
+      parameters:
+      - description: OAuth code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: OAuth state
+        in: query
+        name: state
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Google OAuth callback
+      tags:
+      - auth
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.AuthResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login user
+      tags:
+      - auth
+  /logout:
+    post:
+      description: Clear authentication cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout user
+      tags:
+      - auth
+  /me:
+    get:
+      description: Get the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_go_internal_domain.MeResponseDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: Register DTO
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/api_go_internal_domain.RegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
   /tags:
     get:
       produces:
