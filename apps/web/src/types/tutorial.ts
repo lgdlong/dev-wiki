@@ -1,36 +1,45 @@
 // apps/web/src/types/tutorial.ts
 import type { Tag } from "./tag";
 
-export interface Tutorial {
+// Response DTO for list view (matches TutorialListItemDTO in api_go)
+export interface TutorialListItem {
   id: number;
   title: string;
-  content: string; // markdown or text
-  authorId: number; // khóa ngoại tới User
-  authorName?: string;
-  authorAvatarUrl?: string;
-  views: number; // mặc định = 0
-  tags?: Tag[]; // hoặc mảng Tag nếu backend có entity riêng
-  slug?: string; // SEO-friendly URL segment
-  isPublished: boolean; // mặc định = true
-  createdAt: string; // ISO string (yyyy-mm-ddTHH:mm:ssZ)
-  updatedAt: string; // ISO string (yyyy-mm-ddTHH:mm:ssZ)
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+  authorName: string;
+  authorAvatarUrl: string;
 }
 
-// Interface for creating a tutorial
+// Response DTO for detail view (matches TutorialDetailDTO in api_go)
+export interface TutorialDetail {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  views: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+  authorName: string;
+  authorAvatarUrl: string;
+  tags: Tag[];
+}
+
+// Legacy interface for backward compatibility
+export interface Tutorial extends TutorialDetail {
+  authorId?: number;
+}
+
+// Request DTO for creating a tutorial (matches CreateTutorialDTO in api_go)
 export interface CreateTutorialRequest {
   title: string;
   content: string;
-  author_id?: number;
-  tags?: string[];
-  slug?: string;
 }
 
-// Interface for updating a tutorial (partial Tutorial without id/createdAt)
+// Request DTO for updating a tutorial (matches UpdateTutorialDTO in api_go)
 export interface UpdateTutorialRequest {
   title?: string;
   content?: string;
-  author_id?: number;
-  views?: number;
-  tags?: string[];
-  slug?: string;
 }

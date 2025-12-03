@@ -1,90 +1,136 @@
 import { api } from "@/lib/api";
 import {
   Tutorial,
+  TutorialListItem,
+  TutorialDetail,
   CreateTutorialRequest,
   UpdateTutorialRequest,
 } from "@/types/tutorial";
 import { Tag } from "@/types/tag";
 
-export async function getAllTutorials(): Promise<Tutorial[]> {
-  const res = await api.get<Tutorial[]>("/tutorials");
+/**
+ * Get all tutorials (list view)
+ * GET /tutorials
+ */
+export async function getAllTutorials(): Promise<TutorialListItem[]> {
+  const res = await api.get<TutorialListItem[]>("/tutorials");
   return res.data;
 }
 
-export async function getTutorialById(id: number): Promise<Tutorial> {
-  const res = await api.get<Tutorial>(`/tutorials/${id}`);
+/**
+ * Get a tutorial by ID (detail view)
+ * GET /tutorials/:id
+ */
+export async function getTutorialById(id: number): Promise<TutorialDetail> {
+  const res = await api.get<TutorialDetail>(`/tutorials/${id}`);
   return res.data;
 }
 
-export async function getTutorialsByAuthor(
-  authorId: number,
-): Promise<Tutorial[]> {
-  const res = await api.get<Tutorial[]>(`/tutorials/author/${authorId}`);
+/**
+ * Get a tutorial by slug (detail view)
+ * GET /tutorials/slug/:slug
+ */
+export async function getTutorialBySlug(slug: string): Promise<TutorialDetail> {
+  const res = await api.get<TutorialDetail>(`/tutorials/slug/${slug}`);
   return res.data;
 }
 
-export async function getTutorialBySlug(slug: string): Promise<Tutorial> {
-  const res = await api.get<Tutorial>(`/tutorials/slug/${slug}`);
-  return res.data;
-}
-
-export async function getTutorialPublishedById(id: number): Promise<Tutorial> {
-  const res = await api.get<Tutorial>(`/tutorials/${id}/published`);
-  return res.data;
-}
-
-export async function getTutorialPublishedBySlug(
-  slug: string,
-): Promise<Tutorial> {
-  const res = await api.get<Tutorial>(`/tutorials/slug/${slug}/published`);
-  return res.data;
-}
-
+/**
+ * Create a new tutorial
+ * POST /tutorials
+ * Requires X-User-ID header
+ */
 export async function createTutorial(
   data: CreateTutorialRequest,
-): Promise<Tutorial> {
+  userId: number,
+): Promise<TutorialDetail> {
   const body = {
     title: data.title,
     content: data.content,
   };
-  const res = await api.post<Tutorial>("/tutorials", body);
+  const res = await api.post<TutorialDetail>("/tutorials", body, {
+    headers: { "X-User-ID": userId.toString() },
+  });
   return res.data;
 }
 
+/**
+ * Update a tutorial
+ * PATCH /tutorials/:id
+ * Requires X-User-ID header
+ */
 export async function updateTutorial(
   id: number,
   data: UpdateTutorialRequest,
-): Promise<Tutorial> {
-  const res = await api.patch<Tutorial>(`/tutorials/${id}`, data);
+  userId?: number,
+): Promise<TutorialDetail> {
+  const headers = userId ? { "X-User-ID": userId.toString() } : {};
+  const res = await api.patch<TutorialDetail>(`/tutorials/${id}`, data, {
+    headers,
+  });
   return res.data;
 }
 
-export async function deleteTutorial(id: number): Promise<void> {
-  await api.delete(`/tutorials/${id}`);
+/**
+ * Delete a tutorial
+ * DELETE /tutorials/:id
+ * Requires X-User-ID header
+ */
+export async function deleteTutorial(
+  id: number,
+  userId?: number,
+): Promise<void> {
+  const headers = userId ? { "X-User-ID": userId.toString() } : {};
+  await api.delete(`/tutorials/${id}`, { headers });
 }
 
-export async function upsertTutorialTags(
-  tutorialId: number,
-  tagIds: number[],
-): Promise<{ success: boolean }> {
-  const res = await api.patch<{ success: boolean }>(
-    `/tutorial-tags/${tutorialId}/tags`,
-    { tagIds },
-  );
-  return res.data;
-}
+// ==================== Tutorial Tags (NOT YET IMPLEMENTED IN API_GO) ====================
+// These functions are stubs for backward compatibility.
+// Tutorial tags are included in TutorialDetail response from getTutorialById/getTutorialBySlug.
+// Consider using those instead of fetching tags separately.
 
+/**
+ * @deprecated Use getTutorialById().tags instead - tags are now included in TutorialDetail
+ * Get tags for a tutorial
+ */
 export async function getTutorialTags(tutorialId: number): Promise<Tag[]> {
-  const res = await api.get<Tag[]>(`/tutorial-tags/${tutorialId}/tags`);
-  return res.data;
+  console.warn(
+    "[tutorialApi] getTutorialTags is deprecated. Use getTutorialById().tags instead.",
+  );
+  // Fetch the full tutorial and return its tags
+  try {
+    const tutorial = await getTutorialById(tutorialId);
+    return tutorial.tags || [];
+  } catch {
+    return [];
+  }
 }
 
-// Get all tutorials by tag name (calls /tutorial-tags/tag-name/:name/tutorials)
-export async function getTutorialsByTagName(
-  tagName: string,
-): Promise<Tutorial[]> {
-  const res = await api.get<Tutorial[]>(
-    `/tutorial-tags/tag-name/${encodeURIComponent(tagName)}/tutorials`,
+/**
+ * @deprecated Tutorial-tags endpoints are not yet implemented in api_go
+ * Upsert tags for a tutorial
+ */
+export async function upsertTutorialTags(
+  _tutorialId: number,
+  _tagIds: number[],
+): Promise<{ success: boolean }> {
+  console.warn(
+    "[tutorialApi] upsertTutorialTags is not yet implemented in api_go backend.",
   );
-  return res.data;
+  // TODO: Implement when tutorial-tags module is added to api_go
+  return { success: false };
+}
+
+/**
+ * @deprecated Tutorial-tags endpoints are not yet implemented in api_go
+ * Get tutorials by tag name
+ */
+export async function getTutorialsByTagName(
+  _tagName: string,
+): Promise<TutorialListItem[]> {
+  console.warn(
+    "[tutorialApi] getTutorialsByTagName is not yet implemented in api_go backend.",
+  );
+  // TODO: Implement when tutorial-tags module is added to api_go
+  return [];
 }
