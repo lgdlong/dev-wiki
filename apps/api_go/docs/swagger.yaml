@@ -1527,6 +1527,33 @@ paths:
       summary: Update all tags for a video
       tags:
       - video-tags
+  /videos/tag-name/{tagName}:
+    get:
+      description: Retrieve all videos with a specific tag by tag name
+      parameters:
+      - description: Tag Name
+        in: path
+        name: tagName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api_go_internal_domain.VideoResponseDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get videos by tag name
+      tags:
+      - videos
   /videos/tag/{tagId}:
     get:
       description: Retrieve all videos with a specific tag

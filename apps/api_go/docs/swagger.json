@@ -1539,6 +1539,47 @@
                 }
             }
         },
+        "/videos/tag-name/{tagName}": {
+            "get": {
+                "description": "Retrieve all videos with a specific tag by tag name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "videos"
+                ],
+                "summary": "Get videos by tag name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tag Name",
+                        "name": "tagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api_go_internal_domain.VideoResponseDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/videos/tag/{tagId}": {
             "get": {
                 "description": "Retrieve all videos with a specific tag",
