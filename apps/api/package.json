@@ -34,7 +34,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/pg": "^8.15.4",
-    "axios": "^1.11.0",
+    "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
